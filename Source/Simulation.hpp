@@ -9,6 +9,7 @@
 #include "Stencils/BFInputStencils.hpp"
 #include "Stencils/BFStepInitStencil.hpp"
 #include "Stencils/FGHStencil.hpp"
+#include "Stencils/RHSStencil.hpp"
 #include "Stencils/InitTaylorGreenFlowFieldStencil.hpp"
 #include "Stencils/MaxUStencil.hpp"
 #include "Stencils/MovingWallStencils.hpp"
@@ -17,6 +18,11 @@
 #include "Stencils/PeriodicBoundaryStencils.hpp"
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKStencil.hpp"
+
+// #include <cfenv>
+// #include <csignal>
+// #include <cstdio>
+// #pragma STDC FENV_ACCESS ON
 
 class Simulation {
 protected:
@@ -40,6 +46,9 @@ protected:
   Stencils::ObstacleStencil obstacleStencil_;
   FieldIterator<FlowField>  velocityIterator_;
   FieldIterator<FlowField>  obstacleIterator_;
+
+  Stencils::RHSStencil     rhsStencil_;
+  FieldIterator<FlowField> rhsIterator_;
 
   std::unique_ptr<Solvers::LinearSolver> solver_;
 
