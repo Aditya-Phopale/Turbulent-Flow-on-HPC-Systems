@@ -728,4 +728,21 @@ namespace Stencils {
             - dvwdy(localVelocity, parameters, localMeshsize) + parameters.environment.gz);
   }
 
+  inline RealType computeRHS2D(
+    RealType* const vp, RealType* const vf, RealType* const vg, const RealType* const lm, RealType dt
+  ) {
+    auto term1 = (vp[0] - vf[0])/lm[mapd(0,0,0,0)];
+    auto term2 = (vp[1] - vg[1])/lm[mapd(0,0,0,1)];
+    return (term1 + term2)/dt;
+  }
+
+  inline RealType computeRHS3D(
+    RealType* const vp, RealType* const vf, RealType* const vg, RealType* const vh,  const RealType* const lm, RealType dt
+  ) {
+    auto term1 = (vp[0] - vf[0])/lm[mapd(0,0,0,0)];
+    auto term2 = (vp[1] - vg[1])/lm[mapd(0,0,0,1)];
+    auto term3 = (vp[2] - vh[2])/lm[mapd(0,0,0,2)];
+    return (term1 + term2 + term3)/dt;
+  }
+
 } // namespace Stencils
