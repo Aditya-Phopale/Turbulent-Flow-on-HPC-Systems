@@ -1,5 +1,10 @@
 #include "StdAfx.hpp"
 
+// #include <cfenv>
+// #include <csignal>
+// #include <cstdio>
+// #pragma STDC FENV_ACCESS ON
+
 #include "Clock.hpp"
 #include "Configuration.hpp"
 #include "MeshsizeFactory.hpp"
@@ -39,7 +44,7 @@ int main(int argc, char* argv[]) {
 #else
   spdlog::info("Running in Release mode");
 #endif
-
+// argv[1] = "ExampleCases/ChannelBackwardFacingStep3D.xml";
   if (!argv[1]) {
     spdlog::error("You need to pass a configuration file: mpirun -np 1 ./NS-EOF ExampleCases/Cavity2D.xml.");
     throw std::runtime_error("Argument parsing error");
@@ -108,9 +113,10 @@ int main(int argc, char* argv[]) {
 
   Clock clock;
   // Time loop
+  
   while (time < parameters.simulation.finalTime) {
-    simulation->solveTimestep();
 
+    simulation->solveTimestep();
     timeSteps++;
     time += parameters.timestep.dt;
 
