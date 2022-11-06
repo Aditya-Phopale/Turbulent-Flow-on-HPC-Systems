@@ -74,7 +74,7 @@ void Simulation::initializeFlowField() {
 }
 
 void Simulation::solveTimestep() {
-  // Determine and set max. timestep which is allowed in this simulation 
+  // Determine and set max. timestep which is allowed in this simulation  
   setTimeStep();
   // Compute FGH
   fghIterator_.iterate(); 
