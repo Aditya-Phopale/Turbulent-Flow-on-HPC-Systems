@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 #else
   spdlog::info("Running in Release mode");
 #endif
-// argv[1] = "ExampleCases/ChannelBackwardFacingStep3D.xml";
+
   if (!argv[1]) {
     spdlog::error("You need to pass a configuration file: mpirun -np 1 ./NS-EOF ExampleCases/Cavity2D.xml.");
     throw std::runtime_error("Argument parsing error");
