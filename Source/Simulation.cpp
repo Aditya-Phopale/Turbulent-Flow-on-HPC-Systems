@@ -16,6 +16,8 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   wallFGHIterator_(globalBoundaryFactory_.getGlobalBoundaryFGHIterator(flowField_)),
   fghStencil_(parameters),
   fghIterator_(flowField_, parameters, fghStencil_),
+  rhsStencil_(parameters),
+  rhsIterator_(flowField_, parameters, rhsStencil_),
   velocityStencil_(parameters),
   obstacleStencil_(parameters),
   velocityIterator_(flowField_, parameters, velocityStencil_),
@@ -78,6 +80,7 @@ void Simulation::solveTimestep() {
   // Set global boundary values
   wallFGHIterator_.iterate();
   // TODO WS1: compute the right hand side (RHS)
+  rhsIterator_.iterate();
   // Solve for pressure
   solver_->solve();
   // TODO WS2: communicate pressure values
@@ -106,21 +109,26 @@ void Simulation::setTimeStep() {
   maxUStencil_.reset();
   maxUFieldIterator_.iterate();
   maxUBoundaryIterator_.iterate();
+
   if (parameters_.geometry.dim == 3) {
     factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
-    parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2]);
+    parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2] + std::numeric_limits<double>::min());
   } else {
-    parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0]);
+    parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0] + std::numeric_limits<double>::min());
   }
 
-  // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
-  // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
   localMin = std::min(
     parameters_.flow.Re / (2 * factor),
     std::min(
-      parameters_.timestep.dt, std::min(1 / (maxUStencil_.getMaxValues()[0]), 1 / (maxUStencil_.getMaxValues()[1]))
+      parameters_.timestep.dt,
+      std::min(
+        1 / (maxUStencil_.getMaxValues()[1] + std::numeric_limits<double>::min()),
+        1 / (maxUStencil_.getMaxValues()[0] + std::numeric_limits<double>::min())
+      )
     )
   );
+  // if (fetestexcept(FE_DIVBYZERO))
+  //     std::cout <<"Exception occured\n";
 
   // Here, we select the type of operation before compiling. This allows to use the correct
   // data type for MPI. Not a concern for small simulations, but useful if using heterogeneous

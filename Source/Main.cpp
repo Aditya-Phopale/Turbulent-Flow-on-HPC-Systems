@@ -108,9 +108,10 @@ int main(int argc, char* argv[]) {
 
   Clock clock;
   // Time loop
-  while (time < parameters.simulation.finalTime) {
-    simulation->solveTimestep();
 
+  while (time < parameters.simulation.finalTime) {
+
+    simulation->solveTimestep();
     timeSteps++;
     time += parameters.timestep.dt;
 
