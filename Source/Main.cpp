@@ -1,10 +1,5 @@
 #include "StdAfx.hpp"
 
-// #include <cfenv>
-// #include <csignal>
-// #include <cstdio>
-// #pragma STDC FENV_ACCESS ON
-
 #include "Clock.hpp"
 #include "Configuration.hpp"
 #include "MeshsizeFactory.hpp"

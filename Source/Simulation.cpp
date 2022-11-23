@@ -117,9 +117,6 @@ void Simulation::setTimeStep() {
     parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0] + std::numeric_limits<double>::min());
   }
 
-  // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
-  // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
-
   localMin = std::min(
     parameters_.flow.Re / (2 * factor),
     std::min(
