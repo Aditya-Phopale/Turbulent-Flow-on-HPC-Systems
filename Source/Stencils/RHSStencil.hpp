@@ -9,7 +9,7 @@ namespace Stencils {
   // TODO WS1: implement RHSStencil class
   class RHSStencil: public FieldStencil<FlowField> {
   private:
-    RealType localMeshsize_[27*3];
+    // RealType localMeshsize_[27*3];
   public:
     RHSStencil(const Parameters& parameters);
     ~RHSStencil() override = default;
