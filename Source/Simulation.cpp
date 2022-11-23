@@ -110,6 +110,22 @@ void Simulation::setTimeStep() {
   maxUFieldIterator_.iterate();
   maxUBoundaryIterator_.iterate();
 
+  double temp_u, temp_v, temp_w;
+  if (maxUStencil_.getMaxValues()[0] == 0)
+    temp_u = std::numeric_limits<double>::min();
+  else
+    temp_u = maxUStencil_.getMaxValues()[0];
+
+  if (maxUStencil_.getMaxValues()[1] == 0)
+    temp_v = std::numeric_limits<double>::min();
+  else
+    temp_v = maxUStencil_.getMaxValues()[1];
+
+  if (maxUStencil_.getMaxValues()[2] == 0)
+    temp_w = std::numeric_limits<double>::min();
+  else
+    temp_w = maxUStencil_.getMaxValues()[2];
+
   if (parameters_.geometry.dim == 3) {
     factor += 1.0 / (parameters_.meshsize->getDzMin() * parameters_.meshsize->getDzMin());
     parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2] + std::numeric_limits<double>::min());
@@ -117,15 +133,11 @@ void Simulation::setTimeStep() {
     parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0] + std::numeric_limits<double>::min());
   }
 
+  // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
+  // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
+
   localMin = std::min(
-    parameters_.flow.Re / (2 * factor),
-    std::min(
-      parameters_.timestep.dt,
-      std::min(
-        1 / (maxUStencil_.getMaxValues()[1] + std::numeric_limits<double>::min()),
-        1 / (maxUStencil_.getMaxValues()[0] + std::numeric_limits<double>::min())
-      )
-    )
+    parameters_.flow.Re / (2 * factor), std::min(parameters_.timestep.dt, std::min(1 / temp_v, 1 / temp_u))
   );
   // if (fetestexcept(FE_DIVBYZERO))
   //     std::cout <<"Exception occured\n";
