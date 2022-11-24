@@ -8,7 +8,7 @@
 
 namespace Stencils {
 
-  class PressureBufferFillStencil: public BoundaryStencil<FlowField> {
+  class PressureBufferReadStencil: public BoundaryStencil<FlowField> {
   private:
     RealType* bLeft;
     RealType* bRight;
@@ -18,8 +18,8 @@ namespace Stencils {
     RealType* bBack;
 
   public:
-    PressureBufferFillStencil(const Parameters&, RealType*, RealType*, RealType*, RealType*, RealType*, RealType*);
-    ~PressureBufferFillStencil() override = default;
+    PressureBufferReadStencil(const Parameters&, RealType*, RealType*, RealType*, RealType*, RealType*, RealType*);
+    ~PressureBufferReadStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;
     void applyRightWall(FlowField& flowField, int i, int j) override;
