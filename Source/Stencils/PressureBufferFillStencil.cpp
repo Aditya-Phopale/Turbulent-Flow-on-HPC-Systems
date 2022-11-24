@@ -6,31 +6,41 @@
 #include "StencilFunctions.hpp"
 
 Stencils::PressureBufferFillStencil::PressureBufferFillStencil(const Parameters& parameters):
-  FieldStencil<FlowField>(parameters) {
-
-  pressurefill_iteratorx(parameters)
+  BoundaryStencil<FlowField>(parameters) {
 }
 
-void Stencils::PressureBufferFillStencil::fill(FlowField& flowField) {
-  int sizeX       = parameters_.parallel.localSize[0];
-  int sizeY       = parameters_.parallel.localSize[1];
-  int sizeZ       = parameters_.parallel.localSize[2];
-  int rnk         = parameters_.parallel.rank;
-  int lowOffsetX  = rnk * sizeX;
-  int highOffsetX = lowOffsetX + sizeX;
-
-  int lowOffsetY  = rnk * sizeY;
-  int highOffsetY = lowOffsetY + sizeY;
-
-  int lowOffsetZ  = rnk * sizeZ;
-  int highOffsetZ = lowOffsetZ + sizeZ;
-
-  auto pressure = flowField.getPressure();
-  ParallelBoundaryIterator<FlowField> pressurefill_iteratorx(pressure, parameters_, );
-  ParallelBoundaryIterator<FlowField> pressurefill_iteratory;
-  ParallelBoundaryIterator<FlowField> pressurefill_iteratorz;
-  if (parameters_.geometry.dim == 2)
-    RealType* buffer[sizeX + sizeY];
-  else
-    RealType* buffer[sizeX + sizeY + sizeZ];
+void Stencils::PressureBufferFillStencil::applyLeftWall(FlowField& flowField, int i, int j){
+  bLeft.push_back(flowField.getPressure().getScalar(i+2,j));
 }
+
+void Stencils::PressureBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j){
+  bRight1.push_back(flowField.getPressure().getScalar(i-1,j));
+  bRight2.push_back(flowField.getPressure().getScalar(i-2,j));
+}
+void Stencils::PressureBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j){
+  bBottom.push_back(flowField.getPressure().getScalar(i,j));
+}
+void Stencils::PressureBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j){
+  bTop.push_back(flowField.getPressure().getScalar(i,j));
+}
+
+
+void Stencils::PressureBufferFillStencil::applyLeftWall(FlowField& flowField, int i, int j, int k){
+  bLeft.push_back(flowField.getPressure().getScalar(i,j));
+}
+void Stencils::PressureBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j, int k){
+  bRight.push_back(flowField.getPressure().getScalar(i,j));
+}
+void Stencils::PressureBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j, int k){
+  bBottom.push_back(flowField.getPressure().getScalar(i,j));
+}
+void Stencils::PressureBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j, int k){
+  bTop.push_back(flowField.getPressure().getScalar(i,j));
+}
+void Stencils::PressureBufferFillStencil::applyFrontWall(FlowField& flowField, int i, int j, int k){
+  bFront.push_back(flowField.getPressure().getScalar(i,j));
+}
+void Stencils::PressureBufferFillStencil::applyBackWall(FlowField& flowField, int i, int j, int k){
+  bBack.push_back(flowField.getPressure().getScalar(i,j));
+}
+

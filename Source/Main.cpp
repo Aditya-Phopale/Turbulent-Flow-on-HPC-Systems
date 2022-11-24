@@ -8,6 +8,11 @@
 #include "ParallelManagers/PetscParallelConfiguration.hpp"
 
 int main(int argc, char* argv[]) {
+
+  int i = 0;
+  while(i == 0){
+    sleep(5);
+  }
   spdlog::set_level(spdlog::level::info);
 
   // Parallelisation related. Initialise and identify.
@@ -39,7 +44,7 @@ int main(int argc, char* argv[]) {
 #else
   spdlog::info("Running in Release mode");
 #endif
-
+argv[1] = "ExampleCases/Cavity2D.xml";
   if (!argv[1]) {
     spdlog::error("You need to pass a configuration file: mpirun -np 1 ./NS-EOF ExampleCases/Cavity2D.xml.");
     throw std::runtime_error("Argument parsing error");
