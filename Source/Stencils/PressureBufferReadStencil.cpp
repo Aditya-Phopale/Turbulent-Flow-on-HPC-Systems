@@ -11,8 +11,8 @@ Stencils::PressureBufferReadStencil::PressureBufferReadStencil(
   BoundaryStencil<FlowField>(parameters),
   bLeft(bL),
   bRight(bR),
-  bBottom(bB),
   bTop(bT),
+  bBottom(bBo),
   bFront(bF),
   bBack(bB) {}
 
@@ -30,20 +30,20 @@ void Stencils::PressureBufferReadStencil::applyTopWall(FlowField& flowField, int
 }
 
 void Stencils::PressureBufferReadStencil::applyLeftWall(FlowField& flowField, int i, int j, int k) {
-  flowField.getPressure().getScalar(i + 2, j, k) = bLeft[j * parameters_.geometry.sizeZ + k];
+  flowField.getPressure().getScalar(i + 1, j, k) = bLeft[j * parameters_.geometry.sizeZ + k];
 }
 void Stencils::PressureBufferReadStencil::applyRightWall(FlowField& flowField, int i, int j, int k) {
-  bRight[j * parameters_.geometry.sizeZ + k] = flowField.getPressure().getScalar(i - 1, j, k);
+  flowField.getPressure().getScalar(i, j, k) = bRight[j * parameters_.geometry.sizeZ + k];
 }
 void Stencils::PressureBufferReadStencil::applyBottomWall(FlowField& flowField, int i, int j, int k) {
-  bBottom[i * parameters_.geometry.sizeZ + k] = (flowField.getPressure().getScalar(i, j + 2, k));
+  (flowField.getPressure().getScalar(i, j + 1, k)) = bBottom[i * parameters_.geometry.sizeZ + k];
 }
 void Stencils::PressureBufferReadStencil::applyTopWall(FlowField& flowField, int i, int j, int k) {
-  bTop[i * parameters_.geometry.sizeZ + k] = flowField.getPressure().getScalar(i, j - 1, k);
+  flowField.getPressure().getScalar(i, j, k) = bTop[i * parameters_.geometry.sizeZ + k];
 }
 void Stencils::PressureBufferReadStencil::applyFrontWall(FlowField& flowField, int i, int j, int k) {
-  bFront[i * parameters_.geometry.sizeY + j] = flowField.getPressure().getScalar(i, j, k + 2);
+  flowField.getPressure().getScalar(i, j, k + 1) = bFront[i * parameters_.geometry.sizeY + j];
 }
 void Stencils::PressureBufferReadStencil::applyBackWall(FlowField& flowField, int i, int j, int k) {
-  bBack[i * parameters_.geometry.sizeY + j] = flowField.getPressure().getScalar(i, j, k - 1);
+  flowField.getPressure().getScalar(i, j, k) = bBack[i * parameters_.geometry.sizeY + j];
 }

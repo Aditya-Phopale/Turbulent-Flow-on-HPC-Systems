@@ -11,8 +11,8 @@ Stencils::PressureBufferFillStencil::PressureBufferFillStencil(
   BoundaryStencil<FlowField>(parameters),
   bLeft(bL),
   bRight(bR),
-  bBottom(bB),
   bTop(bT),
+  bBottom(bBo),
   bFront(bF),
   bBack(bB) {}
 
