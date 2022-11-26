@@ -12,16 +12,16 @@ namespace Stencils {
 
   class VelocityBufferReadStencil: public BoundaryStencil<FlowField> {
   private:
-    std::vector<std::vector<RealType>> Left_;
-    std::vector<std::vector<RealType>> Right_;
-    std::vector<std::vector<RealType>> Top_;
-    std::vector<std::vector<RealType>> Bottom_;
-    std::vector<std::vector<RealType>> Front_;
-    std::vector<std::vector<RealType>> Back_;
+    std::vector<RealType> Left_;
+    std::vector<RealType> Right_;
+    std::vector<RealType> Top_;
+    std::vector<RealType> Bottom_;
+    std::vector<RealType> Front_;
+    std::vector<RealType> Back_;
 
   public:
-    VelocityBufferReadStencil(const Parameters&, std::vector<std::vector<RealType>>, std::vector<std::vector<RealType>>, std::vector<std::vector<RealType>>, std::vector<std::vector<RealType>>);
-    VelocityBufferReadStencil(const Parameters&, std::vector<std::vector<RealType>>, std::vector<std::vector<RealType>>, std::vector<std::vector<RealType>>, std::vector<std::vector<RealType>>, std::vector<std::vector<RealType>>, std::vector<std::vector<RealType>>);
+    VelocityBufferReadStencil(const Parameters&, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>);
+    VelocityBufferReadStencil(const Parameters&, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>);
 
     ~VelocityBufferReadStencil() override = default;
 

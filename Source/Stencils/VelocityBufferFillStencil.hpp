@@ -12,15 +12,15 @@ namespace Stencils {
 
   class VelocityBufferFillStencil: public BoundaryStencil<FlowField> {
   private:
-    std::vector<std::vector<RealType>>& Left_;
-    std::vector<std::vector<RealType>>& Right_;
-    std::vector<std::vector<RealType>>& Top_;
-    std::vector<std::vector<RealType>>& Bottom_;
-    std::vector<std::vector<RealType>>& Front_;
-    std::vector<std::vector<RealType>>& Back_;
+    std::vector<RealType>& Left_;
+    std::vector<RealType>& Right_;
+    std::vector<RealType>& Top_;
+    std::vector<RealType>& Bottom_;
+    std::vector<RealType>& Front_;
+    std::vector<RealType>& Back_;
 
   public:
-    VelocityBufferFillStencil(const Parameters& parameters, std::vector<std::vector<RealType>>&, std::vector<std::vector<RealType>>&, std::vector<std::vector<RealType>>&, std::vector<std::vector<RealType>>&, std::vector<std::vector<RealType>>&, std::vector<std::vector<RealType>>&);
+    VelocityBufferFillStencil(const Parameters& parameters, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&);
     ~VelocityBufferFillStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;
