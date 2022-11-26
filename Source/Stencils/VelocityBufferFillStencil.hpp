@@ -1,24 +1,26 @@
 #pragma once
 
 #include <vector>
+
 #include "BoundaryStencil.hpp"
 #include "FieldStencil.hpp"
 #include "FlowField.hpp"
-#include "Parameters.hpp"
 #include "Iterators.hpp"
+#include "Parameters.hpp"
 
 namespace Stencils {
 
   class VelocityBufferFillStencil: public BoundaryStencil<FlowField> {
   private:
-    RealType* bLeft_v;
-    RealType* bRight_v;
-    RealType* bTop_v;
-    RealType* bBottom_v;
-    RealType* bFront_v;
-    RealType* bBack_v;
+    std::vector<std::vector<RealType>> Left_;
+    std::vector<std::vector<RealType>> Right_;
+    std::vector<std::vector<RealType>> Top_;
+    std::vector<std::vector<RealType>> Bottom_;
+    std::vector<std::vector<RealType>> Front_;
+    std::vector<std::vector<RealType>> Back_;
+
   public:
-    VelocityBufferFillStencil(const Parameters& parameters, RealType*, RealType*, RealType*, RealType*, RealType*, RealType*);
+    VelocityBufferFillStencil(const Parameters& parameters);
     ~VelocityBufferFillStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;
