@@ -5,23 +5,37 @@
 #include "Definitions.hpp"
 #include "StencilFunctions.hpp"
 
-Stencils::VelocityBufferFillStencil::VelocityBufferFillStencil(const Parameters& parameters):
-  BoundaryStencil<FlowField>(parameters) {
-  if (parameters_.geometry.dim == 2) {
-    Left_.resize((parameters_.geometry.sizeY + 3), std::vector<RealType>(2));
-    Right_.resize((parameters_.geometry.sizeY + 3), std::vector<RealType>(2));
-    Top_.resize((parameters_.geometry.sizeX + 3), std::vector<RealType>(2));
-    Bottom_.resize((parameters_.geometry.sizeX + 3), std::vector<RealType>(2));
-  }
+Stencils::VelocityBufferFillStencil::VelocityBufferFillStencil(
+  const Parameters&                   parameters,
+  std::vector<std::vector<RealType>>& left,
+  std::vector<std::vector<RealType>>& right,
+  std::vector<std::vector<RealType>>& top,
+  std::vector<std::vector<RealType>>& bottom,
+  std::vector<std::vector<RealType>>& front,
+  std::vector<std::vector<RealType>>& back
+):
+  BoundaryStencil<FlowField>(parameters),
+  Left_(left),
+  Right_(right),
+  Top_(top),
+  Bottom_(bottom),
+  Front_(front),
+  Back_(back) {
+  // if (parameters_.geometry.dim == 2) {
+  //   Left_.resize(2,std::vector<RealType>(parameters_.geometry.sizeY + 3));
+  //   Right_.resize(2,std::vector<RealType>(parameters_.geometry.sizeY + 3));
+  //   Top_.resize(2, std::vector<RealType>(parameters_.geometry.sizeX + 3));
+  //   Bottom_.resize(2, std::vector<RealType>(parameters_.geometry.sizeX + 3));
+  // }
 
-  if (parameters_.geometry.dim == 3) {
-    Left_.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3), std::vector<RealType>(3));
-    Right_.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3), std::vector<RealType>(3));
-    Top_.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3), std::vector<RealType>(3));
-    Bottom_.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3), std::vector<RealType>(3));
-    Front_.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3), std::vector<RealType>(3));
-    Back_.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3), std::vector<RealType>(3));
-  }
+  // if (parameters_.geometry.dim == 3) {
+  //   Left_.resize(3,  std::vector<RealType>((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3)));
+  //   Right_.resize(3,  std::vector<RealType>((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3)));
+  //   Top_.resize(3,  std::vector<RealType>((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3)));
+  //   Bottom_.resize(3,  std::vector<RealType>((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3)));
+  //   Front_.resize(3, std::vector<RealType>((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3)));
+  //   Back_.resize(3, std::vector<RealType>((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3)));
+  // }
 }
 
 void Stencils::VelocityBufferFillStencil::applyLeftWall(FlowField& flowField, int i, int j) {

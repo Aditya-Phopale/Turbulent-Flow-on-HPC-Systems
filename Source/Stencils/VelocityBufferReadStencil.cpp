@@ -17,21 +17,6 @@ Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil(
   Right_(Right),
   Top_(Top),
   Bottom_(Bottom) {
-  // if (parameters_.geometry.dim == 2) {
-  //   Left.resize((parameters_.geometry.sizeY + 3), std::vector<RealType>(2));
-  //   Right.resize((parameters_.geometry.sizeY + 3), std::vector<RealType>(2));
-  //   Top.resize((parameters_.geometry.sizeX + 3), std::vector<RealType>(2));
-  //   Bottom.resize((parameters_.geometry.sizeX + 3), std::vector<RealType>(2));
-  // }
-
-  // if (parameters_.geometry.dim == 3) {
-  //   Left.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3), std::vector<RealType>(3));
-  //   Right.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3), std::vector<RealType>(3));
-  //   Top.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3), std::vector<RealType>(3));
-  //   Bottom.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3), std::vector<RealType>(3));
-  //   Front.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3), std::vector<RealType>(3));
-  //   Back.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3), std::vector<RealType>(3));
-  // }
 }
 
 Stencils::VelocityBufferReadStencil::VelocityBufferReadStencil(
@@ -79,7 +64,7 @@ void Stencils::VelocityBufferReadStencil::applyRightWall(FlowField& flowField, i
   flowField.getVelocity().getVector(i, j, k)[2] = Right_.at(j * (parameters_.geometry.sizeZ + 3) + k).at(2);
 }
 void Stencils::VelocityBufferReadStencil::applyBottomWall(FlowField& flowField, int i, int j, int k) {
-  flowField.getVelocity().getVector(i, j + 1, k)[0] = Bottom._at(i * (parameters_.geometry.sizeZ + 3) + k).at(0);
+  flowField.getVelocity().getVector(i, j + 1, k)[0] = Bottom_.at(i * (parameters_.geometry.sizeZ + 3) + k).at(0);
   flowField.getVelocity().getVector(i, j, k)[1]     = Bottom_.at(i * (parameters_.geometry.sizeZ + 3) + k).at(1);
   flowField.getVelocity().getVector(i, j + 1, k)[2] = Bottom_.at(i * (parameters_.geometry.sizeZ + 3) + k).at(2);
 }

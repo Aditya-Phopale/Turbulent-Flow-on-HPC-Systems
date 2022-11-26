@@ -5,22 +5,21 @@
 #include "BoundaryStencil.hpp"
 #include "FieldStencil.hpp"
 #include "FlowField.hpp"
-#include "Iterators.hpp"
 #include "Parameters.hpp"
 
 namespace Stencils {
 
   class PressureBufferFillStencil: public BoundaryStencil<FlowField> {
   private:
-    std::vector<RealType> Left_;
-    std::vector<RealType> Right_;
-    std::vector<RealType> Top_;
-    std::vector<RealType> Bottom_;
-    std::vector<RealType> Front_;
-    std::vector<RealType> Back_;
+    std::vector<RealType>& Left_;
+    std::vector<RealType>& Right_;
+    std::vector<RealType>& Top_;
+    std::vector<RealType>& Bottom_;
+    std::vector<RealType>& Front_;
+    std::vector<RealType>& Back_;
 
   public:
-    PressureBufferFillStencil(const Parameters&);
+    PressureBufferFillStencil(const Parameters&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&);
     ~PressureBufferFillStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;
@@ -34,5 +33,6 @@ namespace Stencils {
     void applyTopWall(FlowField& flowField, int i, int j, int k) override;
     void applyFrontWall(FlowField& flowField, int i, int j, int k) override;
     void applyBackWall(FlowField& flowField, int i, int j, int k) override;
+
   };
 } // namespace Stencils

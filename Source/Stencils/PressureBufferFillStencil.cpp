@@ -5,22 +5,9 @@
 #include "Definitions.hpp"
 #include "StencilFunctions.hpp"
 
-Stencils::PressureBufferFillStencil::PressureBufferFillStencil(const Parameters& parameters):
-  BoundaryStencil<FlowField>(parameters) {
-  if (parameters_.geometry.dim == 2) {
-    Left_.resize(parameters_.geometry.sizeY + 3);
-    Right_.resize(parameters_.geometry.sizeY + 3);
-    Top_.resize(parameters_.geometry.sizeX + 3);
-    Bottom_.resize(parameters_.geometry.sizeX + 3);
-  }
-  if (parameters_.geometry.dim == 3) {
-    Left_.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3));
-    Right_.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3));
-    Top_.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3));
-    Bottom_.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3));
-    Front_.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3));
-    Back_.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3));
-  }
+Stencils::PressureBufferFillStencil::
+  PressureBufferFillStencil(const Parameters& parameters, std::vector<RealType>& left, std::vector<RealType>& right, std::vector<RealType>& top, std::vector<RealType>& bottom, std::vector<RealType>& front, std::vector<RealType>& back):
+  BoundaryStencil<FlowField>(parameters), Left_(left), Right_(right), Top_(top), Bottom_(bottom), Front_(front), Back_(back) {
 }
 
 void Stencils::PressureBufferFillStencil::applyLeftWall(FlowField& flowField, int i, int j) {
@@ -55,3 +42,4 @@ void Stencils::PressureBufferFillStencil::applyFrontWall(FlowField& flowField, i
 void Stencils::PressureBufferFillStencil::applyBackWall(FlowField& flowField, int i, int j, int k) {
   Back_.at(i * (parameters_.geometry.sizeY + 3) + j) = flowField.getPressure().getScalar(i, j, k - 1);
 }
+
