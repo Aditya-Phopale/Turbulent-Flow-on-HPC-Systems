@@ -30,7 +30,7 @@ void Stencils::VelocityBufferFillStencil::applyLeftWall(FlowField& flowField, in
 }
 
 void Stencils::VelocityBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j) {
-  Right_.at(j).at(0) = flowField.getVelocity().getVector(i - 1, j)[0];
+  Right_.at(j).at(0) = flowField.getVelocity().getVector(i - 2, j)[0];
   Right_.at(j).at(1) = flowField.getVelocity().getVector(i - 1, j)[1];
 }
 
@@ -41,7 +41,7 @@ void Stencils::VelocityBufferFillStencil::applyBottomWall(FlowField& flowField, 
 
 void Stencils::VelocityBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j) {
   Top_.at(i).at(0) = flowField.getVelocity().getVector(i, j - 1)[0];
-  Top_.at(i).at(1) = flowField.getVelocity().getVector(i, j - 1)[1];
+  Top_.at(i).at(1) = flowField.getVelocity().getVector(i, j - 2)[1];
 }
 
 void Stencils::VelocityBufferFillStencil::applyLeftWall(FlowField& flowField, int i, int j, int k) {
@@ -50,7 +50,7 @@ void Stencils::VelocityBufferFillStencil::applyLeftWall(FlowField& flowField, in
   Left_.at(j * (parameters_.geometry.sizeZ + 3) + k).at(2) = flowField.getVelocity().getVector(i + 2, j, k)[2];
 }
 void Stencils::VelocityBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j, int k) {
-  Right_.at(j * (parameters_.geometry.sizeZ + 3) + k).at(0) = flowField.getVelocity().getVector(i - 1, j, k)[0];
+  Right_.at(j * (parameters_.geometry.sizeZ + 3) + k).at(0) = flowField.getVelocity().getVector(i - 2, j, k)[0];
   Right_.at(j * (parameters_.geometry.sizeZ + 3) + k).at(1) = flowField.getVelocity().getVector(i - 1, j, k)[1];
   Right_.at(j * (parameters_.geometry.sizeZ + 3) + k).at(2) = flowField.getVelocity().getVector(i - 1, j, k)[2];
 }
@@ -61,7 +61,7 @@ void Stencils::VelocityBufferFillStencil::applyBottomWall(FlowField& flowField, 
 }
 void Stencils::VelocityBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j, int k) {
   Top_.at(i * (parameters_.geometry.sizeZ + 3) + k).at(0) = flowField.getVelocity().getVector(i, j - 1, k)[0];
-  Top_.at(i * (parameters_.geometry.sizeZ + 3) + k).at(1) = flowField.getVelocity().getVector(i, j - 1, k)[1];
+  Top_.at(i * (parameters_.geometry.sizeZ + 3) + k).at(1) = flowField.getVelocity().getVector(i, j - 2, k)[1];
   Top_.at(i * (parameters_.geometry.sizeZ + 3) + k).at(2) = flowField.getVelocity().getVector(i, j - 1, k)[2];
 }
 void Stencils::VelocityBufferFillStencil::applyFrontWall(FlowField& flowField, int i, int j, int k) {
@@ -72,5 +72,5 @@ void Stencils::VelocityBufferFillStencil::applyFrontWall(FlowField& flowField, i
 void Stencils::VelocityBufferFillStencil::applyBackWall(FlowField& flowField, int i, int j, int k) {
   Back_.at(i * (parameters_.geometry.sizeY + 3) + j).at(0) = flowField.getVelocity().getVector(i, j, k - 1)[0];
   Back_.at(i * (parameters_.geometry.sizeY + 3) + j).at(1) = flowField.getVelocity().getVector(i, j, k - 1)[1];
-  Back_.at(i * (parameters_.geometry.sizeY + 3) + j).at(2) = flowField.getVelocity().getVector(i, j, k - 1)[2];
+  Back_.at(i * (parameters_.geometry.sizeY + 3) + j).at(2) = flowField.getVelocity().getVector(i, j, k - 2)[2];
 }
