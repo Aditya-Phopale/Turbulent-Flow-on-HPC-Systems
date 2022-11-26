@@ -12,7 +12,7 @@ Stencils::VelocityBufferFillStencil::VelocityBufferFillStencil(
   std::vector<RealType>& top,
   std::vector<RealType>& bottom,
   std::vector<RealType>& front,
-  std::vector<RealType>& back,
+  std::vector<RealType>& back
 ):
   BoundaryStencil<FlowField>(parameters),
   Left_(left),

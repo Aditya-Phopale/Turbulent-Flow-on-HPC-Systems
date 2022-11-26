@@ -1,22 +1,3 @@
-// // RealType*                 bufferleft[sizeY];
-// // PressureBufferFillStencil pfill(params, buffers)
-// // PressureBufferReadStencil pread(params, buffers)
-// // similar for vels
-
-// // communicate();
-// // pfill.iterate();
-// // velsfill.iterate(); for
-// //   u and v
-
-// //     MPI_sendrecv();
-
-// // pread.iterate();
-// // velread.iterate();
-// #include "PetscParallelManager.hpp"
-
-// ParallelManagers::PetscParallelManager::PetscParallelManager(const Parameters& parameters):
-//   pfill_(parameters),
-//   vfill_(parameters) {}
 #include "PetscParallelManager.hpp"
 
 ParallelManagers::PetscParallelManager::PetscParallelManager(const Parameters& parameters, FlowField& flowfield):
@@ -82,7 +63,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.rightNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -97,7 +78,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.rightNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -112,7 +93,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.rightNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -127,7 +108,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.rightNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -142,7 +123,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.rightNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -157,7 +138,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.rightNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -227,7 +208,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.rightNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -242,7 +223,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.leftNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -257,7 +238,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.bottomNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -272,7 +253,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.topNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -287,7 +268,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.backNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -302,7 +283,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.frontNb,
     0,
-    PETSC_COMM_WORLD,
+    MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 

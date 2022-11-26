@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "BoundaryStencil.hpp"
-#include "FieldStencil.hpp"
 #include "FlowField.hpp"
 #include "Parameters.hpp"
 

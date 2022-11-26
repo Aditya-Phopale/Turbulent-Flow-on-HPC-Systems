@@ -3,10 +3,7 @@
 #include <vector>
 
 #include "BoundaryStencil.hpp"
-#include "Definitions.hpp"
-#include "FieldStencil.hpp"
 #include "FlowField.hpp"
-#include "Iterators.hpp"
 #include "Parameters.hpp"
 
 namespace Stencils {
