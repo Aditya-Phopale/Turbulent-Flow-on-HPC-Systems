@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "BoundaryStencil.hpp"
 #include "FieldStencil.hpp"
 #include "FlowField.hpp"
@@ -10,15 +12,15 @@ namespace Stencils {
 
   class PressureBufferFillStencil: public BoundaryStencil<FlowField> {
   private:
-    RealType* bLeft;
-    RealType* bRight;
-    RealType* bTop;
-    RealType* bBottom;
-    RealType* bFront;
-    RealType* bBack;
+    std::vector<RealType> Left_;
+    std::vector<RealType> Right_;
+    std::vector<RealType> Top_;
+    std::vector<RealType> Bottom_;
+    std::vector<RealType> Front_;
+    std::vector<RealType> Back_;
 
   public:
-    PressureBufferFillStencil(const Parameters&, RealType*, RealType*, RealType*, RealType*, RealType*, RealType*);
+    PressureBufferFillStencil(const Parameters&);
     ~PressureBufferFillStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;
