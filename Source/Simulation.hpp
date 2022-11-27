@@ -18,6 +18,7 @@
 #include "Stencils/RHSStencil.hpp"
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKStencil.hpp"
+#include "ParallelManagers/PetscParallelManager.hpp"
 
 class Simulation {
 protected:
@@ -48,6 +49,8 @@ protected:
   std::unique_ptr<Solvers::LinearSolver> solver_;
 
   virtual void setTimeStep();
+
+  ParallelManagers::PetscParallelManager ppm_;
 
 public:
   Simulation(Parameters& parameters, FlowField& flowField);

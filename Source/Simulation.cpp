@@ -21,7 +21,8 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   velocityStencil_(parameters),
   obstacleStencil_(parameters),
   velocityIterator_(flowField_, parameters, velocityStencil_),
-  obstacleIterator_(flowField_, parameters, obstacleStencil_)
+  obstacleIterator_(flowField_, parameters, obstacleStencil_),
+  ppm_(parameters, flowField_)
 #ifdef ENABLE_PETSC
   ,
   solver_(std::make_unique<Solvers::PetscSolver>(flowField_, parameters))
@@ -82,10 +83,12 @@ void Simulation::solveTimestep() {
   // TODO WS1: compute the right hand side (RHS)
   rhsIterator_.iterate();
   // Solve for pressure
-  solver_->solve();
+  solver_->solve(); 
   // TODO WS2: communicate pressure values
+  ppm_.communicatePressure();
   // Compute velocity
   velocityIterator_.iterate();
+  ppm_.communicateVelocities();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
   // Iterate for velocities on the boundary
