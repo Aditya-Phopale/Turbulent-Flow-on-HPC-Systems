@@ -5,19 +5,19 @@ ParallelManagers::PetscParallelManager::PetscParallelManager(const Parameters& p
   flowfield_(flowfield) {}
 
 void ParallelManagers::PetscParallelManager::communicatePressure() {
-  std::vector<RealType> leftSend;
-  std::vector<RealType> rightSend;
-  std::vector<RealType> topSend;
-  std::vector<RealType> bottomSend;
-  std::vector<RealType> frontSend;
-  std::vector<RealType> backSend;
+  std::vector<RealType> leftSend{0};
+  std::vector<RealType> rightSend{0};
+  std::vector<RealType> topSend{0};
+  std::vector<RealType> bottomSend{0};
+  std::vector<RealType> frontSend{0};
+  std::vector<RealType> backSend{0};
 
-  std::vector<RealType> leftReceive;
-  std::vector<RealType> rightReceive;
-  std::vector<RealType> topReceive;
-  std::vector<RealType> bottomReceive;
-  std::vector<RealType> frontReceive;
-  std::vector<RealType> backReceive;
+  std::vector<RealType> leftReceive{0};
+  std::vector<RealType> rightReceive{0};
+  std::vector<RealType> topReceive{0};
+  std::vector<RealType> bottomReceive{0};
+  std::vector<RealType> frontReceive{0};
+  std::vector<RealType> backReceive{0};
 
   if (parameters_.geometry.dim == 2) {
     leftSend.resize(parameters_.geometry.sizeY + 3);
@@ -71,12 +71,12 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     rightSend.data(),
     rightSend.size(),
     MPI_DOUBLE,
-    parameters_.parallel.leftNb,
+    parameters_.parallel.rightNb,
     0,
     leftReceive.data(),
     leftReceive.size(),
     MPI_DOUBLE,
-    parameters_.parallel.rightNb,
+    parameters_.parallel.leftNb,
     0,
     MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
@@ -86,12 +86,12 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     topSend.data(),
     topSend.size(),
     MPI_DOUBLE,
-    parameters_.parallel.leftNb,
+    parameters_.parallel.topNb,
     0,
     bottomReceive.data(),
     bottomReceive.size(),
     MPI_DOUBLE,
-    parameters_.parallel.rightNb,
+    parameters_.parallel.bottomNb,
     0,
     MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
@@ -101,12 +101,12 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     bottomSend.data(),
     bottomSend.size(),
     MPI_DOUBLE,
-    parameters_.parallel.leftNb,
+    parameters_.parallel.bottomNb,
     0,
     topReceive.data(),
     topReceive.size(),
     MPI_DOUBLE,
-    parameters_.parallel.rightNb,
+    parameters_.parallel.topNb,
     0,
     MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
@@ -116,12 +116,12 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     frontSend.data(),
     frontSend.size(),
     MPI_DOUBLE,
-    parameters_.parallel.leftNb,
+    parameters_.parallel.frontNb,
     0,
     backReceive.data(),
     backReceive.size(),
     MPI_DOUBLE,
-    parameters_.parallel.rightNb,
+    parameters_.parallel.backNb,
     0,
     MPI_COMM_WORLD,
     MPI_STATUS_IGNORE
@@ -131,12 +131,12 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     backSend.data(),
     backSend.size(),
     MPI_DOUBLE,
-    parameters_.parallel.leftNb,
+    parameters_.parallel.backNb,
     0,
     frontReceive.data(),
     frontReceive.size(),
     MPI_DOUBLE,
-    parameters_.parallel.rightNb,
+    parameters_.parallel.frontNb,
     0,
     MPI_COMM_WORLD,
     MPI_STATUS_IGNORE

@@ -133,13 +133,14 @@ int main(int argc, char* argv[]) {
 
   // Plot final solution
   simulation->plotVTK(timeSteps, time);
-
+ 
   delete simulation;
   simulation = NULL;
 
   delete flowField;
   flowField = NULL;
 
+ 
 #ifdef ENABLE_PETSC
   PetscFinalize();
 #else

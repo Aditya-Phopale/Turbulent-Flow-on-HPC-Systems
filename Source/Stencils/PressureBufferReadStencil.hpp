@@ -18,7 +18,7 @@ namespace Stencils {
     std::vector<RealType> Back_;
 
   public:
-    PressureBufferReadStencil(const Parameters&, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>, std::vector<RealType>);
+    PressureBufferReadStencil(const Parameters&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&);
     ~PressureBufferReadStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;

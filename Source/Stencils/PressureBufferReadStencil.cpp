@@ -7,12 +7,12 @@
 
 Stencils::PressureBufferReadStencil::PressureBufferReadStencil(
   const Parameters&     parameters,
-  std::vector<RealType> Left,
-  std::vector<RealType> Right,
-  std::vector<RealType> Top,
-  std::vector<RealType> Bottom,
-  std::vector<RealType> Front,
-  std::vector<RealType> Back
+  std::vector<RealType>& Left,
+  std::vector<RealType>& Right,
+  std::vector<RealType>& Top,
+  std::vector<RealType>& Bottom,
+  std::vector<RealType>& Front,
+  std::vector<RealType>& Back
 ):
   BoundaryStencil<FlowField>(parameters),
   Left_(Left),
