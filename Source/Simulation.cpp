@@ -85,10 +85,10 @@ void Simulation::solveTimestep() {
   // Solve for pressure
   solver_->solve(); 
   // TODO WS2: communicate pressure values
-  //ppm_.communicatePressure();
+  ppm_.communicatePressure();
   // Compute velocity
   velocityIterator_.iterate();
-  //ppm_.communicateVelocities();
+  ppm_.communicateVelocities();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
   // Iterate for velocities on the boundary

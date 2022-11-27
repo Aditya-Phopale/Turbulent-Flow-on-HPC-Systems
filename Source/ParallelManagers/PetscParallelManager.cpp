@@ -1,6 +1,6 @@
 #include "PetscParallelManager.hpp"
 
-ParallelManagers::PetscParallelManager::PetscParallelManager(const Parameters& parameters, FlowField& flowfield):
+ParallelManagers::PetscParallelManager::PetscParallelManager(Parameters& parameters, FlowField& flowfield):
   parameters_(parameters),
   flowfield_(flowfield) {}
 
