@@ -6,7 +6,7 @@
 #include "StencilFunctions.hpp"
 
 Stencils::PressureBufferFillStencil::
-  PressureBufferFillStencil(const Parameters& parameters, std::vector<RealType>& left, std::vector<RealType>& right, std::vector<RealType>& top, std::vector<RealType>& bottom, std::vector<RealType>& front, std::vector<RealType>& back):
+  PressureBufferFillStencil(const Parameters& parameters):
   BoundaryStencil<FlowField>(parameters), Left_(left), Right_(right), Top_(top), Bottom_(bottom), Front_(front), Back_(back) {
 }
 

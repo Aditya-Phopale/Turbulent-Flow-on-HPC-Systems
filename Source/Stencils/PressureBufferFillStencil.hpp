@@ -18,7 +18,7 @@ namespace Stencils {
     std::vector<RealType>& Back_;
 
   public:
-    PressureBufferFillStencil(const Parameters&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&);
+    PressureBufferFillStencil(const Parameters&);
     ~PressureBufferFillStencil() override = default;
 
     void applyLeftWall(FlowField& flowField, int i, int j) override;
@@ -32,6 +32,13 @@ namespace Stencils {
     void applyTopWall(FlowField& flowField, int i, int j, int k) override;
     void applyFrontWall(FlowField& flowField, int i, int j, int k) override;
     void applyBackWall(FlowField& flowField, int i, int j, int k) override;
+
+    std::vector<RealType>& getLeftBuffer(){ return Left_;}
+    std::vector<RealType>& getRightBuffer(){ return Right_;}
+    std::vector<RealType>& getTopBuffer(){ return Top_;}
+    std::vector<RealType>& getBottomBuffer(){ return Bottom_;}
+    std::vector<RealType>& getFrontBuffer(){ return Front_;}
+    std::vector<RealType>& getBackBuffer(){ return Back_;}
 
   };
 } // namespace Stencils

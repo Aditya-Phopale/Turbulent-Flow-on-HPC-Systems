@@ -2,7 +2,15 @@
 
 ParallelManagers::PetscParallelManager::PetscParallelManager(Parameters& parameters, FlowField& flowfield):
   parameters_(parameters),
-  flowfield_(flowfield) {}
+  flowfield_(flowfield),
+  pressureFillStencil_(parameters, flowfield),
+  pressureReadStencil_(parameters, flowfield),
+  velocityFillStencil_(parameters, flowfield),
+  velocityReadStencil_(parameters, flowfield),
+  pressureFillIterator_(parameters, flowfield, pressureFillStencil_),
+  pressureReadIterator_(parameters, flowfield, pressureReadStencil_),
+  velocityFillIterator_(parameters, flowfield, pressureFillStencil_),
+  velocityReadIterator_(parameters, flowfield, pressureFillStencil_) {}
 
 void ParallelManagers::PetscParallelManager::communicatePressure() {
   std::vector<RealType> leftSend{0};
@@ -50,8 +58,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
   Stencils::PressureBufferFillStencil pfill_(
     parameters_, leftSend, rightSend, topSend, bottomSend, frontSend, backSend
   );
-  ParallelBoundaryIterator<FlowField> pressureFillIterator(flowfield_, parameters_, pfill_, 0, 0);
-  pressureFillIterator.iterate();
+  pressureFillIterator_.iterate();
   MPI_Sendrecv(
     leftSend.data(),
     leftSend.size(),
@@ -63,7 +70,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.rightNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -78,7 +85,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.leftNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -93,7 +100,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.bottomNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -108,7 +115,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.topNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -123,7 +130,7 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.backNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -138,15 +145,15 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
     MPI_DOUBLE,
     parameters_.parallel.frontNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
   Stencils::PressureBufferReadStencil pread_(
     parameters_, leftReceive, rightReceive, topReceive, bottomReceive, frontReceive, backReceive
   );
-  ParallelBoundaryIterator<FlowField> pressureReadIterator(flowfield_, parameters_, pread_, 0, 0);
-  pressureReadIterator.iterate();
+
+  pressureReadIterator_.iterate();
 }
 
 void ParallelManagers::PetscParallelManager::communicateVelocities() {
@@ -165,16 +172,16 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
   std::vector<RealType> backReceive;
 
   if (parameters_.geometry.dim == 2) {
-    leftSend.resize(2 *(parameters_.geometry.sizeY + 3));
-    rightSend.resize(2 *(parameters_.geometry.sizeY + 3));
-    topSend.resize(2 *(parameters_.geometry.sizeX + 3));
-    bottomSend.resize(2 *(parameters_.geometry.sizeX + 3));
+    leftSend.resize(2 * (parameters_.geometry.sizeY + 3));
+    rightSend.resize(2 * (parameters_.geometry.sizeY + 3));
+    topSend.resize(2 * (parameters_.geometry.sizeX + 3));
+    bottomSend.resize(2 * (parameters_.geometry.sizeX + 3));
     frontSend = {0};
     backSend  = {0};
-    leftReceive.resize(2 *(parameters_.geometry.sizeY + 3));
-    rightReceive.resize(2 *(parameters_.geometry.sizeY + 3));
-    topReceive.resize(2 *(parameters_.geometry.sizeX + 3));
-    bottomReceive.resize(2 *(parameters_.geometry.sizeX + 3));
+    leftReceive.resize(2 * (parameters_.geometry.sizeY + 3));
+    rightReceive.resize(2 * (parameters_.geometry.sizeY + 3));
+    topReceive.resize(2 * (parameters_.geometry.sizeX + 3));
+    bottomReceive.resize(2 * (parameters_.geometry.sizeX + 3));
     frontReceive = {0};
     backReceive  = {0};
   } else if (parameters_.geometry.dim == 3) {
@@ -195,8 +202,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
   Stencils::VelocityBufferFillStencil vfill_(
     parameters_, leftSend, rightSend, topSend, bottomSend, frontSend, backSend
   );
-  ParallelBoundaryIterator<FlowField> velocityFillIterator(flowfield_, parameters_, vfill_, 0, 0);
-  velocityFillIterator.iterate();
+  velocityFillIterator_.iterate();
   MPI_Sendrecv(
     leftSend.data(),
     leftSend.size(),
@@ -208,7 +214,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.rightNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -223,7 +229,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.leftNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -238,7 +244,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.bottomNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -253,7 +259,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.topNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -268,7 +274,7 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.backNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
@@ -283,13 +289,12 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
     MPI_DOUBLE,
     parameters_.parallel.frontNb,
     0,
-    MPI_COMM_WORLD,
+    PETSC_COMM_WORLD,
     MPI_STATUS_IGNORE
   );
 
   Stencils::VelocityBufferReadStencil vread_(
     parameters_, leftReceive, rightReceive, topReceive, bottomReceive, frontReceive, backReceive
   );
-  ParallelBoundaryIterator<FlowField> velocityReadIterator(flowfield_, parameters_, vread_, 0, 0);
-  velocityReadIterator.iterate();
+  velocityReadIterator_.iterate();
 }

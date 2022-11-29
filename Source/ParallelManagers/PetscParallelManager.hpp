@@ -15,6 +15,14 @@ namespace ParallelManagers {
   private:
     Parameters& parameters_;
     FlowField&  flowfield_;
+    Stencils::PressureBufferFillStencil pressureFillStencil_;
+    Stencils::PressureBufferReadStencil pressureReadStencil_;
+    Stencils::VelocityBufferFillStencil velocityFillStencil_;
+    Stencils::VelocityBufferReadStencil VeclocityBufferStencil_;
+    ParallelBoundaryIterator<FlowField> pressureFillIterator_;
+    ParallelBoundaryIterator<FlowField> pressureReadIterator_;
+    ParallelBoundaryIterator<FlowField> VelocityFillIterator_;
+    ParallelBoundaryIterator<FlowField> VelocityReadIterator_;
 
   public:
     PetscParallelManager(Parameters& parameters, FlowField& flowfield);
@@ -24,3 +32,6 @@ namespace ParallelManagers {
     void communicateVelocities();
   };
 } // namespace ParallelManagers
+
+
+// I am still at pressurefill stencil need to update all the files
