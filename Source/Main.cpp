@@ -48,7 +48,8 @@ int main(int argc, char* argv[]) {
 
   // Read configuration and store information in parameters object
   Configuration configuration(argv[1]);
-  Parameters    parameters;
+
+  Parameters parameters;
   configuration.loadParameters(parameters);
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
@@ -77,7 +78,16 @@ int main(int argc, char* argv[]) {
 
   // Initialise simulation
   if (parameters.simulation.type == "turbulence") {
-    // TODO WS2: initialise turbulent flow field and turbulent simulation object
+    spdlog::info(parameters.turbulent.kappa);
+    // // TODO WS2: initialise turbulent flow field and turbulent simulation object
+    // if (rank == 0) {
+    //   spdlog::info("Start DNS simulation in {}D", parameters.geometry.dim);
+    // }
+    // flowField = new TurbulentFlowField(parameters);
+    // if (flowField == NULL) {
+    //   throw std::runtime_error("flowField == NULL!");
+    // }
+    // simulation = new TurbulentSimulation(parameters, *flowField);
     if (rank == 0) {
       spdlog::info("Start DNS simulation in {}D", parameters.geometry.dim);
     }
@@ -85,7 +95,8 @@ int main(int argc, char* argv[]) {
     if (flowField == NULL) {
       throw std::runtime_error("flowField == NULL!");
     }
-    simulation = new TurbulentSimulation(parameters, *flowField);
+    simulation = new Simulation(parameters, *flowField);
+
   } else if (parameters.simulation.type == "dns") {
     if (rank == 0) {
       spdlog::info("Start DNS simulation in {}D", parameters.geometry.dim);
@@ -118,22 +129,22 @@ int main(int argc, char* argv[]) {
   Clock clock;
   // Time loop
 
-  while (time < parameters.simulation.finalTime) {
+  // while (time < parameters.simulation.finalTime) {
 
-    simulation->solveTimestep();
-    timeSteps++;
-    time += parameters.timestep.dt;
+  //   simulation->solveTimestep();
+  //   timeSteps++;
+  //   time += parameters.timestep.dt;
 
-    if ((rank == 0) && (timeStdOut <= time)) {
-      spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
-      timeStdOut += parameters.stdOut.interval;
-    }
+  //   if ((rank == 0) && (timeStdOut <= time)) {
+  //     spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
+  //     timeStdOut += parameters.stdOut.interval;
+  //   }
 
-    if (timeVtk <= time) {
-      simulation->plotVTK(timeSteps, time);
-      timeVtk += parameters.vtk.interval;
-    }
-  }
+  //   if (timeVtk <= time) {
+  //     simulation->plotVTK(timeSteps, time);
+  //     timeVtk += parameters.vtk.interval;
+  //   }
+  // }
   spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
   // Plot final solution
@@ -153,3 +164,10 @@ int main(int argc, char* argv[]) {
 
   return EXIT_SUCCESS;
 }
+
+// TODO
+// viscosity stencil and iterator object in SIMULATION.HPP
+// make if tree for FGH turbulent stencil with return values in FIELDSTENCILS.HPP
+// find TimeStep function in literature
+// Complete turbulent simulation class
+// use localSizes[i] in parallelmanager

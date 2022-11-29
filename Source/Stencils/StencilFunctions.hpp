@@ -679,7 +679,7 @@ namespace Stencils {
 
     return tmp2;
   }
-
+  // make if tree for FGH turbulent stencil with return values.
   inline RealType computeF2D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
   ) {

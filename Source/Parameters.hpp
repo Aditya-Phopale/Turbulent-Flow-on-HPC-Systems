@@ -134,6 +134,11 @@ public:
 };
 //@}
 
+class TurbulenceParameters {
+public:
+  RealType kappa = 0;
+};
+
 /** A class to store and pass around the parameters
  */
 class Parameters {
@@ -153,5 +158,6 @@ public:
   StdOutParameters        stdOut;
   BFStepParameters        bfStep;
   // TODO WS2: include parameters for turbulence
-  Meshsize* meshsize;
+  Meshsize*            meshsize;
+  TurbulenceParameters turbulent;
 };
