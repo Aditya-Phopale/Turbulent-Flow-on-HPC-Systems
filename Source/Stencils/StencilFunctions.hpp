@@ -19,7 +19,7 @@ namespace Stencils {
   inline void loadLocalViscosity2D(FlowField& flowField, RealType* const localViscosity, int i, int j) {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
-        const RealType* const point               = flowField.getVelocity().getVector(i + column, j + row);
+        const RealType* const point               = flowField.getViscosity().getScalar(i + column, j + row);
         localViscosity[39 + 9 * row + 3 * column] = point; // x-component
       }
     }
@@ -43,7 +43,7 @@ namespace Stencils {
     for (int layer = -1; layer <= 1; layer++) {
       for (int row = -1; row <= 1; row++) {
         for (int column = -1; column <= 1; column++) {
-          const RealType* const point = flowField.getVelocity().getVector(i + column, j + row, k + layer);
+          const RealType* const point = flowField.getViscosity().getScalar(i + column, j + row, k + layer);
           localViscosity[39 + 27 * layer + 9 * row + 3 * column] = point; // x-component
         }
       }
@@ -103,25 +103,6 @@ namespace Stencils {
     return (lv[index0] - lv[index1]) / lm[index0];
   }
 
-  // Second derivative of u-component w.r.t. x-direction, evaluated at the location of the u-component.
-  inline RealType d2udx2(
-    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
-  ) {
-    // Evaluate the second derivative at the location of the u-component of the velocity field;
-    // we therefore use the two neighbouring u-components and assume arbitrary mesh sizes in both
-    // directions -> the formula arises from a straight-forward taylor expansion
-    // -> for equal meshsizes, we obtain the usual [1 -2 1]-like stencil.
-    const int indexM1 = mapd(-1, 0, 0, 0);
-    const int index0  = mapd(0, 0, 0, 0);
-    const int indexP1 = mapd(1, 0, 0, 0);
-
-    const RealType dx0   = lm[index0];
-    const RealType dx1   = lm[indexP1];
-    const RealType dxSum = dx0 + dx1;
-    // return 2.0 * (lv[indexP1] / (dx1 * dxSum) - lv[index0] / (dx1 * dx0) + lv[indexM1] / (dx0 * dxSum));
-    return 2.0 * (1 /)
-  }
-
   inline RealType d2udx2(const RealType* const lv, const RealType* const lm) {
     // Evaluate the second derivative at the location of the u-component of the velocity field;
     // we therefore use the two neighbouring u-components and assume arbitrary mesh sizes in both
@@ -137,6 +118,27 @@ namespace Stencils {
     return 2.0 * (lv[indexP1] / (dx1 * dxSum) - lv[index0] / (dx1 * dx0) + lv[indexM1] / (dx0 * dxSum));
   }
 
+  // Second derivative of turbulent u-component w.r.t. x-direction, evaluated at the location of the u-component.
+  inline RealType d2udx2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    // Evaluate the second derivative at the location of the u-component of the velocity field;
+    // we therefore use the two neighbouring u-components and assume arbitrary mesh sizes in both
+    // directions -> the formula arises from a straight-forward taylor expansion
+    // -> for equal meshsizes, we obtain the usual [1 -2 1]-like stencil.
+    const int indexM1 = mapd(-1, 0, 0, 0);
+    const int index0  = mapd(0, 0, 0, 0);
+    const int indexP1 = mapd(1, 0, 0, 0);
+
+    const RealType dx0   = lm[index0];
+    const RealType dx1   = lm[indexP1];
+    const RealType dxSum = dx0 + dx1;
+
+    return ((lvis[indexP1] + 1 / parameters.flow.Re) * (lv[indexP1] - lv[index0]) / dx1
+            - (lvis[index0] + 1 / parameters.flow.Re) * (lv[index0] - lv[indexM1]) / dx0)
+           / (0.5 * (dxSum));
+  }
+
   inline RealType d2udy2(const RealType* const lv, const RealType* const lm) {
     // Average mesh sizes, since the component u is located in the middle of the cell's face.
     const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
@@ -147,6 +149,39 @@ namespace Stencils {
     const RealType dySum = dy0 + dy1;
     return 2.0
            * (lv[mapd(0, 1, 0, 0)] / (dy1 * dySum) - lv[mapd(0, 0, 0, 0)] / (dy1 * dy0) + lv[mapd(0, -1, 0, 0)] / (dy0 * dySum));
+  }
+
+  inline RealType d2udy2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    // Average mesh sizes, since the component u is located in the middle of the cell's face.
+    const RealType dy_M1     = lm[mapd(0, -1, 0, 1)];
+    const RealType dy_0      = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1     = lm[mapd(0, 1, 0, 1)];
+    const RealType dy0       = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1       = 0.5 * (dy_0 + dy_P1);
+    const RealType dySum     = dy0 + dy1;
+    const RealType ViscT1    = lvis[mapd(0, 1, 0, 0)];
+    const RealType ViscT2    = lvis[mapd(1, 1, 0, 0)];
+    const RealType ViscM1    = lvis[mapd(0, 0, 0, 0)];
+    const RealType ViscM2    = lvis[mapd(1, 0, 0, 0)];
+    const RealType ViscB1    = lvis[mapd(0, -1, 0, 0)];
+    const RealType ViscB2    = lvis[mapd(1, -1, 0, 0)];
+    const RealType dx0       = lm[mapd(0, 0, 0, 0)];
+    const RealType dx1       = lm[mapd(1, 0, 0, 0)];
+    const RealType ViscAvg_1 = ((1 / (0.5 * dx0 + 0.5 * dx1)) * (0.5 * dy_0)
+                                  * (0.5 * lm[mapd(1, 0, 0, 0)] * ViscT1 + 0.5 * lm[mapd(0, 0, 0, 0)] * ViscT2)
+                                + (1 / (0.5 * dx0 + 0.5 * dx1)) * (0.5 * dy_P1)
+                                    * (0.5 * lm[mapd(1, 0, 0, 0)] * ViscM1 + 0.5 * lm[mapd(0, 0, 0, 0)] * ViscM2))
+                               / (0.5 * dy_P1 + 0.5 * dy_0);
+
+    const RealType ViscAvg_2 = ((1 / (0.5 * dx0 + 0.5 * dx1)) * (0.5 * dy_0)
+                                  * (0.5 * lm[mapd(1, 0, 0, 0)] * ViscB1 + 0.5 * lm[mapd(0, 0, 0, 0)] * ViscB2)
+                                + (1 / (0.5 * dx0 + 0.5 * dx1)) * (0.5 * dy_M1)
+                                    * (0.5 * lm[mapd(1, 0, 0, 0)] * ViscM1 + 0.5 * lm[mapd(0, 0, 0, 0)] * ViscM2))
+                               / (0.5 * dy_M1 + 0.5 * dy_0);
+
+    return (1 / dy_0) * (ViscAvg_1 * ((lv[0, 1, 0, 0] - lv[0, 0, 0, 0]) / dy1) + (lv[1, 0, 0, 1] - lv[]) / d)
   }
 
   inline RealType d2udz2(const RealType* const lv, const RealType* const lm) {
