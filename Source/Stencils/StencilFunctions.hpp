@@ -16,6 +16,15 @@ namespace Stencils {
     }
   }
 
+  inline void loadLocalViscosity2D(FlowField& flowField, RealType* const localViscosity, int i, int j) {
+    for (int row = -1; row <= 1; row++) {
+      for (int column = -1; column <= 1; column++) {
+        const RealType* const point               = flowField.getVelocity().getVector(i + column, j + row);
+        localViscosity[39 + 9 * row + 3 * column] = point; // x-component
+      }
+    }
+  }
+
   // Load the local velocity cube with surrounding velocities
   inline void loadLocalVelocity3D(FlowField& flowField, RealType* const localVelocity, int i, int j, int k) {
     for (int layer = -1; layer <= 1; layer++) {
@@ -25,6 +34,17 @@ namespace Stencils {
           localVelocity[39 + 27 * layer + 9 * row + 3 * column]     = point[0]; // x-component
           localVelocity[39 + 27 * layer + 9 * row + 3 * column + 1] = point[1]; // y-component
           localVelocity[39 + 27 * layer + 9 * row + 3 * column + 2] = point[2]; // z-component
+        }
+      }
+    }
+  }
+
+  inline void loadLocalViscosity3D(FlowField& flowField, RealType* const localViscosity, int i, int j, int k) {
+    for (int layer = -1; layer <= 1; layer++) {
+      for (int row = -1; row <= 1; row++) {
+        for (int column = -1; column <= 1; column++) {
+          const RealType* const point = flowField.getVelocity().getVector(i + column, j + row, k + layer);
+          localViscosity[39 + 27 * layer + 9 * row + 3 * column] = point; // x-component
         }
       }
     }
@@ -84,6 +104,24 @@ namespace Stencils {
   }
 
   // Second derivative of u-component w.r.t. x-direction, evaluated at the location of the u-component.
+  inline RealType d2udx2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    // Evaluate the second derivative at the location of the u-component of the velocity field;
+    // we therefore use the two neighbouring u-components and assume arbitrary mesh sizes in both
+    // directions -> the formula arises from a straight-forward taylor expansion
+    // -> for equal meshsizes, we obtain the usual [1 -2 1]-like stencil.
+    const int indexM1 = mapd(-1, 0, 0, 0);
+    const int index0  = mapd(0, 0, 0, 0);
+    const int indexP1 = mapd(1, 0, 0, 0);
+
+    const RealType dx0   = lm[index0];
+    const RealType dx1   = lm[indexP1];
+    const RealType dxSum = dx0 + dx1;
+    // return 2.0 * (lv[indexP1] / (dx1 * dxSum) - lv[index0] / (dx1 * dx0) + lv[indexM1] / (dx0 * dxSum));
+    return 2.0 * (1 /)
+  }
+
   inline RealType d2udx2(const RealType* const lv, const RealType* const lm) {
     // Evaluate the second derivative at the location of the u-component of the velocity field;
     // we therefore use the two neighbouring u-components and assume arbitrary mesh sizes in both
@@ -689,6 +727,19 @@ namespace Stencils {
             - duvdy(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
   }
 
+  inline RealType computeF2D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 0)]
+        + dt * ((d2udx2(localVelocity, localViscosity, parameters, localMeshsize)
+            + d2udy2(localVelocity, localViscosity, parameters, localMeshsize)) - du2dx(localVelocity, parameters, localMeshsize)
+            - duvdy(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
+  }
+
   inline RealType computeG2D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
   ) {
@@ -698,8 +749,35 @@ namespace Stencils {
             - dv2dy(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
   }
 
+  inline RealType computeG2D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 1)]
+        + dt * (1 / parameters.flow.Re * (d2vdx2(localVelocity, localMeshsize)
+            + d2vdy2(localVelocity, localMeshsize)) - duvdx(localVelocity, parameters, localMeshsize)
+            - dv2dy(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
+  }
+
   inline RealType computeF3D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 0)]
+        + dt * (1 / parameters.flow.Re * (d2udx2(localVelocity, localMeshsize)
+            + d2udy2(localVelocity, localMeshsize) + d2udz2(localVelocity, localMeshsize))
+            - du2dx(localVelocity, parameters, localMeshsize) - duvdy(localVelocity, parameters, localMeshsize)
+            - duwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
+  }
+
+  inline RealType computeF3D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
   ) {
     return localVelocity[mapd(0, 0, 0, 0)]
         + dt * (1 / parameters.flow.Re * (d2udx2(localVelocity, localMeshsize)
@@ -718,8 +796,36 @@ namespace Stencils {
             - dvwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
   }
 
+  inline RealType computeG3D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 1)]
+        + dt * (1 / parameters.flow.Re * (d2vdx2(localVelocity, localMeshsize)
+            + d2vdy2(localVelocity, localMeshsize) + d2vdz2(localVelocity, localMeshsize))
+            - dv2dy(localVelocity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
+            - dvwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
+  }
+
   inline RealType computeH3D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 2)]
+        + dt * (1 / parameters.flow.Re * (d2wdx2(localVelocity, localMeshsize)
+            + d2wdy2(localVelocity, localMeshsize) + d2wdz2(localVelocity, localMeshsize))
+            - dw2dz(localVelocity, parameters, localMeshsize) - duwdx(localVelocity, parameters, localMeshsize)
+            - dvwdy(localVelocity, parameters, localMeshsize) + parameters.environment.gz);
+  }
+
+  inline RealType computeH3D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
   ) {
     return localVelocity[mapd(0, 0, 0, 2)]
         + dt * (1 / parameters.flow.Re * (d2wdx2(localVelocity, localMeshsize)
