@@ -25,21 +25,21 @@ void Stencils::PressureBufferFillStencil::applyTopWall(FlowField& flowField, int
 }
 
 void Stencils::PressureBufferFillStencil::applyLeftWall(FlowField& flowField, int i, int j, int k) {
-  Left_.at(j * (parameters_.geometry.sizeZ + 3) + k) = flowField.getPressure().getScalar(i + 2, j, k);
+  Left_.at(j * (parameters_.parallel.localSize[2] + 3) + k) = flowField.getPressure().getScalar(i + 2, j, k);
 }
 void Stencils::PressureBufferFillStencil::applyRightWall(FlowField& flowField, int i, int j, int k) {
-  Right_.at(j * (parameters_.geometry.sizeZ + 3) + k) = flowField.getPressure().getScalar(i - 1, j, k);
+  Right_.at(j * (parameters_.parallel.localSize[2] + 3) + k) = flowField.getPressure().getScalar(i - 1, j, k);
 }
 void Stencils::PressureBufferFillStencil::applyBottomWall(FlowField& flowField, int i, int j, int k) {
-  Bottom_.at(i * (parameters_.geometry.sizeZ + 3) + k) = (flowField.getPressure().getScalar(i, j + 2, k));
+  Bottom_.at(i * (parameters_.parallel.localSize[2] + 3) + k) = (flowField.getPressure().getScalar(i, j + 2, k));
 }
 void Stencils::PressureBufferFillStencil::applyTopWall(FlowField& flowField, int i, int j, int k) {
-  Top_.at(i * (parameters_.geometry.sizeZ + 3) + k) = flowField.getPressure().getScalar(i, j - 1, k);
+  Top_.at(i * (parameters_.parallel.localSize[2] + 3) + k) = flowField.getPressure().getScalar(i, j - 1, k);
 }
 void Stencils::PressureBufferFillStencil::applyFrontWall(FlowField& flowField, int i, int j, int k) {
-  Front_.at(i * (parameters_.geometry.sizeY + 3) + j) = flowField.getPressure().getScalar(i, j, k + 2);
+  Front_.at(i * (parameters_.parallel.localSize[1] + 3) + j) = flowField.getPressure().getScalar(i, j, k + 2);
 }
 void Stencils::PressureBufferFillStencil::applyBackWall(FlowField& flowField, int i, int j, int k) {
-  Back_.at(i * (parameters_.geometry.sizeY + 3) + j) = flowField.getPressure().getScalar(i, j, k - 1);
+  Back_.at(i * (parameters_.parallel.localSize[1] + 3) + j) = flowField.getPressure().getScalar(i, j, k - 1);
 }
 

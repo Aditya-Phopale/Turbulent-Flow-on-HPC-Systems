@@ -20,31 +20,31 @@ void ParallelManagers::PetscParallelManager::communicatePressure() {
   std::vector<RealType> backReceive{0};
 
   if (parameters_.geometry.dim == 2) {
-    leftSend.resize(parameters_.geometry.sizeY + 3);
-    rightSend.resize(parameters_.geometry.sizeY + 3);
-    topSend.resize(parameters_.geometry.sizeX + 3);
-    bottomSend.resize(parameters_.geometry.sizeX + 3);
+    leftSend.resize(parameters_.parallel.localSize[1] + 3);
+    rightSend.resize(parameters_.parallel.localSize[1] + 3);
+    topSend.resize(parameters_.parallel.localSize[0] + 3);
+    bottomSend.resize(parameters_.parallel.localSize[0] + 3);
     frontSend = {0};
     backSend  = {0};
-    leftReceive.resize(parameters_.geometry.sizeY + 3);
-    rightReceive.resize(parameters_.geometry.sizeY + 3);
-    topReceive.resize(parameters_.geometry.sizeX + 3);
-    bottomReceive.resize(parameters_.geometry.sizeX + 3);
+    leftReceive.resize(parameters_.parallel.localSize[1] + 3);
+    rightReceive.resize(parameters_.parallel.localSize[1] + 3);
+    topReceive.resize(parameters_.parallel.localSize[0] + 3);
+    bottomReceive.resize(parameters_.parallel.localSize[0] + 3);
     frontReceive = {0};
     backReceive  = {0};
   } else if (parameters_.geometry.dim == 3) {
-    leftSend.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3));
-    rightSend.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3));
-    topSend.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3));
-    bottomSend.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3));
-    frontSend.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3));
-    backSend.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3));
-    leftReceive.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3));
-    rightReceive.resize((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3));
-    topReceive.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3));
-    bottomReceive.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3));
-    frontReceive.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3));
-    backReceive.resize((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3));
+    leftSend.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    rightSend.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    topSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    bottomSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    frontSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    backSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    leftReceive.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    rightReceive.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    topReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    bottomReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    frontReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    backReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
   }
 
   Stencils::PressureBufferFillStencil pfill_(
@@ -165,31 +165,31 @@ void ParallelManagers::PetscParallelManager::communicateVelocities() {
   std::vector<RealType> backReceive;
 
   if (parameters_.geometry.dim == 2) {
-    leftSend.resize(2 *(parameters_.geometry.sizeY + 3));
-    rightSend.resize(2 *(parameters_.geometry.sizeY + 3));
-    topSend.resize(2 *(parameters_.geometry.sizeX + 3));
-    bottomSend.resize(2 *(parameters_.geometry.sizeX + 3));
+    leftSend.resize(2 *(parameters_.parallel.localSize[1] + 3));
+    rightSend.resize(2 *(parameters_.parallel.localSize[1] + 3));
+    topSend.resize(2 *(parameters_.parallel.localSize[0] + 3));
+    bottomSend.resize(2 *(parameters_.parallel.localSize[0] + 3));
     frontSend = {0};
     backSend  = {0};
-    leftReceive.resize(2 *(parameters_.geometry.sizeY + 3));
-    rightReceive.resize(2 *(parameters_.geometry.sizeY + 3));
-    topReceive.resize(2 *(parameters_.geometry.sizeX + 3));
-    bottomReceive.resize(2 *(parameters_.geometry.sizeX + 3));
+    leftReceive.resize(2 *(parameters_.parallel.localSize[1] + 3));
+    rightReceive.resize(2 *(parameters_.parallel.localSize[1] + 3));
+    topReceive.resize(2 *(parameters_.parallel.localSize[0] + 3));
+    bottomReceive.resize(2 *(parameters_.parallel.localSize[0] + 3));
     frontReceive = {0};
     backReceive  = {0};
   } else if (parameters_.geometry.dim == 3) {
-    leftSend.resize(3 * ((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3)));
-    rightSend.resize(3 * ((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3)));
-    topSend.resize(3 * ((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3)));
-    bottomSend.resize(3 * ((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3)));
-    frontSend.resize(3 * ((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3)));
-    backSend.resize(3 * ((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3)));
-    leftReceive.resize(3 * ((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3)));
-    rightReceive.resize(3 * ((parameters_.geometry.sizeY + 3) * (parameters_.geometry.sizeZ + 3)));
-    topReceive.resize(3 * ((parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3)));
-    bottomReceive.resize(3 * (parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeZ + 3));
-    frontReceive.resize(3 * (parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3));
-    backReceive.resize(3 * (parameters_.geometry.sizeX + 3) * (parameters_.geometry.sizeY + 3));
+    leftSend.resize(3 * ((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3)));
+    rightSend.resize(3 * ((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3)));
+    topSend.resize(3 * ((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3)));
+    bottomSend.resize(3 * ((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3)));
+    frontSend.resize(3 * ((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3)));
+    backSend.resize(3 * ((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3)));
+    leftReceive.resize(3 * ((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3)));
+    rightReceive.resize(3 * ((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3)));
+    topReceive.resize(3 * ((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3)));
+    bottomReceive.resize(3 * (parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    frontReceive.resize(3 * (parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    backReceive.resize(3 * (parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
   }
 
   Stencils::VelocityBufferFillStencil vfill_(
