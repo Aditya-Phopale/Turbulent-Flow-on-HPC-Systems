@@ -181,7 +181,7 @@ namespace Stencils {
                                     * (0.5 * lm[mapd(1, 0, 0, 0)] * ViscM1 + 0.5 * lm[mapd(0, 0, 0, 0)] * ViscM2))
                                / (0.5 * dy_M1 + 0.5 * dy_0);
 
-    return (1 / dy_0) * (ViscAvg_1 * ((lv[0, 1, 0, 0] - lv[0, 0, 0, 0]) / dy1) + (lv[1, 0, 0, 1] - lv[]) / d)
+    return (1 / dy_0) * (ViscAvg_1 * ((lv[0, 1, 0, 0] - lv[0, 0, 0, 0]) / dy1) + (lv[1, 0, 0, 1] - lv[]) / d);
   }
 
   inline RealType d2udz2(const RealType* const lv, const RealType* const lm) {
