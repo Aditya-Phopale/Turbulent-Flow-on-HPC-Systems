@@ -55,9 +55,9 @@ void Stencils::VelocityBufferReadStencil::applyBottomWall(FlowField& flowField, 
   flowField.getVelocity().getVector(i, j + 1, k)[2] = Bottom_.at(i * (parameters_.parallel.localSize[2] + 3) + k + 2*(parameters_.parallel.localSize[0] + 3)*(parameters_.parallel.localSize[2] + 3));
 }
 void Stencils::VelocityBufferReadStencil::applyTopWall(FlowField& flowField, int i, int j, int k) {
-  flowField.getVelocity().getVector(i, j, k)[1] = Top_.at(i * (parameters_.parallel.localSize[2] + 3) + k);
+  flowField.getVelocity().getVector(i, j, k)[0] = Top_.at(i * (parameters_.parallel.localSize[2] + 3) + k);
   flowField.getVelocity().getVector(i, j, k)[1] = Top_.at(i * (parameters_.parallel.localSize[2] + 3) + k + (parameters_.parallel.localSize[0] + 3)*(parameters_.parallel.localSize[2] + 3));
-  flowField.getVelocity().getVector(i, j, k)[1] = Top_.at(i * (parameters_.parallel.localSize[2] + 3) + k + 2*(parameters_.parallel.localSize[0] + 3)*(parameters_.parallel.localSize[2] + 3));
+  flowField.getVelocity().getVector(i, j, k)[2] = Top_.at(i * (parameters_.parallel.localSize[2] + 3) + k + 2*(parameters_.parallel.localSize[0] + 3)*(parameters_.parallel.localSize[2] + 3));
 }
 void Stencils::VelocityBufferReadStencil::applyFrontWall(FlowField& flowField, int i, int j, int k) {
   flowField.getVelocity().getVector(i, j, k + 1)[0] = Front_.at(i * (parameters_.parallel.localSize[1] + 3) + j);
