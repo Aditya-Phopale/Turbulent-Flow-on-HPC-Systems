@@ -1,8 +1,8 @@
 #pragma once
 
 #include "FieldStencil.hpp"
-#include "FlowField.hpp"
 #include "Parameters.hpp"
+#include "TurbulentFlowField.hpp"
 
 namespace Stencils {
   class hStencil: public FieldStencil<FlowField> {
@@ -14,4 +14,3 @@ namespace Stencils {
     void apply(FlowField& flowField, int i, int j, int k) override;
   };
 } // namespace Stencils
-

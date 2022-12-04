@@ -1,38 +1,39 @@
 #include "Simulation.hpp"
+#include "ViscStencil.hpp"
 
 class TurbulentSimulation: public Simulation {
 protected:
-//   FlowField& flowField_;
+  //   FlowField& flowField_;
 
-//   Stencils::MaxUStencil             maxUStencil_;
-//   FieldIterator<FlowField>          maxUFieldIterator_;
-//   GlobalBoundaryIterator<FlowField> maxUBoundaryIterator_;
+  //   Stencils::MaxUStencil             maxUStencil_;
+  //   FieldIterator<FlowField>          maxUFieldIterator_;
+  //   GlobalBoundaryIterator<FlowField> maxUBoundaryIterator_;
 
-//   // Set up the boundary conditions
-//   GlobalBoundaryFactory             globalBoundaryFactory_;
-//   GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
-//   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
+  //   // Set up the boundary conditions
+  //   GlobalBoundaryFactory             globalBoundaryFactory_;
+  //   GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
+  //   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
 
   Stencils::FGHStencil     fghStencil_;
   FieldIterator<FlowField> fghIterator_;
 
-  Stencil::ViscStencil      viscStencil_;
-  FieldIterator<FlowField>  viscIterator_;
+  Stencils::ViscStencil    viscStencil_;
+  FieldIterator<FlowField> viscIterator_;
 
-//   Stencils::VelocityStencil velocityStencil_;
-//   Stencils::ObstacleStencil obstacleStencil_;
-//   FieldIterator<FlowField>  velocityIterator_;
-//   FieldIterator<FlowField>  obstacleIterator_;
+  //   Stencils::VelocityStencil velocityStencil_;
+  //   Stencils::ObstacleStencil obstacleStencil_;
+  //   FieldIterator<FlowField>  velocityIterator_;
+  //   FieldIterator<FlowField>  obstacleIterator_;
 
-//   Stencils::RHSStencil     rhsStencil_;
-//   FieldIterator<FlowField> rhsIterator_;
+  //   Stencils::RHSStencil     rhsStencil_;
+  //   FieldIterator<FlowField> rhsIterator_;
 
-//   std::unique_ptr<Solvers::LinearSolver> solver_;
+  //   std::unique_ptr<Solvers::LinearSolver> solver_;
 
   virtual void setTimeStep();
 
 public:
-  TurbulentSimulation(Parameters&, FlowField& );
+  TurbulentSimulation(Parameters&, FlowField&);
   virtual ~TurbulentSimulation() = default;
 
   /** Initialises the flow field according to the scenario */

@@ -158,6 +158,6 @@ public:
   StdOutParameters        stdOut;
   BFStepParameters        bfStep;
   // TODO WS2: include parameters for turbulence
-  Meshsize*            meshsize;
   TurbulenceParameters turbulent;
+  Meshsize*            meshsize;
 };
