@@ -2,8 +2,6 @@
 
 class TurbulentSimulation: public Simulation {
 protected:
-//   Parameters& parameters_;
-
 //   FlowField& flowField_;
 
 //   Stencils::MaxUStencil             maxUStencil_;
@@ -15,8 +13,11 @@ protected:
 //   GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
 //   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
 
-//   Stencils::FGHStencil     fghStencil_;
-//   FieldIterator<FlowField> fghIterator_;
+  Stencils::FGHStencil     fghStencil_;
+  FieldIterator<FlowField> fghIterator_;
+
+  Stencil::ViscStencil      viscStencil_;
+  FieldIterator<FlowField>  viscIterator_;
 
 //   Stencils::VelocityStencil velocityStencil_;
 //   Stencils::ObstacleStencil obstacleStencil_;
@@ -31,7 +32,7 @@ protected:
   virtual void setTimeStep();
 
 public:
-  TurbulentSimulation(Parameters& parameters, FlowField& flowField) : Simulation(parameters, flowField){}
+  TurbulentSimulation(Parameters&, FlowField& );
   virtual ~TurbulentSimulation() = default;
 
   /** Initialises the flow field according to the scenario */

@@ -167,7 +167,6 @@ int main(int argc, char* argv[]) {
 
 // TODO
 // viscosity stencil and iterator object in SIMULATION.HPP
-// make if tree for FGH turbulent stencil with return values in FIELDSTENCILS.HPP
 // find TimeStep function in literature
 // Complete turbulent simulation class
 // use localSizes[i] in parallelmanager
