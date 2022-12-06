@@ -119,25 +119,28 @@ int main(int argc, char* argv[]) {
   simulation->plotVTK(timeSteps, time);
 
   Clock clock;
-  // Time loop
 
-  // while (time < parameters.simulation.finalTime) {
+  simulation->
 
-  //   simulation->solveTimestep();
-  //   timeSteps++;
-  //   time += parameters.timestep.dt;
+    // Time loop
 
-  //   if ((rank == 0) && (timeStdOut <= time)) {
-  //     spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
-  //     timeStdOut += parameters.stdOut.interval;
-  //   }
+    // while (time < parameters.simulation.finalTime) {
 
-  //   if (timeVtk <= time) {
-  //     simulation->plotVTK(timeSteps, time);
-  //     timeVtk += parameters.vtk.interval;
-  //   }
-  // }
-  spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
+    //   simulation->solveTimestep();
+    //   timeSteps++;
+    //   time += parameters.timestep.dt;
+
+    //   if ((rank == 0) && (timeStdOut <= time)) {
+    //     spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
+    //     timeStdOut += parameters.stdOut.interval;
+    //   }
+
+    //   if (timeVtk <= time) {
+    //     simulation->plotVTK(timeSteps, time);
+    //     timeVtk += parameters.vtk.interval;
+    //   }
+    // }
+    spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
   // Plot final solution
   simulation->plotVTK(timeSteps, time);

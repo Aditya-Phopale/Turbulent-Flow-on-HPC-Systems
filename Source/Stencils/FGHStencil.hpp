@@ -30,8 +30,8 @@ namespace Stencils {
     RealType localMeshsize_[27 * 3];
 
   public:
-    FGHStencil(const Parameters& parameters);
-    ~FGHStencil() override = default;
+    TurbulentFGHStencil(const Parameters& parameters);
+    ~TurbulentFGHStencil() override = default;
 
     void apply(FlowField& flowField, int i, int j) override;
     void apply(FlowField& flowField, int i, int j, int k) override;

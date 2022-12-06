@@ -1,5 +1,5 @@
+#include "nuTStencil.hpp"
 #include "Simulation.hpp"
-#include "ViscStencil.hpp"
 
 class TurbulentSimulation: public Simulation {
 protected:
@@ -14,11 +14,11 @@ protected:
   //   GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
   //   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
 
-  Stencils::FGHStencil     fghStencil_;
-  FieldIterator<FlowField> fghIterator_;
+  Stencils::FGHStencil     TurbulentFGHStencil_;
+  FieldIterator<FlowField> TurbulentFGHIterator_;
 
-  Stencils::ViscStencil    viscStencil_;
-  FieldIterator<FlowField> viscIterator_;
+  Stencils::nuTStencil     nuTStencil_;
+  FieldIterator<FlowField> nuTIterator_;
 
   //   Stencils::VelocityStencil velocityStencil_;
   //   Stencils::ObstacleStencil obstacleStencil_;
