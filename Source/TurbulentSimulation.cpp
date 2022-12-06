@@ -8,3 +8,5 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flow
   nuTIterator_(flowField_, parameters_, nuTStencil_) {}
 
 void TurbulentSimulation::solveTimestep() {}
+
+void TurbulentSimulation::hUpdate() { hIterator_.iterate(); }

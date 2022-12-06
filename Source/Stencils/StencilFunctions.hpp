@@ -19,7 +19,7 @@ namespace Stencils {
   inline void loadLocalViscosity2D(FlowField& flowField, RealType* const localViscosity, int i, int j) {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
-        const RealType* const point               = flowField.getViscosity().getScalar(i + column, j + row);
+        const RealType* const point               = flowField.getnuT().getScalar(i + column, j + row);
         localViscosity[39 + 9 * row + 3 * column] = point; // x-component
       }
     }
@@ -43,7 +43,7 @@ namespace Stencils {
     for (int layer = -1; layer <= 1; layer++) {
       for (int row = -1; row <= 1; row++) {
         for (int column = -1; column <= 1; column++) {
-          const RealType* const point = flowField.getViscosity().getScalar(i + column, j + row, k + layer);
+          const RealType* const point = flowField.getnuT().getScalar(i + column, j + row, k + layer);
           localViscosity[39 + 27 * layer + 9 * row + 3 * column] = point; // x-component
         }
       }
@@ -233,10 +233,9 @@ namespace Stencils {
                                    + (1 / dx1) * (0.5 * dy_P1) * (0.5 * dx_P1 * ViscM1 + 0.5 * dx_0 * ViscR1))
                                   / dy1;
 
-    const RealType ViscAvgLeft
-      = ((1 / dx0) * (0.5 * dy_0) * (0.5 * dx_M1 * ViscM2 + 0.5 * dx_0 * ViscL2)
-         + (1 / dx0) * (0.5 * dy_P1) * (0.5 * dx_M1 * ViscM1 + 0.5 * dx_0 * ViscL1))
-        / dy1;
+    const RealType ViscAvgLeft = ((1 / dx0) * (0.5 * dy_0) * (0.5 * dx_M1 * ViscM2 + 0.5 * dx_0 * ViscL2)
+                                  + (1 / dx0) * (0.5 * dy_P1) * (0.5 * dx_M1 * ViscM1 + 0.5 * dx_0 * ViscL1))
+                                 / dy1;
 
     return (1 / dx_0)
            * ((ViscAvgRight + 1 / parameters.flow.Re) * ((lv[0, 1, 0, 0] - lv[0, 0, 0, 0]) / dy1 + (lv[1, 0, 0, 1] - lv[0, 0, 0, 1]) / dx1) - (ViscAvgLeft + 1 / parameters.flow.Re) * ((lv[-1, 1, 0, 0] - lv[-1, 0, 0, 0]) / dy1 + (lv[0, 0, 0, 1] - lv[-1, 0, 0, 1]) / dx0));

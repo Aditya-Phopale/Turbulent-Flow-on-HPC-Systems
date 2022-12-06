@@ -120,27 +120,29 @@ int main(int argc, char* argv[]) {
 
   Clock clock;
 
-  simulation->
+  if (parameters.simulation.type == "turbulence") {
+    simulation->hUpdate();
+  }
 
-    // Time loop
+  // Time loop
 
-    // while (time < parameters.simulation.finalTime) {
+  // while (time < parameters.simulation.finalTime) {
 
-    //   simulation->solveTimestep();
-    //   timeSteps++;
-    //   time += parameters.timestep.dt;
+  //   simulation->solveTimestep();
+  //   timeSteps++;
+  //   time += parameters.timestep.dt;
 
-    //   if ((rank == 0) && (timeStdOut <= time)) {
-    //     spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
-    //     timeStdOut += parameters.stdOut.interval;
-    //   }
+  //   if ((rank == 0) && (timeStdOut <= time)) {
+  //     spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
+  //     timeStdOut += parameters.stdOut.interval;
+  //   }
 
-    //   if (timeVtk <= time) {
-    //     simulation->plotVTK(timeSteps, time);
-    //     timeVtk += parameters.vtk.interval;
-    //   }
-    // }
-    spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
+  //   if (timeVtk <= time) {
+  //     simulation->plotVTK(timeSteps, time);
+  //     timeVtk += parameters.vtk.interval;
+  //   }
+  // }
+  // spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
   // Plot final solution
   simulation->plotVTK(timeSteps, time);

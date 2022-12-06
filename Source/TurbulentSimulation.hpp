@@ -1,3 +1,4 @@
+#include "hStencil.hpp"
 #include "nuTStencil.hpp"
 #include "Simulation.hpp"
 
@@ -20,6 +21,9 @@ protected:
   Stencils::nuTStencil     nuTStencil_;
   FieldIterator<FlowField> nuTIterator_;
 
+  Stencils::hStencil       hStecnil_;
+  FieldIterator<FlowField> hIterator_;
+
   //   Stencils::VelocityStencil velocityStencil_;
   //   Stencils::ObstacleStencil obstacleStencil_;
   //   FieldIterator<FlowField>  velocityIterator_;
@@ -40,6 +44,8 @@ public:
   virtual void initializeFlowField();
 
   virtual void solveTimestep();
+
+  void hUpdate();
 
   /** Plots the flow field */
   virtual void plotVTK(int timeStep, RealType simulationTime);

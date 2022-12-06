@@ -4,6 +4,7 @@
 #include "FieldStencil.hpp"
 #include "FlowField.hpp"
 #include "Parameters.hpp"
+#include "TurbulentFlowField.hpp"
 
 namespace Stencils {
 
@@ -19,6 +20,7 @@ namespace Stencils {
 
     std::stringstream pressureStream_; //! Stream for the pressure data
     std::stringstream velocityStream_; //! Stream for the velocity data
+    std::stringstream hSTream_;
 
     void writeVTKHeader(std::ostream& file) const;
     void writePoints(std::ostream& file, RealType simulationTime) const;
