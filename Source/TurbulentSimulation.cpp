@@ -4,7 +4,7 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   Simulation(parameters, flowField),
   turbflowField_(flowField),
   TurbulentFGHStencil_(parameters),
-  TurbulentFGHIterator_(turbflowField_, parameters, TurbulentFGHStencil_),
+  TurbulentFGHIterator_(flowField, parameters, TurbulentFGHStencil_),
   nuTStencil_(parameters),
   nuTIterator_(turbflowField_, parameters, nuTStencil_),
   hStencil_(parameters),

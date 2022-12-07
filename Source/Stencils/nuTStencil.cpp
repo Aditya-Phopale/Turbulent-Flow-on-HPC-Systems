@@ -6,7 +6,7 @@
 #include "StencilFunctions.hpp"
 
 Stencils::nuTStencil::nuTStencil(const Parameters& parameters):
-  FieldStencil<FlowField>(parameters) {}
+  FieldStencil<TurbulentFlowField>(parameters) {}
 
 void Stencils::nuTStencil::apply(TurbulentFlowField& flowField, int i, int j) {}
 

@@ -50,5 +50,4 @@ namespace Stencils {
 
     void write(FlowField& flowField, int timeStep, RealType simulationTime);
   };
-
 } // namespace Stencils

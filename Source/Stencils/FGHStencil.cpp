@@ -43,9 +43,9 @@ void Stencils::FGHStencil::apply(FlowField& flowField, int i, int j, int k) {
 }
 
 Stencils::TurbulentFGHStencil::TurbulentFGHStencil(const Parameters& parameters):
-  FieldStencil<FlowField>(parameters) {}
+  FieldStencil<TurbulentFlowField>(parameters) {}
 
-void Stencils::TurbulentFGHStencil::apply(FlowField& flowField, int i, int j) {
+void Stencils::TurbulentFGHStencil::apply(TurbulentFlowField& flowField, int i, int j) {
   // Load local velocities into the center layer of the local array
   loadLocalVelocity2D(flowField, localVelocity_, i, j);
   loadLocalViscosity2D(flowField, localViscosity_, i, j);
@@ -62,7 +62,7 @@ void Stencils::TurbulentFGHStencil::apply(FlowField& flowField, int i, int j) {
   );
 }
 
-void Stencils::TurbulentFGHStencil::apply(FlowField& flowField, int i, int j, int k) {
+void Stencils::TurbulentFGHStencil::apply(TurbulentFlowField& flowField, int i, int j, int k) {
   // The same as in 2D, with slight modifications.
 
   const int       obstacle = flowField.getFlags().getValue(i, j, k);

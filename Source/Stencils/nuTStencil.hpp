@@ -5,7 +5,7 @@
 #include "TurbulentFlowField.hpp"
 
 namespace Stencils {
-  class nuTStencil: public FieldStencil<FlowField> {
+  class nuTStencil: public FieldStencil<TurbulentFlowField> {
   public:
     nuTStencil(const Parameters& parameters);
     ~nuTStencil() override = default;

@@ -2,6 +2,7 @@
 
 #include "Definitions.hpp"
 #include "Parameters.hpp"
+#include "TurbulentFlowField.hpp"
 
 namespace Stencils {
 
@@ -16,7 +17,7 @@ namespace Stencils {
     }
   }
 
-  inline void loadLocalViscosity2D(FlowField& flowField, RealType* const localViscosity, int i, int j) {
+  inline void loadLocalViscosity2D(TurbulentFlowField& flowField, RealType* const localViscosity, int i, int j) {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
         localViscosity[39 + 9 * row + 3 * column] = flowField.getnuT().getScalar(i + column, j + row); // x-component
@@ -38,7 +39,7 @@ namespace Stencils {
     }
   }
 
-  inline void loadLocalViscosity3D(FlowField& flowField, RealType* const localViscosity, int i, int j, int k) {
+  inline void loadLocalViscosity3D(TurbulentFlowField& flowField, RealType* const localViscosity, int i, int j, int k) {
     for (int layer = -1; layer <= 1; layer++) {
       for (int row = -1; row <= 1; row++) {
         for (int column = -1; column <= 1; column++) {

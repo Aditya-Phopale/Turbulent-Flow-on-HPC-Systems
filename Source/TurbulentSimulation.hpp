@@ -18,7 +18,7 @@ protected:
   //   GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
   //   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
 
-  Stencils::FGHStencil              TurbulentFGHStencil_;
+  Stencils::TurbulentFGHStencil     TurbulentFGHStencil_;
   FieldIterator<TurbulentFlowField> TurbulentFGHIterator_;
 
   Stencils::nuTStencil              nuTStencil_;

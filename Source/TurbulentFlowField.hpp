@@ -9,16 +9,13 @@ private:
 public:
   TurbulentFlowField(const Parameters& parameters):
     FlowField(parameters),
-    h_(ScalarField(getNx() + 3, getNy() + 3)),
-    nuT_(ScalarField(getNx() + 3, getNy() + 3)) {}
-  virtual ~TurbulentFlowField() override = default;
+    h_(ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3)),
+    nuT_(ScalarField(parameters.parallel.localSize[0] + 3, parameters.parallel.localSize[1] + 3)) {}
+  ~TurbulentFlowField() = default;
 
-  virtual ScalarField& getheight() override {
-    std::cout << "Hello123\n";
-    return h_;
-  }
-  virtual ScalarField& getnuT() override { return nuT_; }
+  ScalarField& getheight() { return h_; }
+  ScalarField& getnuT() { return nuT_; }
 
-  virtual void geth(RealType& height, int i, int j) override { height = getheight().getScalar(i, j); }
-  virtual void getviscosity(RealType& viscosity, int i, int j) override { viscosity = getnuT().getScalar(i, j); }
+  void geth(RealType& height, int i, int j) { height = getheight().getScalar(i, j); }
+  void getviscosity(RealType& viscosity, int i, int j) { viscosity = getnuT().getScalar(i, j); }
 };

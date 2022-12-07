@@ -95,7 +95,7 @@ void Stencils::VTKStencil::apply(FlowField& flowField, int i, int j) {
 
   RealType pressure    = 0.0;
   RealType velocity[2] = {0.0, 0.0};
-  // RealType h           = 0.0;
+  RealType h           = 0.0;
 
   if ((flowField.getFlags().getValue(i, j) & OBSTACLE_SELF) == 0) {
     flowField.getPressureAndVelocity(pressure, velocity, i, j);

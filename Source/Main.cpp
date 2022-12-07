@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
   spdlog::info("Running in Release mode");
 #endif
 
-  argv[1] = "../ExampleCases/Cavity2D.xml";
+  // argv[1] = "../ExampleCases/Cavity2D.xml";
   if (!argv[1]) {
     spdlog::error("You need to pass a configuration file: mpirun -np 1 ./NS-EOF ExampleCases/Cavity2D.xml.");
     throw std::runtime_error("Argument parsing error");
@@ -55,8 +55,9 @@ int main(int argc, char* argv[]) {
   configuration.loadParameters(parameters);
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
-  FlowField*  flowField  = NULL;
-  Simulation* simulation = NULL;
+  FlowField*          flowField     = NULL;
+  TurbulentFlowField* Turbflowfield = NULL;
+  Simulation*         simulation    = NULL;
 
   spdlog::debug(
     "Processor {} with index {}, {}, {} is computing the size of its subdomain and obtains {}, {} and {}.",
@@ -85,11 +86,9 @@ int main(int argc, char* argv[]) {
     if (rank == 0) {
       spdlog::info("Start Turbulence simulation in {}D", parameters.geometry.dim);
     }
-    TurbulentFlowField Turbflowfield(parameters);
+    Turbflowfield = new TurbulentFlowField(parameters);
 
-    std::cout << Turbflowfield.getheight().getScalar(2, 2) << std::endl;
-
-    simulation = new TurbulentSimulation(parameters, Turbflowfield);
+    simulation = new TurbulentSimulation(parameters, *Turbflowfield);
 
   } else if (parameters.simulation.type == "dns") {
     if (rank == 0) {
@@ -121,10 +120,11 @@ int main(int argc, char* argv[]) {
   simulation->plotVTK(timeSteps, time);
 
   Clock clock;
-  // if (parameters.simulation.type == "turbulence") {
-  //   simulation->hUpdate();
-  // }
-
+  if (parameters.simulation.type == "turbulence") {
+    simulation->hUpdate();
+  }
+  Turbflowfield->getheight().show();
+  // std::cout << Turbflowfield->getCellsX() << " " << Turbflowfield->getCellsY() << "\n";
   // Time loop
 
   // while (time < parameters.simulation.finalTime) {
@@ -154,6 +154,9 @@ int main(int argc, char* argv[]) {
   delete flowField;
   flowField = NULL;
 
+  delete Turbflowfield;
+  Turbflowfield = NULL;
+
 #ifdef ENABLE_PETSC
   PetscFinalize();
 #else
@@ -163,8 +166,12 @@ int main(int argc, char* argv[]) {
   return EXIT_SUCCESS;
 }
 
-// TODO
-// viscosity stencil and iterator object in SIMULATION.HPP
-// find TimeStep function in literature
-// Complete turbulent simulation class
-// use localSizes[i] in parallelmanager
+// TODO by Thursday
+// deltax & Rex
+// find timestep
+// solve timestep & initialize flowfield
+
+// TODO start by Friday
+// Report by Pratik and Jefin
+// parallelise
+// 3D
