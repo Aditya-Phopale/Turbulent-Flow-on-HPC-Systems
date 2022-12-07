@@ -92,8 +92,8 @@ public:
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j);
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j, int k);
 
-  virtual void         geth(RealType& height, int i, int j);
-  virtual ScalarField& getnuT();
-  virtual ScalarField& getheight();
-  virtual void         getviscosity(RealType& viscosity, int i, int j);
+  virtual void         geth(RealType& height, int i, int j) {}
+  virtual ScalarField& getnuT() {}
+  virtual ScalarField& getheight() {}
+  virtual void         getviscosity(RealType& viscosity, int i, int j) {}
 };

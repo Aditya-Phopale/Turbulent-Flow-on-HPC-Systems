@@ -1,11 +1,13 @@
 #pragma once
 
+#include <fstream>
+#include <memory>
+
 #include "Definitions.hpp"
 #include "FieldStencil.hpp"
 #include "FlowField.hpp"
 #include "Parameters.hpp"
 #include "TurbulentFlowField.hpp"
-
 namespace Stencils {
 
   /** Stencil for writting VTK files

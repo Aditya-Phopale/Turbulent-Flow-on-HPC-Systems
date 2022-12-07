@@ -1,12 +1,13 @@
 #pragma once
 #include "Simulation.hpp"
+#include "TurbulentFlowField.hpp"
 
 #include "Stencils/hStencil.hpp"
 #include "Stencils/nuTStencil.hpp"
 
 class TurbulentSimulation: public Simulation {
 protected:
-  //   FlowField& flowField_;
+  TurbulentFlowField& turbflowField_;
 
   //   Stencils::MaxUStencil             maxUStencil_;
   //   FieldIterator<FlowField>          maxUFieldIterator_;
@@ -17,14 +18,14 @@ protected:
   //   GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
   //   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
 
-  Stencils::FGHStencil     TurbulentFGHStencil_;
-  FieldIterator<FlowField> TurbulentFGHIterator_;
+  Stencils::FGHStencil              TurbulentFGHStencil_;
+  FieldIterator<TurbulentFlowField> TurbulentFGHIterator_;
 
-  Stencils::nuTStencil     nuTStencil_;
-  FieldIterator<FlowField> nuTIterator_;
+  Stencils::nuTStencil              nuTStencil_;
+  FieldIterator<TurbulentFlowField> nuTIterator_;
 
-  Stencils::hStencil       hStencil_;
-  FieldIterator<FlowField> hIterator_;
+  Stencils::hStencil                hStencil_;
+  FieldIterator<TurbulentFlowField> hIterator_;
 
   //   Stencils::VelocityStencil velocityStencil_;
   //   Stencils::ObstacleStencil obstacleStencil_;
@@ -36,19 +37,19 @@ protected:
 
   //   std::unique_ptr<Solvers::LinearSolver> solver_;
 
-  virtual void setTimeStep();
+  virtual void setTimeStep() {}
 
 public:
-  TurbulentSimulation(Parameters&, FlowField&);
-  virtual ~TurbulentSimulation() = default;
+  TurbulentSimulation(Parameters&, TurbulentFlowField&);
+  virtual ~TurbulentSimulation() override = default;
 
   /** Initialises the flow field according to the scenario */
-  virtual void initializeFlowField();
+  // virtual void initializeFlowField() override;
 
-  virtual void solveTimestep();
+  virtual void solveTimestep() override;
 
-  void hUpdate();
+  virtual void hUpdate() override;
 
   /** Plots the flow field */
-  virtual void plotVTK(int timeStep, RealType simulationTime);
+  // virtual void plotVTK(int timeStep, RealType simulationTime);
 };

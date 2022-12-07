@@ -4,6 +4,7 @@
 #include "Configuration.hpp"
 #include "MeshsizeFactory.hpp"
 #include "Simulation.hpp"
+#include "TurbulentFlowField.hpp"
 #include "TurbulentSimulation.hpp"
 
 #include "ParallelManagers/PetscParallelConfiguration.hpp"
@@ -41,6 +42,7 @@ int main(int argc, char* argv[]) {
   spdlog::info("Running in Release mode");
 #endif
 
+  argv[1] = "../ExampleCases/Cavity2D.xml";
   if (!argv[1]) {
     spdlog::error("You need to pass a configuration file: mpirun -np 1 ./NS-EOF ExampleCases/Cavity2D.xml.");
     throw std::runtime_error("Argument parsing error");
@@ -78,16 +80,16 @@ int main(int argc, char* argv[]) {
 
   // Initialise simulation
   if (parameters.simulation.type == "turbulence") {
-    spdlog::info(parameters.turbulent.kappa);
-    // TODO WS2: initialise turbulent flow field and turbulent simulation object
+    // spdlog::info(parameters.turbulent.kappa);
+    //  TODO WS2: initialise turbulent flow field and turbulent simulation object
     if (rank == 0) {
-      spdlog::info("Start DNS simulation in {}D", parameters.geometry.dim);
+      spdlog::info("Start Turbulence simulation in {}D", parameters.geometry.dim);
     }
-    flowField = new TurbulentFlowField(parameters);
-    if (flowField == NULL) {
-      throw std::runtime_error("flowField == NULL!");
-    }
-    simulation = new TurbulentSimulation(parameters, *flowField);
+    TurbulentFlowField Turbflowfield(parameters);
+
+    std::cout << Turbflowfield.getheight().getScalar(2, 2) << std::endl;
+
+    simulation = new TurbulentSimulation(parameters, Turbflowfield);
 
   } else if (parameters.simulation.type == "dns") {
     if (rank == 0) {
@@ -119,10 +121,9 @@ int main(int argc, char* argv[]) {
   simulation->plotVTK(timeSteps, time);
 
   Clock clock;
-
-  if (parameters.simulation.type == "turbulence") {
-    simulation->hUpdate();
-  }
+  // if (parameters.simulation.type == "turbulence") {
+  //   simulation->hUpdate();
+  // }
 
   // Time loop
 

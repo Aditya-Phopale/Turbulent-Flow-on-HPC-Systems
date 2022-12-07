@@ -1,13 +1,14 @@
 #include "TurbulentSimulation.hpp"
 
-TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
+TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowField& flowField):
   Simulation(parameters, flowField),
+  turbflowField_(flowField),
   TurbulentFGHStencil_(parameters),
-  TurbulentFGHIterator_(flowField_, parameters, TurbulentFGHStencil_),
+  TurbulentFGHIterator_(turbflowField_, parameters, TurbulentFGHStencil_),
   nuTStencil_(parameters),
-  nuTIterator_(flowField_, parameters, nuTStencil_),
+  nuTIterator_(turbflowField_, parameters, nuTStencil_),
   hStencil_(parameters),
-  hIterator_(flowField_, parameters, hStencil_) {}
+  hIterator_(turbflowField_, parameters, hStencil_, 1, 0) {}
 
 void TurbulentSimulation::solveTimestep() {}
 

@@ -6,15 +6,16 @@
 #include "StencilFunctions.hpp"
 
 Stencils::hStencil::hStencil(const Parameters& parameters):
-  FieldStencil<FlowField>(parameters) {}
+  FieldStencil<TurbulentFlowField>(parameters) {}
 
-void Stencils::hStencil::apply(FlowField& flowField, int i, int j) {
+void Stencils::hStencil::apply(TurbulentFlowField& flowField, int i, int j) {
   auto xPos = parameters_.meshsize->getPosX(i, j);
   auto yPos = parameters_.meshsize->getPosY(i, j);
 
   // For CHannel Flow
   if (parameters_.bfStep.xRatio < 0 || parameters_.bfStep.yRatio < 0) {
     flowField.getheight().getScalar(i, j) = std::min(yPos, (parameters_.geometry.lengthY - yPos));
+
     // ****Remove x pos for cells near to inlet****
   }
   // For BFS
@@ -33,7 +34,7 @@ void Stencils::hStencil::apply(FlowField& flowField, int i, int j) {
   }
 }
 
-void Stencils::hStencil::apply(FlowField& flowField, int i, int j, int k) {
+void Stencils::hStencil::apply(TurbulentFlowField& flowField, int i, int j, int k) {
   auto xPos = parameters_.meshsize->getPosX(i, j, k);
   auto yPos = parameters_.meshsize->getPosY(i, j, k);
   auto zPos = parameters_.meshsize->getPosZ(i, j, k);
