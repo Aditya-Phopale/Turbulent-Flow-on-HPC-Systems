@@ -75,6 +75,7 @@
     "cinttypes": "cpp",
     "typeinfo": "cpp",
     "variant": "cpp",
-    "*.cpph": "cpp"
+    "*.cpph": "cpp",
+    "shared_mutex": "cpp"
   }
 }

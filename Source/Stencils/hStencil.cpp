@@ -14,21 +14,21 @@ void Stencils::hStencil::apply(FlowField& flowField, int i, int j) {
 
   // For CHannel Flow
   if (parameters_.bfStep.xRatio < 0 || parameters_.bfStep.yRatio < 0) {
-    flowField.geth(i, j) = std::min(yPos, (parameters_.geometry.lengthY - yPos));
+    flowField.getheight().getScalar(i, j) = std::min(yPos, (parameters_.geometry.lengthY - yPos));
     // ****Remove x pos for cells near to inlet****
   }
   // For BFS
   else {
     if (xPos <= parameters_.bfStep.xRatio * parameters_.geometry.lengthX) {
-      flowField.geth(i, j) = std::min(
+      flowField.getheight().getScalar(i, j) = std::min(
         yPos - (parameters_.bfStep.yRatio * parameters_.geometry.lengthY), (parameters_.geometry.lengthY - yPos)
       );
     } else if (yPos < parameters_.bfStep.yRatio * parameters_.geometry.lengthY) {
-      flowField.geth(i, j) = std::min(
-        xPos - (parameters_.geometry.lengthX - xPos), yPos, (parameters_.geometry.lengthY - yPos)
+      flowField.getheight().getScalar(i, j) = std::min(
+        xPos - (parameters_.geometry.lengthX - xPos), std::min(yPos, (parameters_.geometry.lengthY - yPos))
       );
     } else {
-      flowField.geth(i, j) = std::min(yPos, (parameters_.geometry.lengthY - yPos));
+      flowField.getheight().getScalar(i, j) = std::min(yPos, (parameters_.geometry.lengthY - yPos));
     }
   }
 }
@@ -39,21 +39,19 @@ void Stencils::hStencil::apply(FlowField& flowField, int i, int j, int k) {
   auto zPos = parameters_.meshsize->getPosZ(i, j, k);
 
   if (parameters_.bfStep.xRatio < 0 || parameters_.bfStep.yRatio < 0) {
-    flowField.geth(i, j, k) = std::min(
-      yPos, (parameters_.geometry.lengthY - yPos), zPos, parameters_.geometry.lengthZ - zPos
+    flowField.getheight().getScalar(i, j, k) = std::min(
+      yPos, std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, parameters_.geometry.lengthZ - zPos))
     );
     // ****Remove x pos for cells near to inlet****
   } else {
     if (xPos <= parameters_.bfStep.xRatio * parameters_.geometry.lengthX) {
-      flowField.geth(i, j, k) = std::min(
+      flowField.getheight().getScalar(i, j, k) = std::min(
         yPos - (parameters_.bfStep.yRatio * parameters_.geometry.lengthY),
-        (parameters_.geometry.lengthY - yPos),
-        zPos,
-        (parameters_.geometry.lengthZ - zPos)
+        std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, (parameters_.geometry.lengthZ - zPos)))
       );
     } else {
-      flowField.geth(i, j, k) = std::min(
-        yPos, (parameters_.geometry.lengthY - yPos), zPos, (parameters_.geometry.lengthZ - zPos)
+      flowField.getheight().getScalar(i, j, k) = std::min(
+        yPos, std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, (parameters_.geometry.lengthZ - zPos)))
       );
     }
   }

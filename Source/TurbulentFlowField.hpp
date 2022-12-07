@@ -1,3 +1,4 @@
+#pragma once
 #include "FlowField.hpp"
 
 class TurbulentFlowField: public FlowField {

@@ -1,6 +1,8 @@
-#include "hStencil.hpp"
-#include "nuTStencil.hpp"
+#pragma once
 #include "Simulation.hpp"
+
+#include "Stencils/hStencil.hpp"
+#include "Stencils/nuTStencil.hpp"
 
 class TurbulentSimulation: public Simulation {
 protected:
@@ -21,7 +23,7 @@ protected:
   Stencils::nuTStencil     nuTStencil_;
   FieldIterator<FlowField> nuTIterator_;
 
-  Stencils::hStencil       hStecnil_;
+  Stencils::hStencil       hStencil_;
   FieldIterator<FlowField> hIterator_;
 
   //   Stencils::VelocityStencil velocityStencil_;

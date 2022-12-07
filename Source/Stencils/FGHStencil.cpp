@@ -45,7 +45,7 @@ void Stencils::FGHStencil::apply(FlowField& flowField, int i, int j, int k) {
 Stencils::TurbulentFGHStencil::TurbulentFGHStencil(const Parameters& parameters):
   FieldStencil<FlowField>(parameters) {}
 
-void Stencils::TurbulentFGHStencilFGHStencil::apply(FlowField& flowField, int i, int j) {
+void Stencils::TurbulentFGHStencil::apply(FlowField& flowField, int i, int j) {
   // Load local velocities into the center layer of the local array
   loadLocalVelocity2D(flowField, localVelocity_, i, j);
   loadLocalViscosity2D(flowField, localViscosity_, i, j);
@@ -58,7 +58,7 @@ void Stencils::TurbulentFGHStencilFGHStencil::apply(FlowField& flowField, int i,
     localVelocity_, localViscosity_, localMeshsize_, parameters_, parameters_.timestep.dt
   );
   values[1] = computeG2D_turbulent(
-    localVelocity_, localViscoisty_, localMeshsize_, parameters_, parameters_.timestep.dt
+    localVelocity_, localViscosity_, localMeshsize_, parameters_, parameters_.timestep.dt
   );
 }
 
@@ -84,7 +84,7 @@ void Stencils::TurbulentFGHStencil::apply(FlowField& flowField, int i, int j, in
     }
     if ((obstacle & OBSTACLE_BACK) == 0) {
       values[2] = computeH3D_turbulent(
-        localVelocity_, localViscoisty_, localMeshsize_, parameters_, parameters_.timestep.dt
+        localVelocity_, localViscosity_, localMeshsize_, parameters_, parameters_.timestep.dt
       );
     }
   }

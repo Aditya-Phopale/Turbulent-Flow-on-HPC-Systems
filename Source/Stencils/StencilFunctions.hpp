@@ -19,8 +19,7 @@ namespace Stencils {
   inline void loadLocalViscosity2D(FlowField& flowField, RealType* const localViscosity, int i, int j) {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
-        const RealType* const point               = flowField.getnuT().getScalar(i + column, j + row);
-        localViscosity[39 + 9 * row + 3 * column] = point; // x-component
+        localViscosity[39 + 9 * row + 3 * column] = flowField.getnuT().getScalar(i + column, j + row); // x-component
       }
     }
   }
@@ -43,8 +42,9 @@ namespace Stencils {
     for (int layer = -1; layer <= 1; layer++) {
       for (int row = -1; row <= 1; row++) {
         for (int column = -1; column <= 1; column++) {
-          const RealType* const point = flowField.getnuT().getScalar(i + column, j + row, k + layer);
-          localViscosity[39 + 27 * layer + 9 * row + 3 * column] = point; // x-component
+          localViscosity[39 + 27 * layer + 9 * row + 3 * column] = flowField.getnuT().getScalar(
+            i + column, j + row, k + layer
+          ); // x-component
         }
       }
     }

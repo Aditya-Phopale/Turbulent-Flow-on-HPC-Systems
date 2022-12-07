@@ -2,10 +2,12 @@
 
 TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
   Simulation(parameters, flowField),
-  TurbulentFGHStencil_(parameters_),
-  TurbulentFGHIterator_(flowField_, parameters_, TurbulentFGHStencil_),
-  nuTStencil_(parameters_),
-  nuTIterator_(flowField_, parameters_, nuTStencil_) {}
+  TurbulentFGHStencil_(parameters),
+  TurbulentFGHIterator_(flowField_, parameters, TurbulentFGHStencil_),
+  nuTStencil_(parameters),
+  nuTIterator_(flowField_, parameters, nuTStencil_),
+  hStencil_(parameters),
+  hIterator_(flowField_, parameters, hStencil_) {}
 
 void TurbulentSimulation::solveTimestep() {}
 
