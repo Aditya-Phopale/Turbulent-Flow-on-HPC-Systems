@@ -30,7 +30,7 @@ void TurbulentSimulation::solveTimestep() {
   wallVelocityIterator_.iterate();
 }
 
-void TurbulentSimulation::setTimeStep() {}
+void TurbulentSimulation::setTimeStep() { tIterator_.iterate(); }
 
 void TurbulentSimulation::hUpdate() { hIterator_.iterate(); }
 

@@ -165,8 +165,7 @@ int main(int argc, char* argv[]) {
   return EXIT_SUCCESS;
 }
 
-// TODO by Thursday
-// deltax & Rex
+// TODO by Friday
 // find timestep
 // solve timestep & initialize flowfield
 
@@ -174,3 +173,8 @@ int main(int argc, char* argv[]) {
 // Report by Pratik and Jefin
 // parallelise
 // 3D
+
+// findtimestep - GG ToDO by friday
+// initialize flowfield- A-pop by friday
+// parallelise turb - J-man & P-raw
+// batch job scaling, help J-man, report -> P-raw

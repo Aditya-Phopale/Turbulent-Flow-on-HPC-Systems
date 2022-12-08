@@ -9,6 +9,8 @@ class TurbulentSimulation: public Simulation {
 protected:
   TurbulentFlowField& turbflowField_;
 
+  Stencils::timeStepStencil         timeStepStencil_;
+  FieldIterator<TurbulentFlowfield> tIterator_;
   //   Stencils::MaxUStencil             maxUStencil_;
   //   FieldIterator<FlowField>          maxUFieldIterator_;
   //   GlobalBoundaryIterator<FlowField> maxUBoundaryIterator_;
