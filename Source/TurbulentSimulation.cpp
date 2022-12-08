@@ -6,10 +6,32 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   TurbulentFGHStencil_(parameters),
   TurbulentFGHIterator_(flowField, parameters, TurbulentFGHStencil_),
   nuTStencil_(parameters),
-  nuTIterator_(turbflowField_, parameters, nuTStencil_),
+  nuTIterator_(turbflowField_, parameters, nuTStencil_, 1, 0),
   hStencil_(parameters),
   hIterator_(turbflowField_, parameters, hStencil_, 1, 0) {}
 
-void TurbulentSimulation::solveTimestep() {}
+void TurbulentSimulation::solveTimestep() {
+  // Determine and set max. timestep which is allowed in this simulation
+  setTimeStep();
+  // Compute FGH
+  fghIterator_.iterate();
+  // Set global boundary values
+  wallFGHIterator_.iterate();
+  // TODO WS1: compute the right hand side (RHS)
+  rhsIterator_.iterate();
+  // Solve for pressure
+  solver_->solve();
+  // TODO WS2: communicate pressure values
+  // Compute velocity
+  velocityIterator_.iterate();
+  obstacleIterator_.iterate();
+  // TODO WS2: communicate velocity values
+  // Iterate for velocities on the boundary
+  wallVelocityIterator_.iterate();
+}
+
+void TurbulentSimulation::setTimeStep() {}
 
 void TurbulentSimulation::hUpdate() { hIterator_.iterate(); }
+
+void TurbulentSimulation::nuTUpdate() { nuTIterator_.iterate(); }

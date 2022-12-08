@@ -403,65 +403,71 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
       }
 
       readFloatMandatory(parameters.turbulent.kappa, node, "kappa");
+      subNode = node->FirstChildElement("boundarylayer");
+      if (subNode != NULL) {
+        readIntMandatory(parameters.turbulent.delta, subNode, "delta");
+      } else {
+        throw std::runtime_error("Missing type in boundary layer");
+      }
     }
+
+    // Broadcasting of the values
+    MPI_Bcast(&(parameters.geometry.sizeX), 1, MPI_INT, 0, communicator);
+    MPI_Bcast(&(parameters.geometry.sizeY), 1, MPI_INT, 0, communicator);
+    MPI_Bcast(&(parameters.geometry.sizeZ), 1, MPI_INT, 0, communicator);
+
+    MPI_Bcast(&(parameters.geometry.dim), 1, MPI_INT, 0, communicator);
+
+    MPI_Bcast(&(parameters.geometry.meshsizeType), 1, MPI_INT, 0, communicator);
+    MPI_Bcast(&(parameters.geometry.stretchX), 1, MPI_INT, 0, communicator);
+    MPI_Bcast(&(parameters.geometry.stretchY), 1, MPI_INT, 0, communicator);
+    MPI_Bcast(&(parameters.geometry.stretchZ), 1, MPI_INT, 0, communicator);
+    MPI_Bcast(&(parameters.geometry.lengthX), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.geometry.lengthY), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.geometry.lengthZ), 1, MY_MPI_FLOAT, 0, communicator);
+
+    MPI_Bcast(&(parameters.timestep.dt), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.timestep.tau), 1, MY_MPI_FLOAT, 0, communicator);
+
+    MPI_Bcast(&(parameters.flow.Re), 1, MY_MPI_FLOAT, 0, communicator);
+
+    MPI_Bcast(&(parameters.solver.gamma), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.solver.maxIterations), 1, MY_MPI_FLOAT, 0, communicator);
+
+    MPI_Bcast(&(parameters.environment.gx), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.environment.gy), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.environment.gz), 1, MY_MPI_FLOAT, 0, communicator);
+
+    MPI_Bcast(&(parameters.simulation.finalTime), 1, MY_MPI_FLOAT, 0, communicator);
+
+    MPI_Bcast(&(parameters.vtk.interval), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.stdOut.interval), 1, MPI_INT, 0, communicator);
+
+    broadcastString(parameters.vtk.prefix, communicator);
+    broadcastString(parameters.simulation.type, communicator);
+    broadcastString(parameters.simulation.scenario, communicator);
+
+    MPI_Bcast(&(parameters.bfStep.xRatio), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.bfStep.yRatio), 1, MY_MPI_FLOAT, 0, communicator);
+
+    MPI_Bcast(parameters.parallel.numProcessors, 3, MPI_INT, 0, communicator);
+
+    MPI_Bcast(&(parameters.walls.scalarLeft), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.walls.scalarRight), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.walls.scalarBottom), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.walls.scalarTop), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.walls.scalarFront), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.walls.scalarBack), 1, MY_MPI_FLOAT, 0, communicator);
+
+    MPI_Bcast(parameters.walls.vectorLeft, 3, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(parameters.walls.vectorRight, 3, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(parameters.walls.vectorBottom, 3, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(parameters.walls.vectorTop, 3, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(parameters.walls.vectorFront, 3, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(parameters.walls.vectorBack, 3, MY_MPI_FLOAT, 0, communicator);
+
+    // TODO WS2: broadcast turbulence parameters
+    MPI_Bcast(&(parameters.turbulent.kappa), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.turbulent.delta), 1, MPI_INT, 0, communicator);
   }
-
-  // Broadcasting of the values
-  MPI_Bcast(&(parameters.geometry.sizeX), 1, MPI_INT, 0, communicator);
-  MPI_Bcast(&(parameters.geometry.sizeY), 1, MPI_INT, 0, communicator);
-  MPI_Bcast(&(parameters.geometry.sizeZ), 1, MPI_INT, 0, communicator);
-
-  MPI_Bcast(&(parameters.geometry.dim), 1, MPI_INT, 0, communicator);
-
-  MPI_Bcast(&(parameters.geometry.meshsizeType), 1, MPI_INT, 0, communicator);
-  MPI_Bcast(&(parameters.geometry.stretchX), 1, MPI_INT, 0, communicator);
-  MPI_Bcast(&(parameters.geometry.stretchY), 1, MPI_INT, 0, communicator);
-  MPI_Bcast(&(parameters.geometry.stretchZ), 1, MPI_INT, 0, communicator);
-  MPI_Bcast(&(parameters.geometry.lengthX), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.geometry.lengthY), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.geometry.lengthZ), 1, MY_MPI_FLOAT, 0, communicator);
-
-  MPI_Bcast(&(parameters.timestep.dt), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.timestep.tau), 1, MY_MPI_FLOAT, 0, communicator);
-
-  MPI_Bcast(&(parameters.flow.Re), 1, MY_MPI_FLOAT, 0, communicator);
-
-  MPI_Bcast(&(parameters.solver.gamma), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.solver.maxIterations), 1, MY_MPI_FLOAT, 0, communicator);
-
-  MPI_Bcast(&(parameters.environment.gx), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.environment.gy), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.environment.gz), 1, MY_MPI_FLOAT, 0, communicator);
-
-  MPI_Bcast(&(parameters.simulation.finalTime), 1, MY_MPI_FLOAT, 0, communicator);
-
-  MPI_Bcast(&(parameters.vtk.interval), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.stdOut.interval), 1, MPI_INT, 0, communicator);
-
-  broadcastString(parameters.vtk.prefix, communicator);
-  broadcastString(parameters.simulation.type, communicator);
-  broadcastString(parameters.simulation.scenario, communicator);
-
-  MPI_Bcast(&(parameters.bfStep.xRatio), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.bfStep.yRatio), 1, MY_MPI_FLOAT, 0, communicator);
-
-  MPI_Bcast(parameters.parallel.numProcessors, 3, MPI_INT, 0, communicator);
-
-  MPI_Bcast(&(parameters.walls.scalarLeft), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.walls.scalarRight), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.walls.scalarBottom), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.walls.scalarTop), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.walls.scalarFront), 1, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(&(parameters.walls.scalarBack), 1, MY_MPI_FLOAT, 0, communicator);
-
-  MPI_Bcast(parameters.walls.vectorLeft, 3, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(parameters.walls.vectorRight, 3, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(parameters.walls.vectorBottom, 3, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(parameters.walls.vectorTop, 3, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(parameters.walls.vectorFront, 3, MY_MPI_FLOAT, 0, communicator);
-  MPI_Bcast(parameters.walls.vectorBack, 3, MY_MPI_FLOAT, 0, communicator);
-
-  // TODO WS2: broadcast turbulence parameters
-
-  MPI_Bcast(&(parameters.turbulent.kappa), 1, MY_MPI_FLOAT, 0, communicator);
 }

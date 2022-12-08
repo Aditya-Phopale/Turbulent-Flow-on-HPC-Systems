@@ -92,6 +92,71 @@ namespace Stencils {
     return (lv[index0] - lv[index1]) / lm[index0];
   }
 
+  inline RealType dudy(const RealType* const lv, const RealType* const lm) {
+    // Evaluate dudx in the cell center by a central difference
+    const int indexc  = mapd(0, 0, 0, 0);
+    const int indexl  = mapd(-1, 0, 0, 0);
+    const int indexlt = mapd(-1, 1, 0, 0);
+    const int indext  = mapd(0, 1, 0, 0);
+    const int indexbl = mapd(-1, -1, 0, 0);
+    const int indexb  = mapd(0, -1, 0, 0);
+
+    RealType topR     = (lv[indext] - lv[indexc]) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)]));
+    RealType topL     = (lv[indexlt] - lv[indexl]) / (0.5 * (lm[mapd(-1, 1, 0, 1)] + lm[mapd(-1, 0, 0, 1)]));
+    RealType bottonmL = (lv[indexl] - lv[indexbl]) / (0.5 * (lm[mapd(0, -1, 0, 1)] + lm[mapd(-1, -1, 0, 1)]));
+    RealType bottomR  = (lv[indexc] - lv[indexb]) / (0.5 * (lm[mapd(0, 0, 0, 1)] + lm[mapd(0, -1, 0, 1)]));
+    return 0.25 * (topR + topL + bottomR + bottonmL);
+  }
+
+  inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
+    // Evaluate dudx in the cell center by a central difference
+    const int indexc  = mapd(0, 0, 0, 1);
+    const int indexl  = mapd(-1, 0, 0, 1);
+    const int indexr  = mapd(1, 0, 0, 1);
+    const int indexbl = mapd(-1, -1, 0, 1);
+    const int indexbr = mapd(1, -1, 0, 1);
+    const int indexb  = mapd(0, -1, 0, 1);
+
+    RealType topR     = (lv[indexr] - lv[indexc]) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)]));
+    RealType topL     = (lv[indexc] - lv[indexl]) / (0.5 * (lm[mapd(0, 0, 0, 0)] + lm[mapd(-1, 0, 0, 0)]));
+    RealType bottonmL = (lv[indexb] - lv[indexbl]) / (0.5 * (lm[mapd(0, -1, 0, 0)] + lm[mapd(-1, -1, 0, 0)]));
+    RealType bottomR  = (lv[indexbr] - lv[indexb]) / (0.5 * (lm[mapd(1, -1, 0, 0)] + lm[mapd(0, -1, 0, 0)]));
+    return 0.25 * (topR + topL + bottomR + bottonmL);
+  }
+
+  inline RealType dudz(const RealType* const lv, const RealType* const lm) {
+    // Evaluate dudx in the cell center by a central difference
+    const int indexc   = mapd(0, 0, 0, 0);
+    const int indexba  = mapd(0, 0, -1, 0);
+    const int indexf   = mapd(0, 0, 1, 0);
+    const int indexbal = mapd(-1, 0, -1, 0);
+    const int indexfl  = mapd(-1, 0, 1, 0);
+    const int indexl   = mapd(-1, 0, 0, 0);
+
+    RealType topR     = (lv[indexf] - lv[indexc]) / (0.5 * (lm[mapd(0, 0, 1, 2)] + lm[mapd(0, 0, 0, 2)]));
+    RealType topL     = (lv[indexfl] - lv[indexl]) / (0.5 * (lm[mapd(-1, 0, 1, 2)] + lm[mapd(-1, 0, 0, 2)]));
+    RealType bottonmL = (lv[indexl] - lv[indexbal]) / (0.5 * (lm[mapd(-1, 0, 0, 2)] + lm[mapd(-1, 0, -1, 2)]));
+    RealType bottomR  = (lv[indexc] - lv[indexba]) / (0.5 * (lm[mapd(0, 0, 0, 2)] + lm[mapd(0, 0, -1, 2)]));
+    return 0.25 * (topR + topL + bottomR + bottonmL);
+  }
+  // Implemented derivaive functions till now are correct
+
+  // inline RealType dwdx(const RealType* const lv, const RealType* const lm) {
+  //   // Evaluate dudx in the cell center by a central difference
+  //   const int indexc  = mapd(0, 0, 0, 2);
+  //   const int indexl  = mapd(-1, 0, 0, 2);
+  //   const int indexr  = mapd(1, 0, 0, 2);
+  //   const int indexbl = mapd(-1, -1, 0, 2);
+  //   const int indexb  = mapd(0, -1, 0, 2);
+  //   const int indexbr = mapd(1, -1, 0, 2);
+
+  //   RealType topR     = (lv[indexf] - lv[indexc]) / (0.5 * (lm[mapd(0, 0, 1, 2)] + lm[mapd(0, 0, 0, 2)]));
+  //   RealType topL     = (lv[indexfl] - lv[indexl]) / (0.5 * (lm[mapd(-1, 0, 1, 2)] + lm[mapd(-1, 0, 0, 2)]));
+  //   RealType bottonmL = (lv[indexl] - lv[indexbal]) / (0.5 * (lm[mapd(-1, 0, 0, 2)] + lm[mapd(-1, 0, -1, 2)]));
+  //   RealType bottomR  = (lv[indexc] - lv[indexba]) / (0.5 * (lm[mapd(0, 0, 0, 2)] + lm[mapd(0, 0, -1, 2)]));
+  //   return 0.25 * (topR + topL + bottomR + bottonmL);
+  // }
+
   inline RealType dvdy(const RealType* const lv, const RealType* const lm) {
     const int index0 = mapd(0, 0, 0, 1);
     const int index1 = mapd(0, -1, 0, 1);

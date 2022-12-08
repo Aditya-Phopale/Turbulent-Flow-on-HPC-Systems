@@ -137,6 +137,7 @@ public:
 class TurbulenceParameters {
 public:
   RealType kappa = 0;
+  int      delta;
 };
 
 /** A class to store and pass around the parameters

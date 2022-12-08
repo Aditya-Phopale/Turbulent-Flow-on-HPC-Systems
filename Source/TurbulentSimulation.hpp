@@ -37,7 +37,7 @@ protected:
 
   //   std::unique_ptr<Solvers::LinearSolver> solver_;
 
-  virtual void setTimeStep() {}
+  virtual void setTimeStep() override;
 
 public:
   TurbulentSimulation(Parameters&, TurbulentFlowField&);
@@ -49,6 +49,8 @@ public:
   virtual void solveTimestep() override;
 
   virtual void hUpdate() override;
+
+  virtual void nuTUpdate() override;
 
   /** Plots the flow field */
   // virtual void plotVTK(int timeStep, RealType simulationTime);
