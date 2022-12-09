@@ -51,9 +51,16 @@ void Stencils::hStencil::apply(TurbulentFlowField& flowField, int i, int j, int 
         yPos - (parameters_.bfStep.yRatio * parameters_.geometry.lengthY),
         std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, (parameters_.geometry.lengthZ - zPos)))
       );
-    } else {
+    } else if (yPos < parameters_.bfStep.yRatio * parameters_.geometry.lengthY) {
       flowField.getheight().getScalar(i, j, k) = std::min(
-        yPos, std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, (parameters_.geometry.lengthZ - zPos)))
+        xPos - (parameters_.bfStep.xRatio * parameters_.geometry.lengthX),
+        std::min(
+          yPos, std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, (parameters_.geometry.lengthZ - zPos)))
+        )
+      );
+    } else {
+      flowField.getheight().getScalar(i, j) = std::min(
+        yPos, std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, parameters_.geometry.lengthZ - zPos))
       );
     }
   }

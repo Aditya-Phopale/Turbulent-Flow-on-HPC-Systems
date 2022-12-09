@@ -9,8 +9,6 @@ class TurbulentSimulation: public Simulation {
 protected:
   TurbulentFlowField& turbflowField_;
 
-  Stencils::timeStepStencil         timeStepStencil_;
-  FieldIterator<TurbulentFlowfield> tIterator_;
   //   Stencils::MaxUStencil             maxUStencil_;
   //   FieldIterator<FlowField>          maxUFieldIterator_;
   //   GlobalBoundaryIterator<FlowField> maxUBoundaryIterator_;
@@ -46,7 +44,7 @@ public:
   virtual ~TurbulentSimulation() override = default;
 
   /** Initialises the flow field according to the scenario */
-  // virtual void initializeFlowField() override;
+  virtual void initializeFlowField() override;
 
   virtual void solveTimestep() override;
 

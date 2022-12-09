@@ -47,14 +47,11 @@ void Stencils::nuTStencil::apply(TurbulentFlowField& flowField, int i, int j, in
   loadLocalVelocity3D(flowField, localVelocity_, i, j, k);
   loadLocalMeshsize3D(parameters_, localMeshsize_, i, j, k);
 
-  RealType Sij = 0.0;
-
-  // pow(dudx(localVelocity_, localMeshsize_), 2) + pow(dvdy(localVelocity_, localMeshsize_), 2)
-  //                + pow(dwdz(localVelocity_, localMeshsize_), 2)
-  //                + pow(dudy(localVelocity_, localMeshsize_) + dvdx(localVelocity_, localMeshsize_), 2)
-  //                + pow(dudz(localVelocity_, localMeshsize_) + dwdx(localVelocity_, localMeshsize_), 2)
-  //                + pow(dvdz(localVelocity_, localMeshsize_) + dwdy(localVelocity_, localMeshsize_),
-  //                2);
+  RealType Sij = pow(dudx(localVelocity_, localMeshsize_), 2) + pow(dvdy(localVelocity_, localMeshsize_), 2)
+                 + pow(dwdz(localVelocity_, localMeshsize_), 2)
+                 + pow(dudy(localVelocity_, localMeshsize_) + dvdx(localVelocity_, localMeshsize_), 2)
+                 + pow(dudz(localVelocity_, localMeshsize_) + dwdx(localVelocity_, localMeshsize_), 2)
+                 + pow(dvdz(localVelocity_, localMeshsize_) + dwdy(localVelocity_, localMeshsize_), 2);
 
   flowField.getnuT().getScalar(i, j, k) = lm * lm * sqrt(2 * Sij);
 }

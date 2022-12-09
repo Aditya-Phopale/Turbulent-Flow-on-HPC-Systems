@@ -10,6 +10,11 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   hStencil_(parameters),
   hIterator_(turbflowField_, parameters, hStencil_, 1, 0) {}
 
+void TurbulentSimulation::initializeFlowField() {
+  Simulation::initializeFlowField();
+  hUpdate();
+}
+
 void TurbulentSimulation::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
