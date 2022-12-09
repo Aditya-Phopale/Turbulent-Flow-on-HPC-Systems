@@ -13,6 +13,7 @@ FlowField::FlowField(int Nx, int Ny):
   // positions with the same iterator for both pressures and velocities.
   ,
   pressure_(ScalarField(Nx + 3, Ny + 3)),
+  viscosity_(ScalarField(Nx + 3, Ny + 3)),
   velocity_(VectorField(Nx + 3, Ny + 3)),
   flags_(IntScalarField(Nx + 3, Ny + 3)),
   FGH_(VectorField(Nx + 3, Ny + 3)),
@@ -30,6 +31,7 @@ FlowField::FlowField(int Nx, int Ny, int Nz):
   cellsY_(Ny + 3),
   cellsZ_(Nz + 3),
   pressure_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  viscosity_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
   velocity_(VectorField(Nx + 3, Ny + 3, Nz + 3)),
   flags_(IntScalarField(Nx + 3, Ny + 3, Nz + 3)),
   FGH_(VectorField(Nx + 3, Ny + 3, Nz + 3)),
@@ -48,6 +50,9 @@ FlowField::FlowField(const Parameters& parameters):
   cellsY_(sizeY_ + 3),
   cellsZ_(parameters.geometry.dim == 2 ? 1 : sizeZ_ + 3),
   pressure_(
+    parameters.geometry.dim == 2 ? ScalarField(sizeX_ + 3, sizeY_ + 3) : ScalarField(sizeX_ + 3, sizeY_ + 3, sizeZ_ + 3)
+  ),
+  viscosity_(
     parameters.geometry.dim == 2 ? ScalarField(sizeX_ + 3, sizeY_ + 3) : ScalarField(sizeX_ + 3, sizeY_ + 3, sizeZ_ + 3)
   ),
   velocity_(
@@ -78,6 +83,8 @@ int FlowField::getCellsY() const { return cellsY_; }
 int FlowField::getCellsZ() const { return cellsZ_; }
 
 ScalarField& FlowField::getPressure() { return pressure_; }
+
+ScalarField& FlowField::getViscosity() { return viscosity_; }
 
 VectorField& FlowField::getVelocity() { return velocity_; }
 
