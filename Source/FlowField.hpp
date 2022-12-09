@@ -18,7 +18,6 @@ private:
   const int cellsZ_;
 
   ScalarField pressure_; //! Scalar field representing the pressure
-  ScalarField viscosity_; //! Scalar field representing the viscosity
   VectorField velocity_; //! Multicomponent field representing velocity
 
   IntScalarField flags_; //! Integer field for the flags
@@ -82,7 +81,6 @@ public:
   int getCellsZ() const;
 
   ScalarField& getPressure();
-  ScalarField& getViscosity();
   VectorField& getVelocity();
 
   IntScalarField& getFlags();
