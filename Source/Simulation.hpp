@@ -62,6 +62,10 @@ public:
 
   virtual void solveTimestep();
 
+  virtual void hUpdate() {}
+
+  virtual void nuTUpdate() {}
+
   /** Plots the flow field */
   virtual void plotVTK(int timeStep, RealType simulationTime);
 };

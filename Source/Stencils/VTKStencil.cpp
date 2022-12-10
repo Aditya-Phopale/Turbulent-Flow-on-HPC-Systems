@@ -95,15 +95,19 @@ void Stencils::VTKStencil::apply(FlowField& flowField, int i, int j) {
 
   RealType pressure    = 0.0;
   RealType velocity[2] = {0.0, 0.0};
+  RealType h           = 0.0;
 
   if ((flowField.getFlags().getValue(i, j) & OBSTACLE_SELF) == 0) {
     flowField.getPressureAndVelocity(pressure, velocity, i, j);
+    // flowField.geth(h, i, j);
 
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " 0" << std::endl;
+    // hStream_ << h << std::endl;
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;
+    // hStream_ << h << std::endl;
   }
 }
 
@@ -112,15 +116,19 @@ void Stencils::VTKStencil::apply(FlowField& flowField, int i, int j, int k) {
 
   RealType pressure    = 0.0;
   RealType velocity[3] = {0.0, 0.0, 0.0};
+  // RealType h           = 0.0;
 
   if ((flowField.getFlags().getValue(i, j, k) & OBSTACLE_SELF) == 0) {
     flowField.getPressureAndVelocity(pressure, velocity, i, j, k);
+    // flowField.geth(h, i, j);
 
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " " << velocity[2] << std::endl;
+    // hStream_ << h << std::endl;
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;
+    // hStream_ << h << std::endl;
   }
 }
 
@@ -171,6 +179,10 @@ void Stencils::VTKStencil::write(FlowField& flowField, int timeStep, RealType si
     ofile_ << "VECTORS velocity float" << std::endl;
     ofile_ << velocityStream_.str() << std::endl;
     velocityStream_.str("");
+
+    // ofile_ << "SCALARS height float 1" << std::endl;
+    // ofile_ << hStream_.str() << std::endl;
+    // hStream_.str("");
   }
 
   written_ = true;

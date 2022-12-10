@@ -2,9 +2,10 @@
 
 #include <limits>
 #include <math.h>
-#include <string.h>
 #include <mpi.h>
+#include <string.h>
 #include <petsc/petsc.h>
+
 #ifndef ENABLE_PETSC
 #define PETSC_COMM_WORLD MPI_COMM_WORLD
 #endif

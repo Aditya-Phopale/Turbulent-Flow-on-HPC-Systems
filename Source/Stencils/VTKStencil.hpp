@@ -1,10 +1,13 @@
 #pragma once
 
+#include <fstream>
+#include <memory>
+
 #include "Definitions.hpp"
 #include "FieldStencil.hpp"
 #include "FlowField.hpp"
 #include "Parameters.hpp"
-
+#include "TurbulentFlowField.hpp"
 namespace Stencils {
 
   /** Stencil for writting VTK files
@@ -19,6 +22,7 @@ namespace Stencils {
 
     std::stringstream pressureStream_; //! Stream for the pressure data
     std::stringstream velocityStream_; //! Stream for the velocity data
+    // std::stringstream hStream_;
 
     void writeVTKHeader(std::ostream& file) const;
     void writePoints(std::ostream& file, RealType simulationTime) const;
@@ -46,5 +50,4 @@ namespace Stencils {
 
     void write(FlowField& flowField, int timeStep, RealType simulationTime);
   };
-
 } // namespace Stencils
