@@ -33,6 +33,5 @@ namespace Stencils {
     void applyTopWall(FlowFieldType& flowField, int i, int j, int k) override;
     void applyFrontWall(FlowFieldType& flowField, int i, int j, int k) override;
     void applyBackWall(FlowFieldType& flowField, int i, int j, int k) override;
-
   };
 } // namespace Stencils

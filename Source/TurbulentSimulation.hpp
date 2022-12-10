@@ -2,6 +2,7 @@
 #include "Simulation.hpp"
 #include "TurbulentFlowField.hpp"
 
+#include "ParallelManagers/PetscParallelManager.hpp"
 #include "Stencils/hStencil.hpp"
 #include "Stencils/nuTStencil.hpp"
 #include "Stencils/timeStepStencil.hpp"
@@ -40,6 +41,7 @@ protected:
   //   FieldIterator<FlowField> rhsIterator_;
 
   //   std::unique_ptr<Solvers::LinearSolver> solver_;
+  ParallelManagers::PetscParallelManager<TurbulentFlowField> ppmTurbulent_;
 
   virtual void setTimeStep() override;
 

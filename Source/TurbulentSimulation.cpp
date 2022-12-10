@@ -10,7 +10,8 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   hStencil_(parameters),
   hIterator_(turbflowField_, parameters, hStencil_, 1, 0),
   dtStencil_(parameters),
-  dtIterator_(turbflowField_, parameters, dtStencil_) {}
+  dtIterator_(turbflowField_, parameters, dtStencil_),
+  ppmTurbulent_(parameters, turbflowField_) {}
 
 void TurbulentSimulation::initializeFlowField() {
   Simulation::initializeFlowField();
@@ -21,12 +22,11 @@ void TurbulentSimulation::initializeFlowField() {
 void TurbulentSimulation::solveTimestep() {
 
   // Communicate viscosity
-
+  ppmTurbulent_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
   // Compute FGH
   TurbulentFGHIterator_.iterate();
-  // std::cout << "Hello from turbulence\n";
   // Set global boundary values
   wallFGHIterator_.iterate();
   // TODO WS1: compute the right hand side (RHS)
@@ -34,10 +34,12 @@ void TurbulentSimulation::solveTimestep() {
   // Solve for pressure
   solver_->solve();
   // TODO WS2: communicate pressure values
+  ppmTurbulent_.communicatePressure();
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
+  ppmTurbulent_.communicateVelocities();
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
 

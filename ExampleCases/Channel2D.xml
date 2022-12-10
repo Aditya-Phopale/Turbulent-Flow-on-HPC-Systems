@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
     <flow Re="10000" />
-    <simulation finalTime="1000.0" >
-        <type>turbulence</type>
+    <simulation finalTime="10.0" >
+        <type>dns</type>
         <scenario>channel</scenario>
     </simulation>
     <turbulenceParameters kappa = "0.41">
@@ -13,7 +13,7 @@
     <geometry
       dim="2"
       lengthX="5.0" lengthY="1.0" lengthZ="1.0"
-      sizeX="1000" sizeY="1000" sizeZ="10"
+      sizeX="100" sizeY="100" sizeZ="10"
       stretchX="false" stretchY="true" stretchZ="true"
     >
       <mesh>uniform</mesh>
