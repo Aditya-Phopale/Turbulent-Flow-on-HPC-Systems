@@ -14,7 +14,7 @@ void Stencils::nuTStencil::apply(TurbulentFlowField& flowField, int i, int j) {
     delta = 0.0;
   } else if (parameters_.turbulent.delta == 1) {
     auto x = parameters_.meshsize->getPosX(i, j) + 0.5 * parameters_.meshsize->getDx(i, j);
-    delta  = 4.91 * sqrt(x / ((parameters_.walls.scalarLeft) * parameters_.flow.Re));
+    delta  = 4.91 * sqrt(x / ((parameters_.walls.vectorLeft[0]) * parameters_.flow.Re));
   } else if (parameters_.turbulent.delta == 2) {
     auto x = parameters_.meshsize->getPosX(i, j) + 0.5 * parameters_.meshsize->getDx(i, j);
     delta  = 0.382 * pow(x, 0.8) / pow(parameters_.walls.vectorLeft[0] * parameters_.flow.Re, 0.2);

@@ -18,4 +18,5 @@ public:
 
   void geth(RealType& height, int i, int j) { height = getheight().getScalar(i, j); }
   void getviscosity(RealType& viscosity, int i, int j) { viscosity = getnuT().getScalar(i, j); }
+  void getviscosity(RealType& viscosity, int i, int j, int k) { viscosity = getnuT().getScalar(i, j, k); }
 };

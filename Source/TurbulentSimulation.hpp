@@ -6,6 +6,7 @@
 #include "Stencils/hStencil.hpp"
 #include "Stencils/nuTStencil.hpp"
 #include "Stencils/timeStepStencil.hpp"
+#include "Stencils/TurbulentVTKStencil.hpp"
 
 class TurbulentSimulation: public Simulation {
 protected:
@@ -57,6 +58,8 @@ public:
   virtual void hUpdate() override;
 
   virtual void nuTUpdate() override;
+
+  void plotVTK(int, RealType) override;
 
   /** Plots the flow field */
   // virtual void plotVTK(int timeStep, RealType simulationTime);

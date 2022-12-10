@@ -93,3 +93,11 @@ void TurbulentSimulation::setTimeStep() {
 void TurbulentSimulation::hUpdate() { hIterator_.iterate(); }
 
 void TurbulentSimulation::nuTUpdate() { nuTIterator_.iterate(); }
+
+void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
+  Stencils::TurbulentVTKStencil     TurbulentvtkStencil(parameters_);
+  FieldIterator<TurbulentFlowField> TurbulentvtkIterator(turbflowField_, parameters_, TurbulentvtkStencil, 1, 0);
+
+  TurbulentvtkIterator.iterate();
+  TurbulentvtkStencil.write(turbflowField_, timeStep, simulationTime);
+}
