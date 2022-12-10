@@ -120,9 +120,6 @@ int main(int argc, char* argv[]) {
   simulation->plotVTK(timeSteps, time);
 
   Clock clock;
-  if (parameters.simulation.type == "turbulence") {
-    simulation->hUpdate();
-  }
 
   // Time loop
 

@@ -13,13 +13,17 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
 void TurbulentSimulation::initializeFlowField() {
   Simulation::initializeFlowField();
   hUpdate();
+  nuTUpdate();
 }
 
 void TurbulentSimulation::solveTimestep() {
+
+  // Communicate viscosity
+
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
   // Compute FGH
-  fghIterator_.iterate();
+  TurbulentFGHIterator_.iterate();
   // Set global boundary values
   wallFGHIterator_.iterate();
   // TODO WS1: compute the right hand side (RHS)
@@ -33,9 +37,11 @@ void TurbulentSimulation::solveTimestep() {
   // TODO WS2: communicate velocity values
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
+
+  // Calculate viscosity
 }
 
-void TurbulentSimulation::setTimeStep() { tIterator_.iterate(); }
+void TurbulentSimulation::setTimeStep() {} //{ tIterator_.iterate(); }
 
 void TurbulentSimulation::hUpdate() { hIterator_.iterate(); }
 
