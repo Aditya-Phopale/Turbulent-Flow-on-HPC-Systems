@@ -1,5 +1,6 @@
 #include "StdAfx.hpp"
 
+#include "TurbulentFlowField.hpp"
 #include "ViscosityBufferReadStencil.hpp"
 
 #include "Definitions.hpp"

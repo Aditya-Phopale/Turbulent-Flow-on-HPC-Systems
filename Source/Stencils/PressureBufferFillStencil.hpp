@@ -8,7 +8,8 @@
 
 namespace Stencils {
 
-  class PressureBufferFillStencil: public BoundaryStencil<FlowField> {
+  template <class FlowFieldType>
+  class PressureBufferFillStencil: public BoundaryStencil<FlowFieldType> {
   private:
     std::vector<RealType>& Left_;
     std::vector<RealType>& Right_;
@@ -21,17 +22,17 @@ namespace Stencils {
     PressureBufferFillStencil(const Parameters&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&);
     ~PressureBufferFillStencil() override = default;
 
-    void applyLeftWall(FlowField& flowField, int i, int j) override;
-    void applyRightWall(FlowField& flowField, int i, int j) override;
-    void applyBottomWall(FlowField& flowField, int i, int j) override;
-    void applyTopWall(FlowField& flowField, int i, int j) override;
+    void applyLeftWall(FlowFieldType& flowField, int i, int j) override;
+    void applyRightWall(FlowFieldType& flowField, int i, int j) override;
+    void applyBottomWall(FlowFieldType& flowField, int i, int j) override;
+    void applyTopWall(FlowFieldType& flowField, int i, int j) override;
 
-    void applyLeftWall(FlowField& flowField, int i, int j, int k) override;
-    void applyRightWall(FlowField& flowField, int i, int j, int k) override;
-    void applyBottomWall(FlowField& flowField, int i, int j, int k) override;
-    void applyTopWall(FlowField& flowField, int i, int j, int k) override;
-    void applyFrontWall(FlowField& flowField, int i, int j, int k) override;
-    void applyBackWall(FlowField& flowField, int i, int j, int k) override;
+    void applyLeftWall(FlowFieldType& flowField, int i, int j, int k) override;
+    void applyRightWall(FlowFieldType& flowField, int i, int j, int k) override;
+    void applyBottomWall(FlowFieldType& flowField, int i, int j, int k) override;
+    void applyTopWall(FlowFieldType& flowField, int i, int j, int k) override;
+    void applyFrontWall(FlowFieldType& flowField, int i, int j, int k) override;
+    void applyBackWall(FlowFieldType& flowField, int i, int j, int k) override;
 
   };
 } // namespace Stencils

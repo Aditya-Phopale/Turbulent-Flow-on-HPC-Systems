@@ -19,6 +19,7 @@
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKStencil.hpp"
 #include "ParallelManagers/PetscParallelManager.hpp"
+#include "ParallelManagers/PetscParallelManager.cpph"
 
 class Simulation {
 protected:
@@ -50,7 +51,7 @@ protected:
 
   virtual void setTimeStep();
 
-  ParallelManagers::PetscParallelManager ppm_;
+  ParallelManagers::PetscParallelManager<FlowField> ppm_;
 
 public:
   Simulation(Parameters& parameters, FlowField& flowField);
