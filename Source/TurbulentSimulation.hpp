@@ -4,6 +4,7 @@
 
 #include "Stencils/hStencil.hpp"
 #include "Stencils/nuTStencil.hpp"
+#include "Stencils/timeStepStencil.hpp"
 
 class TurbulentSimulation: public Simulation {
 protected:
@@ -26,6 +27,9 @@ protected:
 
   Stencils::hStencil                hStencil_;
   FieldIterator<TurbulentFlowField> hIterator_;
+
+  Stencils::timeStepStencil         dtStencil_;
+  FieldIterator<TurbulentFlowField> dtIterator_;
 
   //   Stencils::VelocityStencil velocityStencil_;
   //   Stencils::ObstacleStencil obstacleStencil_;

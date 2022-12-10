@@ -60,6 +60,7 @@ void Stencils::TurbulentFGHStencil::apply(TurbulentFlowField& flowField, int i, 
   values[1] = computeG2D_turbulent(
     localVelocity_, localViscosity_, localMeshsize_, parameters_, parameters_.timestep.dt
   );
+  // std::cout << "Hello from turbulent apply\n";
 }
 
 void Stencils::TurbulentFGHStencil::apply(TurbulentFlowField& flowField, int i, int j, int k) {
