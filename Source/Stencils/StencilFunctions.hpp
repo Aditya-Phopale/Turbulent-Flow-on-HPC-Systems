@@ -297,7 +297,7 @@ namespace Stencils {
 
     return (1 / dy_0)
            * ((ViscAvgTop + 1 / parameters.flow.Re) * ((lv[0, 1, 0, 0] - lv[0, 0, 0, 0]) / dy1 + (lv[1, 0, 0, 1] - lv[0, 0, 0, 1]) / dx1) 
-           - (ViscAvgBottom + 1 / parameters.flow.Re) * ((lv[0, 0, 0, 0] - lv[0, -1, 0, 0]) / dy0 + (lv[1, -1, 0, 1] - lv[0, -1, 0, 1]) / dx0));
+           - (ViscAvgBottom + 1 / parameters.flow.Re) * ((lv[0, 0, 0, 0] - lv[0, -1, 0, 0]) / dy0 + (lv[1, -1, 0, 1] - lv[0, -1, 0, 1]) / dx1));
   }
 
   inline RealType d2udz2(const RealType* const lv, const RealType* const lm) {
@@ -353,7 +353,8 @@ namespace Stencils {
                                  / dy1;
 
     return (1 / dx_0)
-           * ((ViscAvgRight + 1 / parameters.flow.Re) * ((lv[0, 1, 0, 0] - lv[0, 0, 0, 0]) / dy1 + (lv[1, 0, 0, 1] - lv[0, 0, 0, 1]) / dx1) - (ViscAvgLeft + 1 / parameters.flow.Re) * ((lv[-1, 1, 0, 0] - lv[-1, 0, 0, 0]) / dy1 + (lv[0, 0, 0, 1] - lv[-1, 0, 0, 1]) / dx0));
+           * ((ViscAvgRight + 1 / parameters.flow.Re) * ((lv[0, 1, 0, 0] - lv[0, 0, 0, 0]) / dy1 + (lv[1, 0, 0, 1] - lv[0, 0, 0, 1]) / dx1) 
+           - (ViscAvgLeft + 1 / parameters.flow.Re) * ((lv[-1, 1, 0, 0] - lv[-1, 0, 0, 0]) / dy1 + (lv[0, 0, 0, 1] - lv[-1, 0, 0, 1]) / dx0));
   }
 
   inline RealType d2vdy2(const RealType* const lv, const RealType* const lm) {
