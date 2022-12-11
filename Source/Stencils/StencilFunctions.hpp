@@ -94,34 +94,50 @@ namespace Stencils {
 
   inline RealType dudy(const RealType* const lv, const RealType* const lm) {
     // Evaluate dudx in the cell center by a central difference
-    const int indexc  = mapd(0, 0, 0, 0);
-    const int indexl  = mapd(-1, 0, 0, 0);
+    const int indexc = mapd(0, 0, 0, 0);
+    const int indexl = mapd(-1, 0, 0, 0);
+    RealType  cv     = 0.5 * (lv[indexc] + lv[indexl]);
+
     const int indexlt = mapd(-1, 1, 0, 0);
     const int indext  = mapd(0, 1, 0, 0);
+    RealType  tv      = 0.5 * (lv[indexlt] + lv[indext]);
+
     const int indexbl = mapd(-1, -1, 0, 0);
     const int indexb  = mapd(0, -1, 0, 0);
+    RealType  bv      = 0.5 * (lv[indexbl] + lv[indexb]);
 
-    RealType topR     = (lv[indext] - lv[indexc]) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)]));
-    RealType topL     = (lv[indexlt] - lv[indexl]) / (0.5 * (lm[mapd(-1, 1, 0, 1)] + lm[mapd(-1, 0, 0, 1)]));
-    RealType bottonmL = (lv[indexl] - lv[indexbl]) / (0.5 * (lm[mapd(0, -1, 0, 1)] + lm[mapd(-1, -1, 0, 1)]));
-    RealType bottomR  = (lv[indexc] - lv[indexb]) / (0.5 * (lm[mapd(0, 0, 0, 1)] + lm[mapd(0, -1, 0, 1)]));
-    return 0.25 * (topR + topL + bottomR + bottonmL);
+    return 0.5
+           * ((tv - cv) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)])) + (cv - bv) / (0.5 * (lm[mapd(0, 0, 0, 1)] + lm[mapd(0, -1, 0, 1)])));
+
+    // RealType topR     = (lv[indext] - lv[indexc]) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)]));
+    // RealType topL     = (lv[indexlt] - lv[indexl]) / (0.5 * (lm[mapd(-1, 1, 0, 1)] + lm[mapd(-1, 0, 0, 1)]));
+    // RealType bottonmL = (lv[indexl] - lv[indexbl]) / (0.5 * (lm[mapd(0, -1, 0, 1)] + lm[mapd(-1, -1, 0, 1)]));
+    // RealType bottomR  = (lv[indexc] - lv[indexb]) / (0.5 * (lm[mapd(0, 0, 0, 1)] + lm[mapd(0, -1, 0, 1)]));
+    // return 0.25 * (topR + topL + bottomR + bottonmL);
   }
 
   inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
     // Evaluate dudx in the cell center by a central difference
-    const int indexc  = mapd(0, 0, 0, 1);
-    const int indexl  = mapd(-1, 0, 0, 1);
-    const int indexr  = mapd(1, 0, 0, 1);
-    const int indexbl = mapd(-1, -1, 0, 1);
-    const int indexbr = mapd(1, -1, 0, 1);
-    const int indexb  = mapd(0, -1, 0, 1);
+    const int indexc = mapd(0, 0, 0, 1);
+    const int indexb = mapd(0, -1, 0, 1);
+    RealType  cv     = 0.5 * (lv[indexc] + lv[indexb]);
 
-    RealType topR     = (lv[indexr] - lv[indexc]) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)]));
-    RealType topL     = (lv[indexc] - lv[indexl]) / (0.5 * (lm[mapd(0, 0, 0, 0)] + lm[mapd(-1, 0, 0, 0)]));
-    RealType bottonmL = (lv[indexb] - lv[indexbl]) / (0.5 * (lm[mapd(0, -1, 0, 0)] + lm[mapd(-1, -1, 0, 0)]));
-    RealType bottomR  = (lv[indexbr] - lv[indexb]) / (0.5 * (lm[mapd(1, -1, 0, 0)] + lm[mapd(0, -1, 0, 0)]));
-    return 0.25 * (topR + topL + bottomR + bottonmL);
+    const int indexl  = mapd(-1, 0, 0, 1);
+    const int indexbl = mapd(-1, -1, 0, 1);
+    RealType  lev     = 0.5 * (lv[indexl] + lv[indexbl]);
+
+    const int indexr  = mapd(1, 0, 0, 1);
+    const int indexbr = mapd(1, -1, 0, 1);
+    RealType  rv      = 0.5 * (lv[indexr] + lv[indexbr]);
+
+    return 0.5
+           * ((rv - cv) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)])) + (cv - lev) / (0.5 * (lm[mapd(0, 0, 0, 0)] + lm[mapd(-1, 0, 0, 0)])));
+
+    // RealType topR     = (lv[indexr] - lv[indexc]) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)]));
+    // RealType topL     = (lv[indexc] - lv[indexl]) / (0.5 * (lm[mapd(0, 0, 0, 0)] + lm[mapd(-1, 0, 0, 0)]));
+    // RealType bottonmL = (lv[indexb] - lv[indexbl]) / (0.5 * (lm[mapd(0, -1, 0, 0)] + lm[mapd(-1, -1, 0, 0)]));
+    // RealType bottomR  = (lv[indexbr] - lv[indexb]) / (0.5 * (lm[mapd(1, -1, 0, 0)] + lm[mapd(0, -1, 0, 0)]));
+    // return 0.25 * (topR + topL + bottomR + bottonmL);
   }
 
   inline RealType dudz(const RealType* const lv, const RealType* const lm) {
@@ -277,10 +293,11 @@ namespace Stencils {
 
     const RealType ViscAvgBottom = ((1 / dx1) * (0.5 * dy_0) * (0.5 * dx_P1 * ViscB1 + 0.5 * dx_0 * ViscB2)
                                     + (1 / dx1) * (0.5 * dy_M1) * (0.5 * dx_P1 * ViscM1 + 0.5 * dx_0 * ViscM2))
-                                   / dx0;
+                                   / dy0;
 
     return (1 / dy_0)
-           * ((ViscAvgTop + 1 / parameters.flow.Re) * ((lv[0, 1, 0, 0] - lv[0, 0, 0, 0]) / dy1 + (lv[1, 0, 0, 1] - lv[0, 0, 0, 1]) / dx1) - (ViscAvgBottom + 1 / parameters.flow.Re) * ((lv[0, 0, 0, 0] - lv[0, -1, 0, 0]) / dy0 + (lv[1, -1, 0, 1] - lv[0, -1, 0, 1]) / dx0));
+           * ((ViscAvgTop + 1 / parameters.flow.Re) * ((lv[0, 1, 0, 0] - lv[0, 0, 0, 0]) / dy1 + (lv[1, 0, 0, 1] - lv[0, 0, 0, 1]) / dx1) 
+           - (ViscAvgBottom + 1 / parameters.flow.Re) * ((lv[0, 0, 0, 0] - lv[0, -1, 0, 0]) / dy0 + (lv[1, -1, 0, 1] - lv[0, -1, 0, 1]) / dx0));
   }
 
   inline RealType d2udz2(const RealType* const lv, const RealType* const lm) {
@@ -920,8 +937,8 @@ namespace Stencils {
   ) {
     // std::cout << d2udx2(localVelocity, localViscosity, parameters, localMeshsize) << "\n";
     return localVelocity[mapd(0, 0, 0, 0)]
-        + dt * (2*(d2udx2(localVelocity, localViscosity, parameters, localMeshsize)
-            + d2udy2(localVelocity, localViscosity, parameters, localMeshsize)) - du2dx(localVelocity, parameters, localMeshsize)
+        + dt * (2*d2udx2(localVelocity, localViscosity, parameters, localMeshsize)
+            + d2udy2(localVelocity, localViscosity, parameters, localMeshsize) - du2dx(localVelocity, parameters, localMeshsize)
             - duvdy(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
   }
 
@@ -942,8 +959,8 @@ namespace Stencils {
     RealType              dt
   ) {
     return localVelocity[mapd(0, 0, 0, 1)]
-        + dt * ( (d2vdx2(localVelocity, localViscosity, parameters, localMeshsize)
-            + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize)) - duvdx(localVelocity, parameters, localMeshsize)
+        + dt * ( d2vdx2(localVelocity, localViscosity, parameters, localMeshsize)
+            + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
             - dv2dy(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
   }
 

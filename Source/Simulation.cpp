@@ -83,7 +83,7 @@ void Simulation::solveTimestep() {
   // TODO WS1: compute the right hand side (RHS)
   rhsIterator_.iterate();
   // Solve for pressure
-  solver_->solve(); 
+  solver_->solve();
   // TODO WS2: communicate pressure values
   ppm_.communicatePressure();
   // Compute velocity
@@ -119,9 +119,6 @@ void Simulation::setTimeStep() {
   } else {
     parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[0] + std::numeric_limits<double>::min());
   }
-
-  // localMin = std::min(parameters_.timestep.dt, std::min(std::min(parameters_.flow.Re/(2 * factor), 1.0 /
-  // maxUStencil_.getMaxValues()[0]), 1.0 / maxUStencil_.getMaxValues()[1]));
 
   localMin = std::min(
     parameters_.flow.Re / (2 * factor),

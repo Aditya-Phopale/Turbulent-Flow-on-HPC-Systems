@@ -15,8 +15,6 @@ void Stencils::hStencil::apply(TurbulentFlowField& flowField, int i, int j) {
   // For CHannel Flow
   if (parameters_.bfStep.xRatio < 0 || parameters_.bfStep.yRatio < 0) {
     flowField.getheight().getScalar(i, j) = std::min(yPos, (parameters_.geometry.lengthY - yPos));
-
-    // ****Remove x pos for cells near to inlet****
   }
   // For BFS
   else {

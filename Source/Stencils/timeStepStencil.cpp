@@ -17,10 +17,8 @@ void Stencils::timeStepStencil::apply(TurbulentFlowField& flowField, int i, int 
       + 1.0
           / (FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDyMin() * FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDyMin());
 
-  Mindt = std::min(
-    (FieldStencil<TurbulentFlowField>::parameters_.flow.Re + 1 / flowField.getnuT().getScalar(i, j)) / (2 * factor),
-    Mindt
-  );
+  RealType vtotal = 1 / FieldStencil<TurbulentFlowField>::parameters_.flow.Re + flowField.getnuT().getScalar(i, j);
+  Mindt           = std::min(1 / (2 * vtotal * factor), Mindt);
 }
 
 void Stencils::timeStepStencil::apply(TurbulentFlowField& flowField, int i, int j, int k) {
