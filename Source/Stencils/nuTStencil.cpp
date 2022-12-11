@@ -21,14 +21,17 @@ void Stencils::nuTStencil::apply(TurbulentFlowField& flowField, int i, int j) {
   }
 
   RealType lm = std::min(parameters_.turbulent.kappa * flowField.getheight().getScalar(i, j), 0.09 * delta);
-
+  // std::cout << lm << " ";
   loadLocalVelocity2D(flowField, localVelocity_, i, j);
   loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
 
-  RealType Sij = pow(dudx(localVelocity_, localMeshsize_), 2) + pow(dvdy(localVelocity_, localMeshsize_), 2)
-                 + 0.5 * pow(dudy(localVelocity_, localMeshsize_) + dvdx(localVelocity_, localMeshsize_), 2);
+  RealType S11 = dudx(localVelocity_, localMeshsize_);
+  RealType S22 = dvdy(localVelocity_, localMeshsize_);
+  RealType S12 = 0.5 * (dudy(localVelocity_, localMeshsize_) + dvdx(localVelocity_, localMeshsize_));
 
-  flowField.getnuT().getScalar(i, j) = lm * lm * sqrt(2 * Sij);
+  RealType SijSij = S11 * S11 + S22 * S22 + 2 * S12 * S12;
+
+  flowField.getnuT().getScalar(i, j) = lm * lm * sqrt(2 * SijSij);
 }
 
 void Stencils::nuTStencil::apply(TurbulentFlowField& flowField, int i, int j, int k) {

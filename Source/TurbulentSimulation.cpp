@@ -6,9 +6,9 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
   TurbulentFGHStencil_(parameters),
   TurbulentFGHIterator_(turbflowField_, parameters, TurbulentFGHStencil_),
   nuTStencil_(parameters),
-  nuTIterator_(turbflowField_, parameters, nuTStencil_, 1, 0),
+  nuTIterator_(turbflowField_, parameters, nuTStencil_, 0, 0),
   hStencil_(parameters),
-  hIterator_(turbflowField_, parameters, hStencil_, 1, 0),
+  hIterator_(turbflowField_, parameters, hStencil_, 0, 0),
   dtStencil_(parameters),
   dtIterator_(turbflowField_, parameters, dtStencil_),
   ppmTurbulent_(parameters, turbflowField_) {}
@@ -16,12 +16,15 @@ TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowFi
 void TurbulentSimulation::initializeFlowField() {
   Simulation::initializeFlowField();
   hUpdate();
-  nuTUpdate();
+  // nuTUpdate();
 }
 
 void TurbulentSimulation::solveTimestep() {
-
+  nuTUpdate();
+  // std::cout << "***************************************************************************\n";
+  // turbflowField_.getnuT().show();
   // Communicate viscosity
+
   ppmTurbulent_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
@@ -44,7 +47,6 @@ void TurbulentSimulation::solveTimestep() {
   wallVelocityIterator_.iterate();
 
   // Calculate viscosity
-  nuTUpdate();
 }
 
 void TurbulentSimulation::setTimeStep() {
