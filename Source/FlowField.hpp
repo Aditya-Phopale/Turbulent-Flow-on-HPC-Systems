@@ -25,6 +25,10 @@ private:
   VectorField FGH_;
   ScalarField RHS_; //! Right hand side for the Poisson equation
 
+  ScalarField h_;
+
+  ScalarField nuT_;
+
 public:
   /** Constructor for the 2D flow field
    *
@@ -92,6 +96,14 @@ public:
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j);
   void getPressureAndVelocity(RealType& pressure, RealType* const velocity, int i, int j, int k);
 
+  ScalarField& getheight() { return h_; }
+  ScalarField& getnuT() { return nuT_; }
+
+  void geth(RealType& height, int i, int j) elete Turbflowfield;
+  Turbflowfield = NULL;
+  { height = getheight().getScalar(i, j); }
+  void getviscosity(RealType& viscosity, int i, int j) { viscosity = getnuT().getScalar(i, j); }
+  void getviscosity(RealType& viscosity, int i, int j, int k) { viscosity = getnuT().getScalar(i, j, k); }
   // virtual void         geth(RealType& height, int i, int j) {}
   // virtual ScalarField& getnuT() {}
   // virtual ScalarField& getheight() {}

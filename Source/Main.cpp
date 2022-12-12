@@ -4,7 +4,6 @@
 #include "Configuration.hpp"
 #include "MeshsizeFactory.hpp"
 #include "Simulation.hpp"
-#include "TurbulentFlowField.hpp"
 #include "TurbulentSimulation.hpp"
 
 #include "ParallelManagers/PetscParallelConfiguration.hpp"
@@ -58,9 +57,8 @@ int main(int argc, char* argv[]) {
   configuration.loadParameters(parameters);
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
-  FlowField*          flowField     = NULL;
-  TurbulentFlowField* Turbflowfield = NULL;
-  Simulation*         simulation    = NULL;
+  FlowField*  flowField  = NULL;
+  Simulation* simulation = NULL;
 
   spdlog::debug(
     "Processor {} with index {}, {}, {} is computing the size of its subdomain and obtains {}, {} and {}.",
@@ -89,9 +87,9 @@ int main(int argc, char* argv[]) {
     if (rank == 0) {
       spdlog::info("Start Turbulence simulation in {}D", parameters.geometry.dim);
     }
-    Turbflowfield = new TurbulentFlowField(parameters);
+    flowField = new FlowField(parameters);
 
-    simulation = new TurbulentSimulation(parameters, *Turbflowfield);
+    simulation = new TurbulentSimulation(parameters, *flowField);
 
   } else if (parameters.simulation.type == "dns") {
     if (rank == 0) {
@@ -146,15 +144,12 @@ int main(int argc, char* argv[]) {
 
   // Plot final solution
   simulation->plotVTK(timeSteps, time);
- 
+
   delete simulation;
   simulation = NULL;
 
   delete flowField;
   flowField = NULL;
-
-  delete Turbflowfield;
-  Turbflowfield = NULL;
 
 #ifdef ENABLE_PETSC
   PetscFinalize();

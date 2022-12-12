@@ -6,33 +6,32 @@
 #include "StencilFunctions.hpp"
 
 Stencils::timeStepStencil::timeStepStencil(const Parameters& parameters):
-  FieldStencil<TurbulentFlowField>(parameters) {
+  FieldStencil<FlowField>(parameters) {
   Mindt = parameters.timestep.dt;
 }
 
-void Stencils::timeStepStencil::apply(TurbulentFlowField& flowField, int i, int j) {
+void Stencils::timeStepStencil::apply(FlowField& flowField, int i, int j) {
   RealType factor
     = 1.0
-        / (FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDxMin() * FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDxMin())
+        / (FieldStencil<FlowField>::parameters_.meshsize->getDxMin() * FieldStencil<FlowField>::parameters_.meshsize->getDxMin())
       + 1.0
-          / (FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDyMin() * FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDyMin());
+          / (FieldStencil<FlowField>::parameters_.meshsize->getDyMin() * FieldStencil<FlowField>::parameters_.meshsize->getDyMin());
 
-  RealType vtotal = 1 / FieldStencil<TurbulentFlowField>::parameters_.flow.Re + flowField.getnuT().getScalar(i, j);
+  RealType vtotal = 1 / FieldStencil<FlowField>::parameters_.flow.Re + flowField.getnuT().getScalar(i, j);
   Mindt           = std::min(1 / (2 * vtotal * factor), Mindt);
 }
 
-void Stencils::timeStepStencil::apply(TurbulentFlowField& flowField, int i, int j, int k) {
+void Stencils::timeStepStencil::apply(FlowField& flowField, int i, int j, int k) {
   RealType factor
     = 1.0
-        / (FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDxMin() * FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDxMin())
+        / (FieldStencil<FlowField>::parameters_.meshsize->getDxMin() * FieldStencil<FlowField>::parameters_.meshsize->getDxMin())
       + 1.0
-          / (FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDyMin() * FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDyMin())
+          / (FieldStencil<FlowField>::parameters_.meshsize->getDyMin() * FieldStencil<FlowField>::parameters_.meshsize->getDyMin())
       + 1.0
-          / (FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDzMin() * FieldStencil<TurbulentFlowField>::parameters_.meshsize->getDzMin());
+          / (FieldStencil<FlowField>::parameters_.meshsize->getDzMin() * FieldStencil<FlowField>::parameters_.meshsize->getDzMin());
 
   Mindt = std::min(
-    (FieldStencil<TurbulentFlowField>::parameters_.flow.Re + 1 / flowField.getnuT().getScalar(i, j, k)) / (2 * factor),
-    Mindt
+    (FieldStencil<FlowField>::parameters_.flow.Re + 1 / flowField.getnuT().getScalar(i, j, k)) / (2 * factor), Mindt
   );
 }
 

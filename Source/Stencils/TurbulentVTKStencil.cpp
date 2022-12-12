@@ -3,7 +3,7 @@
 #include "TurbulentVTKStencil.hpp"
 
 Stencils::TurbulentVTKStencil::TurbulentVTKStencil(const Parameters& parameters):
-  FieldStencil<TurbulentFlowField>(parameters),
+  FieldStencil<FlowField>(parameters),
   written_(false),
   prefix_(parameters.vtk.prefix) {
 
@@ -90,8 +90,8 @@ void Stencils::TurbulentVTKStencil::writePoints(std::ostream& file, RealType sim
   file << grid;
 }
 
-void Stencils::TurbulentVTKStencil::apply(TurbulentFlowField& flowField, int i, int j) {
-  ASSERTION(FieldStencil<TurbulentFlowField>::parameters_.geometry.dim == 2);
+void Stencils::TurbulentVTKStencil::apply(FlowField& flowField, int i, int j) {
+  ASSERTION(FieldStencil<FlowField>::parameters_.geometry.dim == 2);
 
   RealType pressure    = 0.0;
   RealType velocity[2] = {0.0, 0.0};
@@ -111,8 +111,8 @@ void Stencils::TurbulentVTKStencil::apply(TurbulentFlowField& flowField, int i, 
   }
 }
 
-void Stencils::TurbulentVTKStencil::apply(TurbulentFlowField& flowField, int i, int j, int k) {
-  ASSERTION(FieldStencil<TurbulentFlowField>::parameters_.geometry.dim == 3);
+void Stencils::TurbulentVTKStencil::apply(FlowField& flowField, int i, int j, int k) {
+  ASSERTION(FieldStencil<FlowField>::parameters_.geometry.dim == 3);
 
   RealType pressure    = 0.0;
   RealType velocity[3] = {0.0, 0.0, 0.0};
@@ -148,10 +148,10 @@ void Stencils::TurbulentVTKStencil::openFile(int timeStep, RealType simulationTi
   writePoints(ofile_, simulationTime);
 }
 
-void Stencils::TurbulentVTKStencil::write(TurbulentFlowField& flowField, int timeStep, RealType simulationTime) {
+void Stencils::TurbulentVTKStencil::write(FlowField& flowField, int timeStep, RealType simulationTime) {
   openFile(timeStep, simulationTime);
 
-  if (FieldStencil<TurbulentFlowField>::parameters_.geometry.dim == 2) {
+  if (FieldStencil<FlowField>::parameters_.geometry.dim == 2) {
     // Write pressure
     ofile_
       << "CELL_DATA " << flowField.getNx() * flowField.getNy() << std::endl
@@ -170,7 +170,7 @@ void Stencils::TurbulentVTKStencil::write(TurbulentFlowField& flowField, int tim
     nuTStream_.str("");
   }
 
-  if (FieldStencil<TurbulentFlowField>::parameters_.geometry.dim == 3) {
+  if (FieldStencil<FlowField>::parameters_.geometry.dim == 3) {
     // Write pressure
     ofile_
       << "CELL_DATA " << flowField.getNx() * flowField.getNy() * flowField.getNz() << std::endl

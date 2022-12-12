@@ -1,17 +1,17 @@
 #include "TurbulentSimulation.hpp"
 
-TurbulentSimulation::TurbulentSimulation(Parameters& parameters, TurbulentFlowField& flowField):
+TurbulentSimulation::TurbulentSimulation(Parameters& parameters, FlowField& flowField):
   Simulation(parameters, flowField),
-  turbflowField_(flowField),
   TurbulentFGHStencil_(parameters),
-  TurbulentFGHIterator_(turbflowField_, parameters, TurbulentFGHStencil_),
+  TurbulentFGHIterator_(flowField, parameters, TurbulentFGHStencil_),
   nuTStencil_(parameters),
-  nuTIterator_(turbflowField_, parameters, nuTStencil_, 0, 0),
+  nuTIterator_(flowField, parameters, nuTStencil_, 0, 0),
   hStencil_(parameters),
-  hIterator_(turbflowField_, parameters, hStencil_, 0, 0),
+  hIterator_(flowField, parameters, hStencil_, 0, 0),
   dtStencil_(parameters),
-  dtIterator_(turbflowField_, parameters, dtStencil_),
-  ppmTurbulent_(parameters, turbflowField_) {}
+  dtIterator_(flowField, parameters, dtStencil_, 1, 0)
+// ppmTurbulent_(parameters, flowField)
+{}
 
 void TurbulentSimulation::initializeFlowField() {
   Simulation::initializeFlowField();
@@ -25,8 +25,8 @@ void TurbulentSimulation::solveTimestep() {
   // turbflowField_.getnuT().show();
   // Communicate viscosity
 
-  ppmTurbulent_.communicateViscosity();
-  // Determine and set max. timestep which is allowed in this simulation
+  // ppmTurbulent_.communicateViscosity();
+  //  Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
   // Compute FGH
   TurbulentFGHIterator_.iterate();
@@ -37,12 +37,12 @@ void TurbulentSimulation::solveTimestep() {
   // Solve for pressure
   solver_->solve();
   // TODO WS2: communicate pressure values
-  ppmTurbulent_.communicatePressure();
+  // ppm_.communicatePressure();
   // Compute velocity
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
   // TODO WS2: communicate velocity values
-  ppmTurbulent_.communicateVelocities();
+  // ppm_.communicateVelocities();
   // Iterate for velocities on the boundary
   wallVelocityIterator_.iterate();
 
@@ -97,9 +97,9 @@ void TurbulentSimulation::hUpdate() { hIterator_.iterate(); }
 void TurbulentSimulation::nuTUpdate() { nuTIterator_.iterate(); }
 
 void TurbulentSimulation::plotVTK(int timeStep, RealType simulationTime) {
-  Stencils::TurbulentVTKStencil     TurbulentvtkStencil(parameters_);
-  FieldIterator<TurbulentFlowField> TurbulentvtkIterator(turbflowField_, parameters_, TurbulentvtkStencil, 1, 0);
+  Stencils::TurbulentVTKStencil TurbulentvtkStencil(parameters_);
+  FieldIterator<FlowField>      TurbulentvtkIterator(flowField_, parameters_, TurbulentvtkStencil, 1, 0);
 
   TurbulentvtkIterator.iterate();
-  TurbulentvtkStencil.write(turbflowField_, timeStep, simulationTime);
+  TurbulentvtkStencil.write(flowField_, timeStep, simulationTime);
 }

@@ -10,8 +10,6 @@
 
 class TurbulentSimulation: public Simulation {
 protected:
-  TurbulentFlowField& turbflowField_;
-
   //   Stencils::MaxUStencil             maxUStencil_;
   //   FieldIterator<FlowField>          maxUFieldIterator_;
   //   GlobalBoundaryIterator<FlowField> maxUBoundaryIterator_;
@@ -21,17 +19,17 @@ protected:
   //   GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
   //   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
 
-  Stencils::TurbulentFGHStencil     TurbulentFGHStencil_;
-  FieldIterator<TurbulentFlowField> TurbulentFGHIterator_;
+  Stencils::TurbulentFGHStencil TurbulentFGHStencil_;
+  FieldIterator<FlowField>      TurbulentFGHIterator_;
 
-  Stencils::nuTStencil              nuTStencil_;
-  FieldIterator<TurbulentFlowField> nuTIterator_;
+  Stencils::nuTStencil     nuTStencil_;
+  FieldIterator<FlowField> nuTIterator_;
 
-  Stencils::hStencil                hStencil_;
-  FieldIterator<TurbulentFlowField> hIterator_;
+  Stencils::hStencil       hStencil_;
+  FieldIterator<FlowField> hIterator_;
 
-  Stencils::timeStepStencil         dtStencil_;
-  FieldIterator<TurbulentFlowField> dtIterator_;
+  Stencils::timeStepStencil dtStencil_;
+  FieldIterator<FlowField>  dtIterator_;
 
   //   Stencils::VelocityStencil velocityStencil_;
   //   Stencils::ObstacleStencil obstacleStencil_;
@@ -42,12 +40,12 @@ protected:
   //   FieldIterator<FlowField> rhsIterator_;
 
   //   std::unique_ptr<Solvers::LinearSolver> solver_;
-  ParallelManagers::PetscParallelManager<TurbulentFlowField> ppmTurbulent_;
+  // /ParallelManagers::PetscParallelManager<TurbulentFlowField> ppmTurbulent_;
 
   virtual void setTimeStep() override;
 
 public:
-  TurbulentSimulation(Parameters&, TurbulentFlowField&);
+  TurbulentSimulation(Parameters&, FlowField&);
   virtual ~TurbulentSimulation() override = default;
 
   /** Initialises the flow field according to the scenario */

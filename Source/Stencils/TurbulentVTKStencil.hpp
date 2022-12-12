@@ -12,7 +12,7 @@ namespace Stencils {
    *
    * When iterated with, creates a VTK file.
    */
-  class TurbulentVTKStencil: public FieldStencil<TurbulentFlowField> {
+  class TurbulentVTKStencil: public FieldStencil<FlowField> {
   private:
     bool          written_; //! Whether the file has already been written
     std::string   prefix_;  //! Prefix to be attached to the vtk files
@@ -43,9 +43,9 @@ namespace Stencils {
     TurbulentVTKStencil(const Parameters& parameters);
     ~TurbulentVTKStencil() override = default;
 
-    void apply(TurbulentFlowField& flowField, int i, int j) override;
-    void apply(TurbulentFlowField& flowField, int i, int j, int k) override;
+    void apply(FlowField& flowField, int i, int j) override;
+    void apply(FlowField& flowField, int i, int j, int k) override;
 
-    void write(TurbulentFlowField& flowField, int timeStep, RealType simulationTime);
+    void write(FlowField& flowField, int timeStep, RealType simulationTime);
   };
 } // namespace Stencils

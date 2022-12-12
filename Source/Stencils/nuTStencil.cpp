@@ -6,9 +6,9 @@
 #include "StencilFunctions.hpp"
 
 Stencils::nuTStencil::nuTStencil(const Parameters& parameters):
-  FieldStencil<TurbulentFlowField>(parameters) {}
+  FieldStencil<FlowField>(parameters) {}
 
-void Stencils::nuTStencil::apply(TurbulentFlowField& flowField, int i, int j) {
+void Stencils::nuTStencil::apply(FlowField& flowField, int i, int j) {
   RealType delta = 0.0;
   if (parameters_.turbulent.delta == 0) {
     delta = 0.0;
@@ -34,7 +34,7 @@ void Stencils::nuTStencil::apply(TurbulentFlowField& flowField, int i, int j) {
   flowField.getnuT().getScalar(i, j) = lm * lm * sqrt(2 * SijSij);
 }
 
-void Stencils::nuTStencil::apply(TurbulentFlowField& flowField, int i, int j, int k) {
+void Stencils::nuTStencil::apply(FlowField& flowField, int i, int j, int k) {
   RealType delta = 0.0;
   if (parameters_.turbulent.delta == 0) {
     delta = 0.0;

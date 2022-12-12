@@ -16,7 +16,9 @@ FlowField::FlowField(int Nx, int Ny):
   velocity_(VectorField(Nx + 3, Ny + 3)),
   flags_(IntScalarField(Nx + 3, Ny + 3)),
   FGH_(VectorField(Nx + 3, Ny + 3)),
-  RHS_(ScalarField(Nx + 3, Ny + 3)) {
+  RHS_(ScalarField(Nx + 3, Ny + 3)),
+  h_(ScalarField(Nx + 3, Ny + 3)),
+  nuT_(ScalarField(Nx + 3, Ny + 3)) {
 
   ASSERTION(Nx > 0);
   ASSERTION(Ny > 0);
@@ -33,7 +35,9 @@ FlowField::FlowField(int Nx, int Ny, int Nz):
   velocity_(VectorField(Nx + 3, Ny + 3, Nz + 3)),
   flags_(IntScalarField(Nx + 3, Ny + 3, Nz + 3)),
   FGH_(VectorField(Nx + 3, Ny + 3, Nz + 3)),
-  RHS_(ScalarField(Nx + 3, Ny + 3, Nz + 3)) {
+  RHS_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  h_(ScalarField(Nx + 3, Ny + 3, Nz + 3)),
+  nuT_(ScalarField(Nx + 3, Ny + 3, Nz + 3)) {
 
   ASSERTION(Nx > 0);
   ASSERTION(Ny > 0);
@@ -62,6 +66,12 @@ FlowField::FlowField(const Parameters& parameters):
     parameters.geometry.dim == 2 ? VectorField(sizeX_ + 3, sizeY_ + 3) : VectorField(sizeX_ + 3, sizeY_ + 3, sizeZ_ + 3)
   ),
   RHS_(
+    parameters.geometry.dim == 2 ? ScalarField(sizeX_ + 3, sizeY_ + 3) : ScalarField(sizeX_ + 3, sizeY_ + 3, sizeZ_ + 3)
+  ),
+  h_(
+    parameters.geometry.dim == 2 ? ScalarField(sizeX_ + 3, sizeY_ + 3) : ScalarField(sizeX_ + 3, sizeY_ + 3, sizeZ_ + 3)
+  ),
+  nuT_(
     parameters.geometry.dim == 2 ? ScalarField(sizeX_ + 3, sizeY_ + 3) : ScalarField(sizeX_ + 3, sizeY_ + 3, sizeZ_ + 3)
   ) {}
 
