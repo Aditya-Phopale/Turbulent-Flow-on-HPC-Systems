@@ -996,7 +996,6 @@ namespace Stencils {
   inline RealType computeF2D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
   ) {
-    // std::cout << d2udx2(localVelocity, localMeshsize) << "\n";
     return localVelocity[mapd(0, 0, 0, 0)]
         + dt * (1 / parameters.flow.Re * (d2udx2(localVelocity, localMeshsize)
             + d2udy2(localVelocity, localMeshsize)) - du2dx(localVelocity, parameters, localMeshsize)
