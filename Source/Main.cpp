@@ -4,10 +4,17 @@
 #include "Configuration.hpp"
 #include "MeshsizeFactory.hpp"
 #include "Simulation.hpp"
+#include "TurbulentFlowField.hpp"
+#include "TurbulentSimulation.hpp"
 
 #include "ParallelManagers/PetscParallelConfiguration.hpp"
 
 int main(int argc, char* argv[]) {
+
+  // int i = 0;
+  // while(i == 0){
+  //   sleep(5);
+  // }
   spdlog::set_level(spdlog::level::info);
 
   // Parallelisation related. Initialise and identify.
@@ -39,7 +46,6 @@ int main(int argc, char* argv[]) {
 #else
   spdlog::info("Running in Release mode");
 #endif
-
   if (!argv[1]) {
     spdlog::error("You need to pass a configuration file: mpirun -np 1 ./NS-EOF ExampleCases/Cavity2D.xml.");
     throw std::runtime_error("Argument parsing error");
@@ -47,12 +53,14 @@ int main(int argc, char* argv[]) {
 
   // Read configuration and store information in parameters object
   Configuration configuration(argv[1]);
-  Parameters    parameters;
+
+  Parameters parameters;
   configuration.loadParameters(parameters);
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
-  FlowField*  flowField  = NULL;
-  Simulation* simulation = NULL;
+  FlowField*          flowField     = NULL;
+  TurbulentFlowField* Turbflowfield = NULL;
+  Simulation*         simulation    = NULL;
 
   spdlog::debug(
     "Processor {} with index {}, {}, {} is computing the size of its subdomain and obtains {}, {} and {}.",
@@ -76,7 +84,15 @@ int main(int argc, char* argv[]) {
 
   // Initialise simulation
   if (parameters.simulation.type == "turbulence") {
-    // TODO WS2: initialise turbulent flow field and turbulent simulation object
+    // spdlog::info(parameters.turbulent.kappa);
+    //  TODO WS2: initialise turbulent flow field and turbulent simulation object
+    if (rank == 0) {
+      spdlog::info("Start Turbulence simulation in {}D", parameters.geometry.dim);
+    }
+    Turbflowfield = new TurbulentFlowField(parameters);
+
+    simulation = new TurbulentSimulation(parameters, *Turbflowfield);
+
   } else if (parameters.simulation.type == "dns") {
     if (rank == 0) {
       spdlog::info("Start DNS simulation in {}D", parameters.geometry.dim);
@@ -107,6 +123,7 @@ int main(int argc, char* argv[]) {
   simulation->plotVTK(timeSteps, time);
 
   Clock clock;
+
   // Time loop
 
   while (time < parameters.simulation.finalTime) {
@@ -129,12 +146,15 @@ int main(int argc, char* argv[]) {
 
   // Plot final solution
   simulation->plotVTK(timeSteps, time);
-
+ 
   delete simulation;
   simulation = NULL;
 
   delete flowField;
   flowField = NULL;
+
+  delete Turbflowfield;
+  Turbflowfield = NULL;
 
 #ifdef ENABLE_PETSC
   PetscFinalize();
@@ -144,3 +164,17 @@ int main(int argc, char* argv[]) {
 
   return EXIT_SUCCESS;
 }
+
+// TODO by Friday
+// find timestep
+// solve timestep & initialize flowfield
+
+// TODO start by Friday
+// Report by Pratik and Jefin
+// parallelise
+// 3D
+
+// findtimestep - GG ToDO by friday
+// initialize flowfield- A-pop by friday
+// parallelise turb - J-man & P-raw
+// batch job scaling, help J-man, report -> P-raw

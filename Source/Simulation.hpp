@@ -18,6 +18,8 @@
 #include "Stencils/RHSStencil.hpp"
 #include "Stencils/VelocityStencil.hpp"
 #include "Stencils/VTKStencil.hpp"
+#include "ParallelManagers/PetscParallelManager.hpp"
+#include "ParallelManagers/PetscParallelManager.cpph"
 
 class Simulation {
 protected:
@@ -49,6 +51,8 @@ protected:
 
   virtual void setTimeStep();
 
+  ParallelManagers::PetscParallelManager<FlowField> ppm_;
+
 public:
   Simulation(Parameters& parameters, FlowField& flowField);
   virtual ~Simulation() = default;
@@ -57,6 +61,10 @@ public:
   virtual void initializeFlowField();
 
   virtual void solveTimestep();
+
+  virtual void hUpdate() {}
+
+  virtual void nuTUpdate() {}
 
   /** Plots the flow field */
   virtual void plotVTK(int timeStep, RealType simulationTime);

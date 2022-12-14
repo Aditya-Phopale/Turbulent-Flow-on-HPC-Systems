@@ -25,13 +25,13 @@ else()
     set(GIT_COMMIT_HASH_SHORT "")
 endif()
 
-set(META_PROJECT_NAME        "NS-EOF")
+set(META_PROJECT_NAME "NS-EOF")
 set(META_PROJECT_DESCRIPTION "Navier Stokes - Ernst-Otto-Fischer Teaching Code")
 set(META_AUTHOR_ORGANIZATION "Technische Universitaet Muenchen")
-set(META_AUTHOR_DOMAIN       "https://github.com/TUM-I5/NS-EOF")
-set(META_VERSION_REVISION    "${GIT_COMMIT_HASH_SHORT}")
-set(META_GIT_BRANCH          "${GIT_BRANCH}")
-set(META_GIT_HASH            "${GIT_COMMIT_HASH}")
+set(META_AUTHOR_DOMAIN "https://github.com/TUM-I5/NS-EOF")
+set(META_VERSION_REVISION "${GIT_COMMIT_HASH_SHORT}")
+set(META_GIT_BRANCH "${GIT_BRANCH}")
+set(META_GIT_HASH "${GIT_COMMIT_HASH}")
 message(STATUS "On Git Branch: ${GIT_BRANCH} (${GIT_COMMIT_HASH})")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -42,6 +42,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(META_COMPILER_VERSION "${CMAKE_SYSTEM_NAME} ${CMAKE_CXX_COMPILER_ID} (${CMAKE_CXX_COMPILER_VERSION})")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
+add_definitions(-w)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${META_PROJECT_NAME})
@@ -57,16 +58,16 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(_project_options)
 
 project(${META_PROJECT_NAME}
-        DESCRIPTION ${META_PROJECT_DESCRIPTION}
-        HOMEPAGE_URL ${META_AUTHOR_DOMAIN}
-        LANGUAGES C CXX
+    DESCRIPTION ${META_PROJECT_DESCRIPTION}
+    HOMEPAGE_URL ${META_AUTHOR_DOMAIN}
+    LANGUAGES C CXX
 )
 file(WRITE "${PROJECT_BINARY_DIR}/.gitignore" "*")
 
 include(${_project_options_SOURCE_DIR}/src/DynamicProjectOptions.cmake)
 dynamic_project_options(
     PCH_HEADERS
-        ${CMAKE_SOURCE_DIR}/Source/StdAfx.hpp
+    ${CMAKE_SOURCE_DIR}/Source/StdAfx.hpp
 )
 target_compile_features(project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
