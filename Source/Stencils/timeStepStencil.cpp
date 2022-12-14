@@ -36,6 +36,6 @@ void Stencils::timeStepStencil::apply(TurbulentFlowField& flowField, int i, int 
   );
 }
 
-void Stencils::timeStepStencil::reset() { Mindt = 100; } // temporary solution
+void Stencils::timeStepStencil::reset() { Mindt = MY_FLOAT_MAX; } // temporary solution
 
 RealType Stencils::timeStepStencil::getDt() { return Mindt; }
