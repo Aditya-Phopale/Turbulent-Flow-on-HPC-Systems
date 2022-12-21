@@ -1,5 +1,3 @@
-#pragma once
-
 #include <fstream>
 #include <memory>
 
@@ -14,7 +12,7 @@ namespace Stencils {
    *
    * When iterated with, creates a VTK file.
    */
-  class VTKStencil: public FieldStencil<FlowField> {
+  class TurbulentVTKStencil: public FieldStencil<TurbulentFlowField> {
   private:
     bool          written_; //! Whether the file has already been written
     std::string   prefix_;  //! Prefix to be attached to the vtk files
@@ -22,7 +20,7 @@ namespace Stencils {
 
     std::stringstream pressureStream_; //! Stream for the pressure data
     std::stringstream velocityStream_; //! Stream for the velocity data
-    // std::stringstream hStream_;
+    std::stringstream nuTStream_;
 
     void writeVTKHeader(std::ostream& file) const;
     void writePoints(std::ostream& file, RealType simulationTime) const;
@@ -42,12 +40,12 @@ namespace Stencils {
     void closeFile();
 
   public:
-    VTKStencil(const Parameters& parameters);
-    ~VTKStencil() override = default;
+    TurbulentVTKStencil(const Parameters& parameters);
+    ~TurbulentVTKStencil() override = default;
 
-    void apply(FlowField& flowField, int i, int j) override;
-    void apply(FlowField& flowField, int i, int j, int k) override;
+    void apply(TurbulentFlowField& flowField, int i, int j) override;
+    void apply(TurbulentFlowField& flowField, int i, int j, int k) override;
 
-    void write(FlowField& flowField, int timeStep, RealType simulationTime);
+    void write(TurbulentFlowField& flowField, int timeStep, RealType simulationTime);
   };
 } // namespace Stencils
