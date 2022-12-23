@@ -8,18 +8,18 @@
 
 namespace Stencils {
 
-  class kBufferFillStencil: public BoundaryStencil<TurbulentFlowFieldKE> {
+  class kBufferReadStencil: public BoundaryStencil<TurbulentFlowFieldKE> {
   private:
-    std::vector<RealType>& Left_;
-    std::vector<RealType>& Right_;
-    std::vector<RealType>& Top_;
-    std::vector<RealType>& Bottom_;
-    std::vector<RealType>& Front_;
-    std::vector<RealType>& Back_;
+    std::vector<RealType> Left_;
+    std::vector<RealType> Right_;
+    std::vector<RealType> Top_;
+    std::vector<RealType> Bottom_;
+    std::vector<RealType> Front_;
+    std::vector<RealType> Back_;
 
   public:
-    kBufferFillStencil(const Parameters&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&);
-    ~kBufferFillStencil() override = default;
+    kBufferReadStencil(const Parameters&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&, std::vector<RealType>&);
+    ~kBufferReadStencil() override = default;
 
     void applyLeftWall(TurbulentFlowFieldKE& turbFlowFieldKE, int i, int j) override;
     void applyRightWall(TurbulentFlowFieldKE& turbFlowFieldKE, int i, int j) override;
