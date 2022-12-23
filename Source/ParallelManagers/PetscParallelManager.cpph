@@ -1,4 +1,5 @@
 #include "PetscParallelManager.hpp"
+#include "TurbulentFlowFieldKE.hpp"
 
 template <class FlowFieldType>
 ParallelManagers::PetscParallelManager<FlowFieldType>::PetscParallelManager(
@@ -443,4 +444,292 @@ void ParallelManagers::PetscParallelManager<FlowFieldType>::communicateViscosity
   );
   ParallelBoundaryIterator<TurbulentFlowField> viscReadIterator(flowfield_, parameters_, viscRead_, 0, 0);
   viscReadIterator.iterate();
+}
+
+template <class FlowFieldType>
+void ParallelManagers::PetscParallelManager<FlowFieldType>::communicateKineticEnergy() {
+  std::vector<RealType> leftSend{0};
+  std::vector<RealType> rightSend{0};
+  std::vector<RealType> topSend{0};
+  std::vector<RealType> bottomSend{0};
+  std::vector<RealType> frontSend{0};
+  std::vector<RealType> backSend{0};
+
+  std::vector<RealType> leftReceive{0};
+  std::vector<RealType> rightReceive{0};
+  std::vector<RealType> topReceive{0};
+  std::vector<RealType> bottomReceive{0};
+  std::vector<RealType> frontReceive{0};
+  std::vector<RealType> backReceive{0};
+
+  if (parameters_.geometry.dim == 2) {
+    leftSend.resize(parameters_.parallel.localSize[1] + 3);
+    rightSend.resize(parameters_.parallel.localSize[1] + 3);
+    topSend.resize(parameters_.parallel.localSize[0] + 3);
+    bottomSend.resize(parameters_.parallel.localSize[0] + 3);
+    frontSend = {0};
+    backSend  = {0};
+    leftReceive.resize(parameters_.parallel.localSize[1] + 3);
+    rightReceive.resize(parameters_.parallel.localSize[1] + 3);
+    topReceive.resize(parameters_.parallel.localSize[0] + 3);
+    bottomReceive.resize(parameters_.parallel.localSize[0] + 3);
+    frontReceive = {0};
+    backReceive  = {0};
+  } else if (parameters_.geometry.dim == 3) {
+    leftSend.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    rightSend.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    topSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    bottomSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    frontSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    backSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    leftReceive.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    rightReceive.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    topReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    bottomReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    frontReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    backReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+  }
+
+  Stencils::kBufferFillStencil kFill_(parameters_, leftSend, rightSend, topSend, bottomSend, frontSend, backSend);
+  ParallelBoundaryIterator<TurbulentFlowFieldKE> kFillIterator(flowfield_, parameters_, kFill_, 0, 0);
+  kFillIterator.iterate();
+  MPI_Sendrecv(
+    leftSend.data(),
+    leftSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.leftNb,
+    0,
+    rightReceive.data(),
+    rightReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.rightNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    rightSend.data(),
+    rightSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.rightNb,
+    0,
+    leftReceive.data(),
+    leftReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.leftNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    topSend.data(),
+    topSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.topNb,
+    0,
+    bottomReceive.data(),
+    bottomReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.bottomNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    bottomSend.data(),
+    bottomSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.bottomNb,
+    0,
+    topReceive.data(),
+    topReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.topNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    frontSend.data(),
+    frontSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.frontNb,
+    0,
+    backReceive.data(),
+    backReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.backNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    backSend.data(),
+    backSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.backNb,
+    0,
+    frontReceive.data(),
+    frontReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.frontNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  Stencils::kBufferReadStencil kRead_(
+    parameters_, leftReceive, rightReceive, topReceive, bottomReceive, frontReceive, backReceive
+  );
+  ParallelBoundaryIterator<TurbulentFlowFieldKE> kReadIterator(flowfield_, parameters_, kRead_, 0, 0);
+  kReadIterator.iterate();
+}
+
+template <class FlowFieldType>
+void ParallelManagers::PetscParallelManager<FlowFieldType>::communicateDissipationRate() {
+  std::vector<RealType> leftSend{0};
+  std::vector<RealType> rightSend{0};
+  std::vector<RealType> topSend{0};
+  std::vector<RealType> bottomSend{0};
+  std::vector<RealType> frontSend{0};
+  std::vector<RealType> backSend{0};
+
+  std::vector<RealType> leftReceive{0};
+  std::vector<RealType> rightReceive{0};
+  std::vector<RealType> topReceive{0};
+  std::vector<RealType> bottomReceive{0};
+  std::vector<RealType> frontReceive{0};
+  std::vector<RealType> backReceive{0};
+
+  if (parameters_.geometry.dim == 2) {
+    leftSend.resize(parameters_.parallel.localSize[1] + 3);
+    rightSend.resize(parameters_.parallel.localSize[1] + 3);
+    topSend.resize(parameters_.parallel.localSize[0] + 3);
+    bottomSend.resize(parameters_.parallel.localSize[0] + 3);
+    frontSend = {0};
+    backSend  = {0};
+    leftReceive.resize(parameters_.parallel.localSize[1] + 3);
+    rightReceive.resize(parameters_.parallel.localSize[1] + 3);
+    topReceive.resize(parameters_.parallel.localSize[0] + 3);
+    bottomReceive.resize(parameters_.parallel.localSize[0] + 3);
+    frontReceive = {0};
+    backReceive  = {0};
+  } else if (parameters_.geometry.dim == 3) {
+    leftSend.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    rightSend.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    topSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    bottomSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    frontSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    backSend.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    leftReceive.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    rightReceive.resize((parameters_.parallel.localSize[1] + 3) * (parameters_.parallel.localSize[2] + 3));
+    topReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    bottomReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[2] + 3));
+    frontReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+    backReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
+  }
+
+  Stencils::epsBufferFillStencil epsFill_(parameters_, leftSend, rightSend, topSend, bottomSend, frontSend, backSend);
+  ParallelBoundaryIterator<TurbulentFlowFieldKE> epsFillIterator(flowfield_, parameters_, epsFill_, 0, 0);
+  epsFillIterator.iterate();
+  MPI_Sendrecv(
+    leftSend.data(),
+    leftSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.leftNb,
+    0,
+    rightReceive.data(),
+    rightReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.rightNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    rightSend.data(),
+    rightSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.rightNb,
+    0,
+    leftReceive.data(),
+    leftReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.leftNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    topSend.data(),
+    topSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.topNb,
+    0,
+    bottomReceive.data(),
+    bottomReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.bottomNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    bottomSend.data(),
+    bottomSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.bottomNb,
+    0,
+    topReceive.data(),
+    topReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.topNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    frontSend.data(),
+    frontSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.frontNb,
+    0,
+    backReceive.data(),
+    backReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.backNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  MPI_Sendrecv(
+    backSend.data(),
+    backSend.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.backNb,
+    0,
+    frontReceive.data(),
+    frontReceive.size(),
+    MY_MPI_FLOAT,
+    parameters_.parallel.frontNb,
+    0,
+    PETSC_COMM_WORLD,
+    MPI_STATUS_IGNORE
+  );
+
+  Stencils::epsBufferReadStencil epsRead_(
+    parameters_, leftReceive, rightReceive, topReceive, bottomReceive, frontReceive, backReceive
+  );
+  ParallelBoundaryIterator<TurbulentFlowFieldKE> epsReadIterator(flowfield_, parameters_, epsRead_, 0, 0);
+  epsReadIterator.iterate();
 }

@@ -4,6 +4,10 @@
 // #include "Stencils/BoundaryStencil.hpp"
 #include "Iterators.hpp"
 
+#include "Stencils/epsBufferFillStencil.hpp"
+#include "Stencils/epsBufferReadStencil.hpp"
+#include "Stencils/kBufferFillStencil.hpp"
+#include "Stencils/kBufferReadStencil.hpp"
 #include "Stencils/PressureBufferFillStencil.cpph"
 #include "Stencils/PressureBufferFillStencil.hpp"
 #include "Stencils/PressureBufferReadStencil.cpph"
@@ -32,5 +36,7 @@ namespace ParallelManagers {
     void communicatePressure();
     void communicateVelocities();
     void communicateViscosity();
+    void communicateKineticEnergy();
+    void communicateDissipationRate();
   };
 } // namespace ParallelManagers
