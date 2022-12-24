@@ -300,6 +300,47 @@ void Stencils::BFInputKStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, i
   // flowField.getVelocity().getVector(i, j, k)[2] = -flowField.getVelocity().getVector(i + 1, j, k)[2];
 }
 
+void Stencils::BFInputKStencil::applyRightWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField, [[maybe_unused]] int i, [[maybe_unused]] int j
+) {}
+void Stencils::BFInputKStencil::applyBottomWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField, [[maybe_unused]] int i, [[maybe_unused]] int j
+) {}
+void Stencils::BFInputKStencil::applyTopWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField, [[maybe_unused]] int i, [[maybe_unused]] int j
+) {}
+
+void Stencils::BFInputKStencil::applyRightWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}
+void Stencils::BFInputKStencil::applyBottomWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}
+void Stencils::BFInputKStencil::applyTopWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}
+void Stencils::BFInputKStencil::applyFrontWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}
+void Stencils::BFInputKStencil::applyBackWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}
+
 Stencils::BFInputEpsilonStencil::BFInputEpsilonStencil(const Parameters& parameters):
   BoundaryStencil<TurbulentFlowFieldKE>(parameters)
   // Here, the obstacle size is set to zero if it was set as negative at the configuration.
@@ -340,12 +381,53 @@ Stencils::BFInputEpsilonStencil::BFInputEpsilonStencil(const Parameters& paramet
   }
 }
 
-void Stencils::BFInputKStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) {
+void Stencils::BFInputEpsilonStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) {
   flowField.getEpsilon().getScalar(i, j) = computeEpsilon2D(i, j, stepSize_, parameters_);
 }
 
-void Stencils::BFInputKStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
+void Stencils::BFInputEpsilonStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
   flowField.getEpsilon().getScalar(i, j, k) = computeEpsilon3D(i, j, k, stepSize_, parameters_);
   // flowField.getVelocity().getVector(i, j, k)[1] = -flowField.getVelocity().getVector(i + 1, j, k)[1];
   // flowField.getVelocity().getVector(i, j, k)[2] = -flowField.getVelocity().getVector(i + 1, j, k)[2];
 }
+
+oid Stencils::BFInputEpsilonStencil::applyRightWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField, [[maybe_unused]] int i, [[maybe_unused]] int j
+) {}
+void Stencils::BFInputEpsilonStencil::applyBottomWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField, [[maybe_unused]] int i, [[maybe_unused]] int j
+) {}
+void Stencils::BFInputEpsilonStencil::applyTopWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField, [[maybe_unused]] int i, [[maybe_unused]] int j
+) {}
+
+void Stencils::BFInputEpsilonStencil::applyRightWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}
+void Stencils::BFInputEpsilonStencil::applyBottomWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}
+void Stencils::BFInputEpsilonStencil::applyTopWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}
+void Stencils::BFInputEpsilonStencil::applyFrontWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}
+void Stencils::BFInputEpsilonStencil::applyBackWall(
+  [[maybe_unused]] TurbulentFlowFieldKE& flowField,
+  [[maybe_unused]] int                   i,
+  [[maybe_unused]] int                   j,
+  [[maybe_unused]] int                   k
+) {}

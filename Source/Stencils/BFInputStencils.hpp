@@ -63,16 +63,16 @@ namespace Stencils {
     ~BFInputKStencil() override = default;
 
     void applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
-    // void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
-    // void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
-    // void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
 
     void applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyFrontWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyBackWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyFrontWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyBackWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
   };
 
   class BFInputEpsilonStencil: public BoundaryStencil<TurbulentFlowFieldKE> {
@@ -84,16 +84,16 @@ namespace Stencils {
     ~BFInputEpsilonStencil() override = default;
 
     void applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
-    // void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
-    // void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
-    // void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
 
     void applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyFrontWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
-    // void applyBackWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyFrontWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyBackWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
   };
 
 } // namespace Stencils
