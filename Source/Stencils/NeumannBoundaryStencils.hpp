@@ -43,4 +43,40 @@ namespace Stencils {
     void applyBackWall(FlowField& flowField, int i, int j, int k) override;
   };
 
+  class NeumannKBoundaryStencil: public BoundaryStencil<TurbulentFlowFieldKE> {
+  public:
+    NeumannKBoundaryStencil(const Parameters& parameters);
+    ~NeumannKBoundaryStencil() override = default;
+
+    void applyLeftWall(FlowField& flowField, int i, int j) override;
+    void applyRightWall(FlowField& flowField, int i, int j) override;
+    void applyBottomWall(FlowField& flowField, int i, int j) override;
+    void applyTopWall(FlowField& flowField, int i, int j) override;
+
+    void applyLeftWall(FlowField& flowField, int i, int j, int k) override;
+    void applyRightWall(FlowField& flowField, int i, int j, int k) override;
+    void applyBottomWall(FlowField& flowField, int i, int j, int k) override;
+    void applyTopWall(FlowField& flowField, int i, int j, int k) override;
+    void applyFrontWall(FlowField& flowField, int i, int j, int k) override;
+    void applyBackWall(FlowField& flowField, int i, int j, int k) override;
+  };
+
+  class NeumannEpsilonBoundaryStencil: public BoundaryStencil<TurbulentFlowFieldKE> {
+  public:
+    NeumannEpsilonBoundaryStencil(const Parameters& parameters);
+    ~NeumannEpsilonBoundaryStencil() override = default;
+
+    void applyLeftWall(FlowField& flowField, int i, int j) override;
+    void applyRightWall(FlowField& flowField, int i, int j) override;
+    void applyBottomWall(FlowField& flowField, int i, int j) override;
+    void applyTopWall(FlowField& flowField, int i, int j) override;
+
+    void applyLeftWall(FlowField& flowField, int i, int j, int k) override;
+    void applyRightWall(FlowField& flowField, int i, int j, int k) override;
+    void applyBottomWall(FlowField& flowField, int i, int j, int k) override;
+    void applyTopWall(FlowField& flowField, int i, int j, int k) override;
+    void applyFrontWall(FlowField& flowField, int i, int j, int k) override;
+    void applyBackWall(FlowField& flowField, int i, int j, int k) override;
+  };
+
 } // namespace Stencils
