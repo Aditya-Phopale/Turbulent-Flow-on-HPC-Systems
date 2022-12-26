@@ -4,6 +4,7 @@
 #include "FlowField.hpp"
 #include "Parameters.hpp"
 #include "TurbulentFlowField.hpp"
+#include "TurbulentFlowFieldKE.hpp"
 
 namespace Stencils {
 
@@ -36,6 +37,23 @@ namespace Stencils {
 
     void apply(TurbulentFlowField& flowField, int i, int j) override;
     void apply(TurbulentFlowField& flowField, int i, int j, int k) override;
+  };
+
+  class TurbulentFGHStencilKE: public FieldStencil<TurbulentFlowFieldKE> {
+  private:
+    // A local velocity variable that will be used to approximate derivatives. Size matches 3D
+    // case, but can be used for 2D as well.
+    RealType localVelocity_[27 * 3];
+    RealType localViscosity_[27];
+    RealType localKineticEnergy_[27];
+    RealType localMeshsize_[27 * 3];
+
+  public:
+    TurbulentFGHStencilKE(const Parameters& parameters);
+    ~TurbulentFGHStencilKE() override = default;
+
+    void apply(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void apply(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
   };
 
 } // namespace Stencils

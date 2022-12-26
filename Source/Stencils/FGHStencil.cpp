@@ -4,6 +4,7 @@
 
 #include "Definitions.hpp"
 #include "StencilFunctions.hpp"
+#include "TurbulentFlowFieldKE.hpp"
 
 Stencils::FGHStencil::FGHStencil(const Parameters& parameters):
   FieldStencil<FlowField>(parameters) {}
@@ -89,4 +90,25 @@ void Stencils::TurbulentFGHStencil::apply(TurbulentFlowField& flowField, int i, 
       );
     }
   }
+}
+
+Stencils::TurbulentFGHStencilKE::TurbulentFGHStencilKE(const Parameters& parameters):
+  FieldStencil<TurbulentFlowFieldKE>(parameters) {}
+
+void Stencils::TurbulentFGHStencilKE::apply(TurbulentFlowFieldKE& flowField, int i, int j) {
+  // Load local velocities into the center layer of the local array
+  loadLocalVelocity2D(flowField, localVelocity_, i, j);
+  loadLocalViscosity2D(flowField, localViscosity_, i, j);
+  loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
+
+  RealType* const values = flowField.getFGH().getVector(i, j);
+
+  // Now the localVelocity array should contain lexicographically ordered elements around the given index
+  values[0] = computeF2D_turbulent(
+    localVelocity_, localViscosity_, localMeshsize_, parameters_, parameters_.timestep.dt
+  );
+  values[1] = computeG2D_turbulent(
+    localVelocity_, localViscosity_, localMeshsize_, parameters_, parameters_.timestep.dt
+  );
+  // std::cout << "Hello from turbulent apply\n";
 }
