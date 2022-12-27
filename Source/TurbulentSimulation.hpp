@@ -27,8 +27,8 @@ protected:
   Stencils::nuTStencil              nuTStencil_;
   FieldIterator<TurbulentFlowField> nuTIterator_;
 
-  Stencils::hStencil                hStencil_;
-  FieldIterator<TurbulentFlowField> hIterator_;
+  Stencils::hStencil<TurbulentFlowField> hStencil_;
+  FieldIterator<TurbulentFlowField>      hIterator_;
 
   Stencils::timeStepStencil         dtStencil_;
   FieldIterator<TurbulentFlowField> dtIterator_;

@@ -5,60 +5,92 @@
 #include "Definitions.hpp"
 #include "StencilFunctions.hpp"
 
-Stencils::hStencil::hStencil(const Parameters& parameters):
-  FieldStencil<TurbulentFlowField>(parameters) {}
+template <class FlowFieldType>
+Stencils::hStencil<FlowFieldType>::hStencil(const Parameters& parameters):
+  FieldStencil<FlowFieldType>(parameters) {}
 
-void Stencils::hStencil::apply(TurbulentFlowField& flowField, int i, int j) {
-  auto xPos = parameters_.meshsize->getPosX(i, j) + 0.5 * parameters_.meshsize->getDx(i, j);
-  auto yPos = parameters_.meshsize->getPosY(i, j) + 0.5 * parameters_.meshsize->getDy(i, j);
+template <class FlowFieldType>
+void Stencils::hStencil<FlowFieldType>::apply(FlowFieldType& flowField, int i, int j) {
+  auto xPos = FieldStencil<FlowFieldType>::parameters_.meshsize->getPosX(i, j)
+              + 0.5 * FieldStencil<FlowFieldType>::parameters_.meshsize->getDx(i, j);
+  auto yPos = FieldStencil<FlowFieldType>::parameters_.meshsize->getPosY(i, j)
+              + 0.5 * FieldStencil<FlowFieldType>::parameters_.meshsize->getDy(i, j);
 
   // For CHannel Flow
-  if (parameters_.bfStep.xRatio < 0 || parameters_.bfStep.yRatio < 0) {
-    flowField.getheight().getScalar(i, j) = std::min(yPos, (parameters_.geometry.lengthY - yPos));
+  if (FieldStencil<FlowFieldType>::parameters_.bfStep.xRatio < 0 || FieldStencil<FlowFieldType>::parameters_.bfStep.yRatio < 0) {
+    flowField.getheight().getScalar(i, j) = std::min(
+      yPos, (FieldStencil<FlowFieldType>::parameters_.geometry.lengthY - yPos)
+    );
   }
   // For BFS
   else {
-    if (xPos <= parameters_.bfStep.xRatio * parameters_.geometry.lengthX) {
+    if (xPos <= FieldStencil<FlowFieldType>::parameters_.bfStep.xRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthX) {
       flowField.getheight().getScalar(i, j) = std::min(
-        yPos - (parameters_.bfStep.yRatio * parameters_.geometry.lengthY), (parameters_.geometry.lengthY - yPos)
+        yPos
+          - (FieldStencil<FlowFieldType>::parameters_.bfStep.yRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthY),
+        (FieldStencil<FlowFieldType>::parameters_.geometry.lengthY - yPos)
       );
-    } else if (yPos < parameters_.bfStep.yRatio * parameters_.geometry.lengthY) {
+    } else if (yPos < FieldStencil<FlowFieldType>::parameters_.bfStep.yRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthY) {
       flowField.getheight().getScalar(i, j) = std::min(
-        xPos - (parameters_.bfStep.xRatio * parameters_.geometry.lengthX),
-        std::min(yPos, (parameters_.geometry.lengthY - yPos))
+        xPos
+          - (FieldStencil<FlowFieldType>::parameters_.bfStep.xRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthX),
+        std::min(yPos, (FieldStencil<FlowFieldType>::parameters_.geometry.lengthY - yPos))
       );
     } else {
-      flowField.getheight().getScalar(i, j) = std::min(yPos, (parameters_.geometry.lengthY - yPos));
+      flowField.getheight().getScalar(i, j) = std::min(
+        yPos, (FieldStencil<FlowFieldType>::parameters_.geometry.lengthY - yPos)
+      );
     }
   }
 }
 
-void Stencils::hStencil::apply(TurbulentFlowField& flowField, int i, int j, int k) {
-  auto xPos = parameters_.meshsize->getPosX(i, j, k) + 0.5 * parameters_.meshsize->getDx(i, j, k);
-  auto yPos = parameters_.meshsize->getPosY(i, j, k) + 0.5 * parameters_.meshsize->getDy(i, j, k);
-  auto zPos = parameters_.meshsize->getPosZ(i, j, k) + 0.5 * parameters_.meshsize->getDz(i, j, k);
+template <class FlowFieldType>
+void Stencils::hStencil<FlowFieldType>::apply(FlowFieldType& flowField, int i, int j, int k) {
+  auto xPos = FieldStencil<FlowFieldType>::parameters_.meshsize->getPosX(i, j, k)
+              + 0.5 * FieldStencil<FlowFieldType>::parameters_.meshsize->getDx(i, j, k);
+  auto yPos = FieldStencil<FlowFieldType>::parameters_.meshsize->getPosY(i, j, k)
+              + 0.5 * FieldStencil<FlowFieldType>::parameters_.meshsize->getDy(i, j, k);
+  auto zPos = FieldStencil<FlowFieldType>::parameters_.meshsize->getPosZ(i, j, k)
+              + 0.5 * FieldStencil<FlowFieldType>::parameters_.meshsize->getDz(i, j, k);
 
-  if (parameters_.bfStep.xRatio < 0 || parameters_.bfStep.yRatio < 0) {
+  if (FieldStencil<FlowFieldType>::parameters_.bfStep.xRatio < 0 || FieldStencil<FlowFieldType>::parameters_.bfStep.yRatio < 0) {
     flowField.getheight().getScalar(i, j, k) = std::min(
-      yPos, std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, parameters_.geometry.lengthZ - zPos))
+      yPos,
+      std::min(
+        (FieldStencil<FlowFieldType>::parameters_.geometry.lengthY - yPos),
+        std::min(zPos, FieldStencil<FlowFieldType>::parameters_.geometry.lengthZ - zPos)
+      )
     );
     // ****Remove x pos for cells near to inlet****
   } else {
-    if (xPos <= parameters_.bfStep.xRatio * parameters_.geometry.lengthX) {
+    if (xPos <= FieldStencil<FlowFieldType>::parameters_.bfStep.xRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthX) {
       flowField.getheight().getScalar(i, j, k) = std::min(
-        yPos - (parameters_.bfStep.yRatio * parameters_.geometry.lengthY),
-        std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, (parameters_.geometry.lengthZ - zPos)))
-      );
-    } else if (yPos < parameters_.bfStep.yRatio * parameters_.geometry.lengthY) {
-      flowField.getheight().getScalar(i, j, k) = std::min(
-        xPos - (parameters_.bfStep.xRatio * parameters_.geometry.lengthX),
+        yPos
+          - (FieldStencil<FlowFieldType>::parameters_.bfStep.yRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthY),
         std::min(
-          yPos, std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, (parameters_.geometry.lengthZ - zPos)))
+          (FieldStencil<FlowFieldType>::parameters_.geometry.lengthY - yPos),
+          std::min(zPos, (FieldStencil<FlowFieldType>::parameters_.geometry.lengthZ - zPos))
+        )
+      );
+    } else if (yPos < FieldStencil<FlowFieldType>::parameters_.bfStep.yRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthY) {
+      flowField.getheight().getScalar(i, j, k) = std::min(
+        xPos
+          - (FieldStencil<FlowFieldType>::parameters_.bfStep.xRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthX),
+        std::min(
+          yPos,
+          std::min(
+            (FieldStencil<FlowFieldType>::parameters_.geometry.lengthY - yPos),
+            std::min(zPos, (FieldStencil<FlowFieldType>::parameters_.geometry.lengthZ - zPos))
+          )
         )
       );
     } else {
       flowField.getheight().getScalar(i, j) = std::min(
-        yPos, std::min((parameters_.geometry.lengthY - yPos), std::min(zPos, parameters_.geometry.lengthZ - zPos))
+        yPos,
+        std::min(
+          (FieldStencil<FlowFieldType>::parameters_.geometry.lengthY - yPos),
+          std::min(zPos, FieldStencil<FlowFieldType>::parameters_.geometry.lengthZ - zPos)
+        )
       );
     }
   }
