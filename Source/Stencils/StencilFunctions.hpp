@@ -26,10 +26,20 @@ namespace Stencils {
     }
   }
 
-   inline void loadLocalViscosity2D(TurbulentFlowFieldKE& flowField, RealType* const localViscosity, int i, int j) {
+  inline void loadLocalViscosity2D(TurbulentFlowFieldKE& flowField, RealType* const localViscosity, int i, int j) {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
         localViscosity[39 + 9 * row + 3 * column] = flowField.getnuT().getScalar(i + column, j + row); // x-component
+      }
+    }
+  }
+
+  inline void loadLocalKineticEnergy2D(
+    TurbulentFlowFieldKE& flowField, RealType* const localKineticEnergy, int i, int j
+  ) {
+    for (int row = -1; row <= 1; row++) {
+      for (int column = -1; column <= 1; column++) {
+        localKineticEnergy[39 + 9 * row + 3 * column] = flowField.getk().getScalar(i + column, j + row); // x-component
       }
     }
   }
@@ -224,6 +234,20 @@ namespace Stencils {
     const int index0 = mapd(0, 0, 0, 2);
     const int index1 = mapd(0, 0, -1, 2);
     return (lv[index0] - lv[index1]) / lm[index0];
+  }
+
+  inline RealType dkdx(const RealType* const lk, const RealType* const lm) {
+    // given in pg 164 (followed same as pressure)
+    const int index0 = mapd(1, 0, 0, 0);
+    const int index1 = mapd(0, 0, 0, 0);
+    return (lk[index0] - lk[index1]) / lm[index0];
+  }
+
+  inline RealType dkdy(const RealType* const lk, const RealType* const lm) {
+    // given in pg 164 (followed same as pressure)
+    const int index0 = mapd(0, 1, 0, 0);
+    const int index1 = mapd(0, 0, 0, 0);
+    return (lk[index0] - lk[index1]) / lm[index0];
   }
 
   inline RealType d2udx2(const RealType* const lv, const RealType* const lm) {
@@ -1275,6 +1299,34 @@ namespace Stencils {
         + dt * (2*d2udx2(localVelocity, localViscosity, parameters, localMeshsize)
             + d2udy2(localVelocity, localViscosity, parameters, localMeshsize) + d2vdydx(localVelocity, localViscosity, parameters, localMeshsize) - du2dx(localVelocity, parameters, localMeshsize)
             - duvdy(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
+  }
+
+  inline RealType computeF2D_turbulent_KE(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localKineticEnergy,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 0)]
+        + dt * (2*d2udx2(localVelocity, localViscosity, parameters, localMeshsize)
+            + d2udy2(localVelocity, localViscosity, parameters, localMeshsize) + d2vdydx(localVelocity, localViscosity, parameters, localMeshsize) - du2dx(localVelocity, parameters, localMeshsize)
+            - duvdy(localVelocity, parameters, localMeshsize) - 2*dkdx(localKineticEnergy, localMeshsize)/3 + parameters.environment.gx);
+  }
+
+  inline RealType computeG2D_turbulent_KE(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localKineticEnergy,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 1)]
+        + dt * ( d2vdx2(localVelocity, localViscosity, parameters, localMeshsize) + d2udxdy(localVelocity, localViscosity, parameters, localMeshsize)
+            + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
+            - dv2dy(localVelocity, parameters, localMeshsize) - 2*dkdy(localKineticEnergy, localMeshsize)/3 +  + parameters.environment.gy);
   }
 
   inline RealType computeG2D(

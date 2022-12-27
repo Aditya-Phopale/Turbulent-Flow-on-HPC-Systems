@@ -92,6 +92,7 @@ void Stencils::TurbulentFGHStencil::apply(TurbulentFlowField& flowField, int i, 
   }
 }
 
+
 Stencils::TurbulentFGHStencilKE::TurbulentFGHStencilKE(const Parameters& parameters):
   FieldStencil<TurbulentFlowFieldKE>(parameters) {}
 
@@ -112,3 +113,4 @@ void Stencils::TurbulentFGHStencilKE::apply(TurbulentFlowFieldKE& flowField, int
   );
   // std::cout << "Hello from turbulent apply\n";
 }
+
