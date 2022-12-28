@@ -7,13 +7,13 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
   TurbulentFGHIteratorKE_(turbflowFieldKE_, parameters, TurbulentFGHStencilKE_),
   nuTStencilKE_(parameters),
   nuTIteratorKE_(turbflowFieldKE_, parameters, nuTStencilKE_, 0, 0),
-  hStencil_(parameters),
-  hIterator_(turbflowFieldKE_, parameters, hStencil_, 0, 0),
+  hStencilKE_(parameters),
+  hIteratorKE_(turbflowFieldKE_, parameters, hStencilKE_, 0, 0),
   dtStencil_(parameters),
   dtIterator_(turbflowFieldKE_, parameters, dtStencil_),
   ppmTurbulentKE_(parameters, turbflowFieldKE_) {}
 
-void TurbulentSimulationKE::initializeFlowFieldKE() {
+void TurbulentSimulationKE::initializeFlowField() {
   Simulation::initializeFlowField();
   // hUpdate();
   nuTUpdate();
@@ -92,7 +92,7 @@ void TurbulentSimulationKE::setTimeStep() {
   parameters_.timestep.dt *= parameters_.timestep.tau;
 }
 
-void TurbulentSimulationKE::hUpdate() { hIterator_.iterate(); }
+void TurbulentSimulationKE::hUpdate() { hIteratorKE_.iterate(); }
 
 void TurbulentSimulationKE::nuTUpdate() { nuTIteratorKE_.iterate(); }
 

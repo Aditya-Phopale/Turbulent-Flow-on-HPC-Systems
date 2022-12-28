@@ -5,7 +5,9 @@
 #include "MeshsizeFactory.hpp"
 #include "Simulation.hpp"
 #include "TurbulentFlowField.hpp"
+#include "TurbulentFlowFieldKE.hpp"
 #include "TurbulentSimulation.hpp"
+#include "TurbulentSimulationKE.hpp"
 
 #include "ParallelManagers/PetscParallelConfiguration.hpp"
 
@@ -56,7 +58,10 @@ int main(int argc, char* argv[]) {
 
   Parameters parameters;
   configuration.loadParameters(parameters);
-  spdlog::info(parameters.turbulent.c_nu);
+  spdlog::info(parameters.turbulent.c_mu);
+  spdlog::info(parameters.turbulent.c_e);
+  spdlog::info(parameters.turbulent.c_1);
+  spdlog::info(parameters.turbulent.c_2);
 
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
@@ -86,8 +91,6 @@ int main(int argc, char* argv[]) {
 
   // Initialise simulation
   if (parameters.simulation.type == "turbulence") {
-    // spdlog::info(parameters.turbulent.kappa);
-    //  TODO WS2: initialise turbulent flow field and turbulent simulation object
     if (rank == 0) {
       spdlog::info("Start Turbulence simulation in {}D", parameters.geometry.dim);
     }
@@ -104,6 +107,13 @@ int main(int argc, char* argv[]) {
       throw std::runtime_error("flowField == NULL!");
     }
     simulation = new Simulation(parameters, *flowField);
+  } else if (parameters.simulation.type == "turbulenceKE") {
+    if (rank == 0) {
+      spdlog::info("Start TurbulenceKE simulation in {}D", parameters.geometry.dim);
+    }
+    Turbflowfield = new TurbulentFlowField(parameters);
+
+    simulation = new TurbulentSimulation(parameters, *Turbflowfield);
   } else {
     throw std::runtime_error("Unknown simulation type! Currently supported: dns, turbulence");
   }
@@ -128,22 +138,22 @@ int main(int argc, char* argv[]) {
 
   // Time loop
 
-  while (time < parameters.simulation.finalTime) {
+  // while (time < parameters.simulation.finalTime) {
 
-    simulation->solveTimestep();
-    timeSteps++;
-    time += parameters.timestep.dt;
+  //   simulation->solveTimestep();
+  //   timeSteps++;
+  //   time += parameters.timestep.dt;
 
-    if ((rank == 0) && (timeStdOut <= time)) {
-      spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
-      timeStdOut += parameters.stdOut.interval;
-    }
+  //   if ((rank == 0) && (timeStdOut <= time)) {
+  //     spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
+  //     timeStdOut += parameters.stdOut.interval;
+  //   }
 
-    if (timeVtk <= time) {
-      simulation->plotVTK(timeSteps, time);
-      timeVtk += parameters.vtk.interval;
-    }
-  }
+  //   if (timeVtk <= time) {
+  //     simulation->plotVTK(timeSteps, time);
+  //     timeVtk += parameters.vtk.interval;
+  //   }
+  // }
   spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
   // Plot final solution

@@ -138,7 +138,7 @@ class TurbulenceParameters {
 public:
   RealType kappa = 0;
   int      delta;
-  RealType c_nu = 0;
+  RealType c_mu = 0;
   RealType c_e  = 0;
   RealType c_1  = 0;
   RealType c_2  = 0;

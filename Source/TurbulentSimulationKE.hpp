@@ -3,23 +3,24 @@
 #include "TurbulentFlowFieldKE.hpp"
 
 #include "ParallelManagers/PetscParallelManager.hpp"
-#include "Stencils/hStencil.hpp"
+#include "Stencils/hStencilKE.hpp"
+#include "Stencils/MaxUStencil.hpp"
 #include "Stencils/nuTStencilKE.hpp"
-#include "Stencils/timeStepStencil.hpp"
-#include "Stencils/TurbulentVTKStencil.hpp"
+#include "Stencils/timeStepStencilKE.hpp"
+#include "Stencils/TurbulentVTKStencilKE.hpp"
 
 class TurbulentSimulationKE: public Simulation {
 protected:
   TurbulentFlowFieldKE& turbflowFieldKE_;
 
-  //   Stencils::MaxUStencil             maxUStencil_;
-  //   FieldIterator<FlowField>          maxUFieldIterator_;
-  //   GlobalBoundaryIterator<FlowField> maxUBoundaryIterator_;
+  // Stencils::MaxUStencil             maxUStencil_;
+  // FieldIterator<FlowField>          maxUFieldIterator_;
+  // GlobalBoundaryIterator<TurbulentFlowFieldKE> maxUBoundaryIterator_;
 
-  //   // Set up the boundary conditions
-  //   GlobalBoundaryFactory             globalBoundaryFactory_;
-  //   GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
-  //   GlobalBoundaryIterator<FlowField> wallFGHIterator_;
+  // // Set up the boundary conditions
+  // GlobalBoundaryFactory             globalBoundaryFactory_;
+  // GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
+  // GlobalBoundaryIterator<FlowField> wallFGHIterator_;
 
   Stencils::TurbulentFGHStencilKE     TurbulentFGHStencilKE_;
   FieldIterator<TurbulentFlowFieldKE> TurbulentFGHIteratorKE_;
@@ -27,8 +28,8 @@ protected:
   Stencils::nuTStencilKE              nuTStencilKE_;
   FieldIterator<TurbulentFlowFieldKE> nuTIteratorKE_;
 
-  Stencils::hStencil                  hStencil_;
-  FieldIterator<TurbulentFlowFieldKE> hIterator_;
+  Stencils::hStencilKE                hStencilKE_;
+  FieldIterator<TurbulentFlowFieldKE> hIteratorKE_;
 
   // Stencils::kStencil                  kStencil_;
   // FieldIterator<TurbulentKEFlowField> kIterator_;
@@ -36,7 +37,7 @@ protected:
   // Stencils::eStencil                  eStencil_;
   // FieldIterator<TurbulentKEFlowField> eIterator_;
 
-  Stencils::timeStepStencil           dtStencil_;
+  Stencils::timeStepStencilKE         dtStencil_;
   FieldIterator<TurbulentFlowFieldKE> dtIterator_;
 
   //   Stencils::VelocityStencil velocityStencil_;
@@ -48,7 +49,7 @@ protected:
   //   FieldIterator<FlowField> rhsIterator_;
 
   //   std::unique_ptr<Solvers::LinearSolver> solver_;
-  ParallelManagers::PetscParallelManager<TurbulentFlowField> ppmTurbulentKE_;
+  ParallelManagers::PetscParallelManager<TurbulentFlowFieldKE> ppmTurbulentKE_;
 
   virtual void setTimeStep() override;
 
