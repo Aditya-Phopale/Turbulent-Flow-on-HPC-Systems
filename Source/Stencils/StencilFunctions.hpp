@@ -34,20 +34,18 @@ namespace Stencils {
     }
   }
 
-  inline void loadLocalKineticEnergy2D(
-    TurbulentFlowFieldKE& flowField, RealType* const localKineticEnergy, int i, int j
-  ) {
+  inline void loadLocalK2D(TurbulentFlowFieldKE& flowField, RealType* const localK, int i, int j) {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
-        localKineticEnergy[39 + 9 * row + 3 * column] = flowField.getk().getScalar(i + column, j + row); // x-component
+        localK[39 + 9 * row + 3 * column] = flowField.getk().getScalar(i + column, j + row); // x-component
       }
     }
   }
 
-  inline void loadLocalDissipation2D(TurbulentFlowFieldKE& flowField, RealType* const localDissipation, int i, int j) {
+  inline void loadLocalEpsilon2D(TurbulentFlowFieldKE& flowField, RealType* const localEpsilon, int i, int j) {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
-        localDissipation[39 + 9 * row + 3 * column] = flowField.geteps().getScalar(i + column, j + row); // x-component
+        localEpsilon[39 + 9 * row + 3 * column] = flowField.geteps().getScalar(i + column, j + row); // x-component
       }
     }
   }
@@ -1288,13 +1286,6 @@ namespace Stencils {
   }
 
   //************************************************************************************************************************//
-  inline void loadLocalk(TurbulentFlowField& flowField, RealType* const localk, int i, int j) {
-    for (int row = -1; row <= 1; row++) {
-      for (int column = -1; column <= 1; column++) {
-        localk[39 + 9 * row + 3 * column] = flowField.getk().getScalar(i + column, j + row);
-      }
-    }
-  }
 
   inline RealType dukdx(
     const RealType* const lv, const Parameters& parameters, const RealType* const lk, const RealType* const lm
@@ -1370,16 +1361,6 @@ namespace Stencils {
     const RealType viscB = (0.5 * dy_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, -1, 0, 0)]) / dy0;
 
     return (viscT * dkdyT - viscB * dkdyB) / dy_0;
-  }
-
-  inline void loadLocalEpsilon(TurbulentFlowField& flowField, RealType* const localEpsilon, int i, int j) {
-    for (int row = -1; row <= 1; row++) {
-      for (int column = -1; column <= 1; column++) {
-        localEpsilon[39 + 9 * row + 3 * column] = flowField.getepsilon().getScalar(
-          i + column, j + row
-        ); /*need getepsilon from flowfield here*/
-      }
-    }
   }
 
   inline RealType duepsdx(
@@ -1460,23 +1441,23 @@ namespace Stencils {
     return (viscT * depsdyT - viscB * depsdyB) / dy_0;
   }
 
-  inline RealType fu(TurbulentFlowField& flowField, int i, int j) {
-    ccc
+  inline RealType fu(TurbulentFlowFieldKE& flowField, int i, int j) {
 
-      RealType Rd
-      = sqrt(flowField.getk().getScalar(i, j)) * flowField.getheight().getScalar(i, j)
-        / (flowField.getnuT().getScalar(i, j));
+    RealType Rd = sqrt(flowField.getk().getScalar(i, j)) * flowField.getheight().getScalar(i, j)
+                  / (flowField.getnuT().getScalar(i, j));
+    RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j))
+                  / (flowField.getnuT().getScalar(i, j) * flowField.geteps().getScalar(i, j));
 
     return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
   }
 
-  inline RealType f1(TurbulentFlowField& flowField, int i, int j) {
+  inline RealType f1(TurbulentFlowFieldKE& flowField, int i, int j) {
     return 1 + (0.05 / fu(flowField, i, j)) * (0.05 / fu(flowField, i, j)) * (0.05 / fu(flowField, i, j));
   }
 
-  inline RealType f2(TurbulentFlowField& flowField, int i, int j) {
+  inline RealType f2(TurbulentFlowFieldKE& flowField, int i, int j) {
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j))
-                  / (flowField.getnuT().getScalar(i, j) * flowField.getepsilon().getScalar(i, j));
+                  / (flowField.getnuT().getScalar(i, j) * flowField.geteps().getScalar(i, j));
 
     return 1 - exp(-Rt * Rt);
   }
@@ -1557,7 +1538,7 @@ namespace Stencils {
   }
 
   inline RealType computek2D(
-    TurbulentFlowField&   flowField,
+    TurbulentFlowFieldKE& flowField,
     const RealType* const localVelocity,
     const RealType* const localViscosity,
     const RealType* const localk,
@@ -1571,7 +1552,7 @@ namespace Stencils {
   }
 
   inline RealType computeEpsilon2D(
-    TurbulentFlowField&   flowField,
+    TurbulentFlowFieldKE& flowField,
     const RealType* const localVelocity,
     const RealType* const localViscosity,
     const RealType* const localEpsilon,

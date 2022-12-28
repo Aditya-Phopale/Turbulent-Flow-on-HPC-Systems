@@ -2,10 +2,10 @@
 
 #include "FieldStencil.hpp"
 #include "Parameters.hpp"
-#include "TurbulentFlowField.hpp"
+#include "TurbulentFlowFieldKE.hpp"
 
 namespace Stencils {
-  class kStencil: public FieldStencil<TurbulentFlowField> /*change the flowfield here???*/ {
+  class kStencil: public FieldStencil<TurbulentFlowFieldKE> /*change the flowfield here???*/ {
   private:
     RealType localVelocity_[27 * 3];
     RealType localViscosity_[27 * 3];
@@ -16,7 +16,7 @@ namespace Stencils {
     kStencil(const Parameters& parameters);
     ~kStencil() override = default;
 
-    void apply(TurbulentFlowField& flowField, int i, int j) override;
-    void apply(TurbulentFlowField& flowField, int i, int j, int k) override;
+    void apply(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void apply(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
   };
 } // namespace Stencils

@@ -99,7 +99,7 @@ void Stencils::TurbulentFGHStencilKE::apply(TurbulentFlowFieldKE& flowField, int
   // Load local velocities into the center layer of the local array
   loadLocalVelocity2D(flowField, localVelocity_, i, j);
   loadLocalViscosity2D(flowField, localViscosity_, i, j);
-  loadLocalKineticEnergy2D(flowField, localKineticEnergy_, i, j);
+  loadLocalK2D(flowField, localKineticEnergy_, i, j);
   loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
 
   RealType* const values = flowField.getFGH().getVector(i, j);
