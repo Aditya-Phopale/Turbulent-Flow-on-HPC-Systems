@@ -56,6 +56,8 @@ int main(int argc, char* argv[]) {
 
   Parameters parameters;
   configuration.loadParameters(parameters);
+  spdlog::info(parameters.turbulent.c_nu);
+
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
   FlowField*          flowField     = NULL;
@@ -146,7 +148,7 @@ int main(int argc, char* argv[]) {
 
   // Plot final solution
   simulation->plotVTK(timeSteps, time);
- 
+
   delete simulation;
   simulation = NULL;
 

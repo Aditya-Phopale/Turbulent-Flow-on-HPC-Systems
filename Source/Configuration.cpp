@@ -399,10 +399,34 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     if (parameters.simulation.type == "turbulence") {
       node = confFile.FirstChildElement()->FirstChildElement("turbulenceParameters");
       if (node == NULL) {
-        throw std::runtime_error("Error loading timestep parameters");
+        throw std::runtime_error("Error loading turbulence parameters");
       }
 
       readFloatMandatory(parameters.turbulent.kappa, node, "kappa");
+      subNode = node->FirstChildElement("boundarylayer");
+      if (subNode != NULL) {
+        readIntMandatory(parameters.turbulent.delta, subNode, "delta");
+      } else {
+        throw std::runtime_error("Missing type in boundary layer");
+      }
+    }
+    if (parameters.simulation.type == "turbulenceKE") {
+      node = confFile.FirstChildElement()->FirstChildElement("turbulenceParameters");
+      if (node == NULL) {
+        throw std::runtime_error("Error loading turbulence parameters");
+      }
+
+      readFloatMandatory(parameters.turbulent.kappa, node, "kappa");
+
+      node = confFile.FirstChildElement()->FirstChildElement("turbulenceConstants");
+      if (node == NULL) {
+        throw std::runtime_error("Error loading turbulenceKE constants");
+      }
+      readFloatMandatory(parameters.turbulent.c_nu, node, "c_nu");
+      readFloatMandatory(parameters.turbulent.c_e, node, "c_e");
+      readFloatMandatory(parameters.turbulent.c_1, node, "c_1");
+      readFloatMandatory(parameters.turbulent.c_2, node, "c_2");
+
       subNode = node->FirstChildElement("boundarylayer");
       if (subNode != NULL) {
         readIntMandatory(parameters.turbulent.delta, subNode, "delta");
