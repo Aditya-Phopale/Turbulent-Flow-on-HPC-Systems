@@ -4,6 +4,7 @@
 #include "DataStructures.hpp"
 #include "FlowField.hpp"
 #include "Parameters.hpp"
+#include "TurbulentFlowFieldKE.hpp"
 
 namespace Stencils {
 
