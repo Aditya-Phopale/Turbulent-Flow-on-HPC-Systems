@@ -44,6 +44,14 @@ namespace Stencils {
     }
   }
 
+  inline void loadLocalDissipation2D(TurbulentFlowFieldKE& flowField, RealType* const localDissipation, int i, int j) {
+    for (int row = -1; row <= 1; row++) {
+      for (int column = -1; column <= 1; column++) {
+        localDissipation[39 + 9 * row + 3 * column] = flowField.geteps().getScalar(i + column, j + row); // x-component
+      }
+    }
+  }
+
   // Load the local velocity cube with surrounding velocities
   inline void loadLocalVelocity3D(FlowField& flowField, RealType* const localVelocity, int i, int j, int k) {
     for (int layer = -1; layer <= 1; layer++) {
@@ -1278,6 +1286,18 @@ namespace Stencils {
 
     return tmp2;
   }
+
+  inline RealType computef_mu(TurbulentFlowFieldKE& flowField, int i, int j) {
+
+    RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j))
+                  / (flowField.getnuT().getScalar(i, j) * flowField.geteps().getScalar(i, j));
+
+    RealType Rd = sqrt(flowField.getk().getScalar(i, j)) * flowField.getheight().getScalar(i, j)
+                  / (flowField.getnuT().getScalar(i, j));
+
+    return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
+  }
+
   // make if tree for FGH turbulent stencil with return values.
   inline RealType computeF2D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
