@@ -291,11 +291,11 @@ Stencils::BFInputKStencil::BFInputKStencil(const Parameters& parameters):
 }
 
 void Stencils::BFInputKStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) {
-  flowField.getK().getScalar(i, j) = computeK2D(i, j, stepSize_, parameters_);
+  flowField.getk().getScalar(i, j) = computeK2D(i, j, stepSize_, parameters_);
 }
 
 void Stencils::BFInputKStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
-  flowField.getK().getScalar(i, j, k) = computeK3D(i, j, k, stepSize_, parameters_);
+  flowField.getk().getScalar(i, j, k) = computeK3D(i, j, k, stepSize_, parameters_);
   // flowField.getVelocity().getVector(i, j, k)[1] = -flowField.getVelocity().getVector(i + 1, j, k)[1];
   // flowField.getVelocity().getVector(i, j, k)[2] = -flowField.getVelocity().getVector(i + 1, j, k)[2];
 }
@@ -382,16 +382,16 @@ Stencils::BFInputEpsilonStencil::BFInputEpsilonStencil(const Parameters& paramet
 }
 
 void Stencils::BFInputEpsilonStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) {
-  flowField.getEpsilon().getScalar(i, j) = computeEpsilon2D(i, j, stepSize_, parameters_);
+  flowField.geteps().getScalar(i, j) = computeEpsilon2D(i, j, stepSize_, parameters_);
 }
 
 void Stencils::BFInputEpsilonStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
-  flowField.getEpsilon().getScalar(i, j, k) = computeEpsilon3D(i, j, k, stepSize_, parameters_);
+  flowField.geteps().getScalar(i, j, k) = computeEpsilon3D(i, j, k, stepSize_, parameters_);
   // flowField.getVelocity().getVector(i, j, k)[1] = -flowField.getVelocity().getVector(i + 1, j, k)[1];
   // flowField.getVelocity().getVector(i, j, k)[2] = -flowField.getVelocity().getVector(i + 1, j, k)[2];
 }
 
-oid Stencils::BFInputEpsilonStencil::applyRightWall(
+void Stencils::BFInputEpsilonStencil::applyRightWall(
   [[maybe_unused]] TurbulentFlowFieldKE& flowField, [[maybe_unused]] int i, [[maybe_unused]] int j
 ) {}
 void Stencils::BFInputEpsilonStencil::applyBottomWall(
