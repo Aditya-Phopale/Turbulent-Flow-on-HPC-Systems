@@ -1287,17 +1287,6 @@ namespace Stencils {
     return tmp2;
   }
 
-  inline RealType computef_mu(TurbulentFlowFieldKE& flowField, int i, int j) {
-
-    RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j))
-                  / (flowField.getnuT().getScalar(i, j) * flowField.geteps().getScalar(i, j));
-
-    RealType Rd = sqrt(flowField.getk().getScalar(i, j)) * flowField.getheight().getScalar(i, j)
-                  / (flowField.getnuT().getScalar(i, j));
-
-    return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
-  }
-
   // make if tree for FGH turbulent stencil with return values.
   inline RealType computeF2D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
