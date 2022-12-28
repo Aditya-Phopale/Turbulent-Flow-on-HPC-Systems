@@ -179,64 +179,65 @@ GlobalTurbulentBoundaryFactory::GlobalTurbulentBoundaryFactory(Parameters& param
       KStencils_[i]       = moving_[0];
       EpsilonStencils_[i] = moving_[1];
     }
-    parameters.walls.typeLeft   = DIRICHLET;
-    parameters.walls.typeRight  = DIRICHLET;
-    parameters.walls.typeBottom = DIRICHLET;
-    parameters.walls.typeTop    = DIRICHLET;
-    parameters.walls.typeFront  = DIRICHLET;
-    parameters.walls.typeBack   = DIRICHLET;
+    // parameters.walls.typeLeft   = DIRICHLET;
+    // parameters.walls.typeRight  = DIRICHLET;
+    // parameters.walls.typeBottom = DIRICHLET;
+    // parameters.walls.typeTop    = DIRICHLET;
+    // parameters.walls.typeFront  = DIRICHLET;
+    // parameters.walls.typeBack   = DIRICHLET;
   } else if (scenario == "channel") {
     // To the left, we have the input
     KStencils_[0]       = channelInput_[0];
     EpsilonStencils_[0] = channelInput_[1];
 
     // To the right, there is an outflow boundary
-    velocityStencils_[1] = outflow_[0];
-    FGHStencils_[1]      = outflow_[1];
+    KStencils_[1]       = outflow_[0];
+    EpsilonStencils_[1] = outflow_[1];
 
     // The other walls are moving walls
     for (int i = 2; i < 6; i++) {
-      velocityStencils_[i] = moving_[0];
-      FGHStencils_[i]      = moving_[1];
+      KStencils_[i]       = moving_[0];
+      EpsilonStencils_[i] = outflow_[1];
     }
-    parameters.walls.typeLeft   = DIRICHLET;
-    parameters.walls.typeRight  = NEUMANN;
-    parameters.walls.typeBottom = DIRICHLET;
-    parameters.walls.typeTop    = DIRICHLET;
-    parameters.walls.typeFront  = DIRICHLET;
-    parameters.walls.typeBack   = DIRICHLET;
+    // parameters.walls.typeLeft   = DIRICHLET;
+    // parameters.walls.typeRight  = NEUMANN;
+    // parameters.walls.typeBottom = DIRICHLET;
+    // parameters.walls.typeTop    = DIRICHLET;
+    // parameters.walls.typeFront  = DIRICHLET;
+    // parameters.walls.typeBack   = DIRICHLET;
   } else if (scenario == "pressure-channel") {
     // We have Dirichlet conditions for pressure on both sides,
     // hence outflow conditions for the velocities.
-    velocityStencils_[0] = outflow_[0];
-    FGHStencils_[0]      = outflow_[1];
+    KStencils_[0]       = outflow_[0];
+    EpsilonStencils_[0] = outflow_[1];
 
     // To the right, there is an outflow boundary
-    velocityStencils_[1] = outflow_[0];
-    FGHStencils_[1]      = outflow_[1];
+    KStencils_[1]       = outflow_[0];
+    EpsilonStencils_[1] = outflow_[1];
 
     // The other walls are moving walls
     for (int i = 2; i < 6; i++) {
-      velocityStencils_[i] = moving_[0];
-      FGHStencils_[i]      = moving_[1];
+      KStencils_[i]       = moving_[0];
+      EPsilonStencils_[i] = outflow_[1];
     }
-    parameters.walls.typeLeft   = NEUMANN;
-    parameters.walls.typeRight  = NEUMANN;
-    parameters.walls.typeBottom = DIRICHLET;
-    parameters.walls.typeTop    = DIRICHLET;
-    parameters.walls.typeFront  = DIRICHLET;
-    parameters.walls.typeBack   = DIRICHLET;
-  } else if ((scenario == "periodic-box") || (scenario == "taylor-green")) {
-    for (int i = 0; i < 6; i++) {
-      velocityStencils_[i] = periodic_[0];
-      FGHStencils_[i]      = periodic_[1];
-    }
-    parameters.walls.typeLeft   = PERIODIC;
-    parameters.walls.typeRight  = PERIODIC;
-    parameters.walls.typeBottom = PERIODIC;
-    parameters.walls.typeTop    = PERIODIC;
-    parameters.walls.typeFront  = PERIODIC;
-    parameters.walls.typeBack   = PERIODIC;
+    // parameters.walls.typeLeft   = NEUMANN;
+    // parameters.walls.typeRight  = NEUMANN;
+    // parameters.walls.typeBottom = DIRICHLET;
+    // parameters.walls.typeTop    = DIRICHLET;
+    // parameters.walls.typeFront  = DIRICHLET;
+    // parameters.walls.typeBack   = DIRICHLET;
+    // } else if ((scenario == "periodic-box") || (scenario == "taylor-green")) {
+    //   for (int i = 0; i < 6; i++) {
+    //     KStencils_[i] = periodic_[0];
+    //     EpsilonStencils_[i]      = periodic_[1];
+    //   }
+    //   parameters.walls.typeLeft   = PERIODIC;
+    //   parameters.walls.typeRight  = PERIODIC;
+    //   parameters.walls.typeBottom = PERIODIC;
+    //   parameters.walls.typeTop    = PERIODIC;
+    //   parameters.walls.typeFront  = PERIODIC;
+    //   parameters.walls.typeBack   = PERIODIC;
+    //
   } else {
     throw std::runtime_error("Scenario not recognized");
   }
