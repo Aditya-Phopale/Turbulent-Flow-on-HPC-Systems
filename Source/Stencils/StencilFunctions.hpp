@@ -1319,7 +1319,7 @@ namespace Stencils {
            + (parameters.solver.gamma / dy_0) * (kT * fabs(lv[mapd(0, 0, 0, 1)]) - kB * fabs(lv[mapd(0, -1, 0, 1)]))
   }
 
-  inline RealType dnuTkdx2(
+  inline RealType dnuTkd2x(
     const RealType* const lv,
     const Parameters&     parameters,
     const RealType* const lvis,
@@ -1341,7 +1341,7 @@ namespace Stencils {
     return (viscR * dkdxR - viscL * dkdxL) / dx_0;
   }
 
-  inline RealType dnuTkdy2(
+  inline RealType dnuTkd2y(
     const RealType* const lv,
     const Parameters&     parameters,
     const RealType* const lvis,
@@ -1397,7 +1397,8 @@ namespace Stencils {
              ) * (lepsT * fabs(lv[mapd(0, 0, 0, 1)]) - lepsB * fabs(lv[mapd(0, -1, 0, 1)]))
   }
 
-  inline RealType dnuTepsdx2(
+  inline RealType dfunuTepsd2x(
+    TurbulentFlowFieldKE& flowField,
     const RealType* const lv,
     const Parameters&     parameters,
     const RealType* const lvis,
@@ -1416,10 +1417,14 @@ namespace Stencils {
     const RealType viscR = (0.5 * dx_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(1, 0, 0, 0)]) / dx1;
     const RealType viscL = (0.5 * dx_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(-1, 0, 0, 0)]) / dx0;
 
-    return (viscR * depsdxR - viscL * depsdxL) / dx_0;
+    const RealType fuR = fu(flowField, i + 1, j);
+    const RealType fuL = fu(flowField, i - 1, j);
+
+    return (fuR * viscR * depsdxR - fuL * viscL * depsdxL) / dx_0;
   }
 
-  inline RealType dnuTepskdy2(
+  inline RealType dfunuTepsd2y(
+    TurbulentFlowFieldKE& flowField,
     const RealType* const lv,
     const Parameters&     parameters,
     const RealType* const lvis,
@@ -1438,7 +1443,10 @@ namespace Stencils {
     const RealType viscT = (0.5 * dy_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, 1, 0, 0)]) / dy1;
     const RealType viscB = (0.5 * dy_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, -1, 0, 0)]) / dy0;
 
-    return (viscT * depsdyT - viscB * depsdyB) / dy_0;
+    const RealType fuT = fu(flowField, i, j + 1);
+    const RealType fuB = fu(flowField, i, j - 1);
+
+    return (fuT * viscT * depsdyT - fuB * viscB * depsdyB) / dy_0;
   }
 
   inline RealType fu(TurbulentFlowFieldKE& flowField, int i, int j) {
@@ -1548,7 +1556,7 @@ namespace Stencils {
   ) {
     return localk[mapd(0, 0, 0, 0)]
            + dt
-               * (dnuTkdx2(localVelocity, parameters, localViscosity, localk, localMeshsize) + dnuTkdy2(localVelocity, parameters, localViscosity, localk, localMeshsize) - dukdx(localVelocity, parameters, localk, localMeshsize) - dvkdy(localVelocity, parameters, localk, localMeshsize) + 0.5 * localViscosity[mapd(0, 0, 0, 0)] * (4 * dudx(localVelocity, localMeshsize) * dudx(localVelocity, localMeshsize) + 2 * (dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize)) * (dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize)) + 4 * dvdy(localVelocity, localMeshsize) * dvdy(localVelocity, localMeshsize)) - flowField.getepsilon.getScalar(i, j));
+               * (dnuTkd2x(localVelocity, parameters, localViscosity, localk, localMeshsize) + dnuTkd2y(localVelocity, parameters, localViscosity, localk, localMeshsize) - dukdx(localVelocity, parameters, localk, localMeshsize) - dvkdy(localVelocity, parameters, localk, localMeshsize) + 0.5 * localViscosity[mapd(0, 0, 0, 0)] * (4 * dudx(localVelocity, localMeshsize) * dudx(localVelocity, localMeshsize) + 2 * (dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize)) * (dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize)) + 4 * dvdy(localVelocity, localMeshsize) * dvdy(localVelocity, localMeshsize)) - flowField.getepsilon.getScalar(i, j));
   }
 
   inline RealType computeEpsilon2D(
@@ -1564,7 +1572,7 @@ namespace Stencils {
   ) {
     return localEpsilon[mapd(0, 0, 0, 0)]
            + dt
-               * ((parameters.turbulent.ce / parameters.turbulent.cmu) * (fu(flowField, i, j) * (dnuTepsdx2(localVelocity, parameters, localViscosity, localEpsilon, localMeshsize) + dnuTepskdy2(localVelocity, parameters, localViscosity, localEpsilon, localMeshsize))) 
+               * ((parameters.turbulent.ce / parameters.turbulent.cmu) * (dfunuTepsd2x(flowField, localVelocity, parameters, localViscosity, localEpsilon, localMeshsize) + dfunuTepsd2y(flowField, localVelocity, parameters, localViscosity, localEpsilon, localMeshsize)) 
                 - duepsdx(localVelocity, parameters, localEpsilon, localMeshsize) - dvepsdy(localVelocity, parameters, localEpsilon, localMeshsize)
                 + 0.5*parameters.turbulent.c1*flowField.getk().getScalar(i,j)*f1(flowField,i,j)*(4 * dudx(localVelocity, localMeshsize) * dudx(localVelocity, localMeshsize) + 2 * (dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize)) * (dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize)) + 4 * dvdy(localVelocity, localMeshsize) * dvdy(localVelocity, localMeshsize))
                 - parameters.turbulent.c2*f2(flowField,i,j)*flowField.getepsilon().getScalar(i,j)*flowField.getepsilon().getScalar(i,j)/flowField.getk().getScalar(i,j));
