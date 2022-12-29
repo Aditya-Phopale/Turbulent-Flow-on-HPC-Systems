@@ -5,7 +5,6 @@
 #include "Parameters.hpp"
 #include "TurbulentFlowField.hpp"
 #include "TurbulentFlowFieldKE.hpp"
-
 namespace Stencils {
 
   class FGHStencil: public FieldStencil<FlowField> {

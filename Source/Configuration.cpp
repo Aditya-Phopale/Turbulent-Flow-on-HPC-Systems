@@ -399,7 +399,7 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     if (parameters.simulation.type == "turbulence") {
       node = confFile.FirstChildElement()->FirstChildElement("turbulenceParameters");
       if (node == NULL) {
-        throw std::runtime_error("Error loading timestep parameters");
+        throw std::runtime_error("Error loading turbulence parameters");
       }
 
       readFloatMandatory(parameters.turbulent.kappa, node, "kappa");
@@ -408,6 +408,52 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
         readIntMandatory(parameters.turbulent.delta, subNode, "delta");
       } else {
         throw std::runtime_error("Missing type in boundary layer");
+      }
+      subNode = node->FirstChildElement("constants");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.c_mu, subNode, "c_mu");
+      } else {
+        throw std::runtime_error("Missing");
+      }
+      spdlog::info("read");
+    }
+    if (parameters.simulation.type == "turbulenceKE") {
+      node = confFile.FirstChildElement()->FirstChildElement("turbulenceParameters");
+      if (node == NULL) {
+        throw std::runtime_error("Error loading turbulence parameters");
+      }
+
+      readFloatMandatory(parameters.turbulent.kappa, node, "kappa");
+
+      subNode = node->FirstChildElement("boundarylayer");
+      if (subNode != NULL) {
+        readIntMandatory(parameters.turbulent.delta, subNode, "delta");
+      } else {
+        throw std::runtime_error("Missing type in boundary layer");
+      }
+      subNode = node->FirstChildElement("constant1");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.c_mu, subNode, "c_mu");
+      } else {
+        throw std::runtime_error("Missing constant c_mu");
+      }
+      subNode = node->FirstChildElement("constant2");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.c_e, subNode, "c_e");
+      } else {
+        throw std::runtime_error("Missing constant c_e");
+      }
+      subNode = node->FirstChildElement("constant3");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.c_1, subNode, "c_1");
+      } else {
+        throw std::runtime_error("Missing constant c_1");
+      }
+      subNode = node->FirstChildElement("constant4");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.c_2, subNode, "c_2");
+      } else {
+        throw std::runtime_error("Missing constant c_2");
       }
     }
   }

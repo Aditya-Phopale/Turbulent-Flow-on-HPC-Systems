@@ -347,8 +347,9 @@ void ParallelManagers::PetscParallelManager<FlowFieldType>::communicateViscosity
   Stencils::ViscosityBufferFillStencil viscFill_(
     parameters_, leftSend, rightSend, topSend, bottomSend, frontSend, backSend
   );
-  ParallelBoundaryIterator<TurbulentFlowField> viscFillIterator(flowfield_, parameters_, viscFill_, 0, 0);
-  viscFillIterator.iterate();
+
+  // ParallelBoundaryIterator<FlowFieldType> viscFillIterator(flowfield_, parameters_, viscFill_, 0, 0);
+  // viscFillIterator.iterate();
   MPI_Sendrecv(
     leftSend.data(),
     leftSend.size(),
@@ -442,8 +443,8 @@ void ParallelManagers::PetscParallelManager<FlowFieldType>::communicateViscosity
   Stencils::ViscosityBufferReadStencil viscRead_(
     parameters_, leftReceive, rightReceive, topReceive, bottomReceive, frontReceive, backReceive
   );
-  ParallelBoundaryIterator<TurbulentFlowField> viscReadIterator(flowfield_, parameters_, viscRead_, 0, 0);
-  viscReadIterator.iterate();
+  // ParallelBoundaryIterator<FlowFieldType> viscReadIterator(flowfield_, parameters_, viscRead_, 0, 0);
+  // viscReadIterator.iterate();
 }
 
 template <class FlowFieldType>
