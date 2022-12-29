@@ -52,6 +52,7 @@ namespace Stencils {
     ~TurbulentFGHStencilKE() override = default;
 
     void apply(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void apply(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
   };
 
 } // namespace Stencils

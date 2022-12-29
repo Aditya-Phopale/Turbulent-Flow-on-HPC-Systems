@@ -2,15 +2,15 @@
 <configuration>
     <flow Re="10000" />
     <simulation finalTime="50" >
-        <type>turbulence</type>
+        <type>turbulenceKE</type>
         <scenario>channel</scenario>
     </simulation>
     <turbulenceParameters kappa = "0.41">
         <boundarylayer delta = "2"/>
-        <constant1 c_mu = "0.09"/>
-        <constant2 c_e = "0.07"/>
-        <constant3 c_1 = "0.126"/>
-        <constant4 c_2 = "1.92"/>
+        <constant1 cmu = "0.09"/>
+        <constant2 ce = "0.07"/>
+        <constant3 c1 = "0.126"/>
+        <constant4 c2 = "1.92"/>
     </turbulenceParameters>
     <timestep dt="1" tau="0.5" />
     <solver gamma="0.5" />

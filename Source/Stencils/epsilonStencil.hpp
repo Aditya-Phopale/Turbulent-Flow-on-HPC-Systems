@@ -12,6 +12,7 @@ namespace Stencils {
     RealType localViscosity_[27 * 3];
     RealType localEpsilon_[27 * 3];
     RealType localMeshsize_[27 * 3];
+    RealType localk_[27 * 3];
 
   public:
     epsilonStencil(const Parameters& parameters);

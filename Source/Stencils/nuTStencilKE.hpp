@@ -6,9 +6,6 @@
 
 namespace Stencils {
   class nuTStencilKE: public FieldStencil<TurbulentFlowFieldKE> {
-  private:
-    RealType localVelocity_[27 * 3];
-    RealType localMeshsize_[27 * 3];
 
   public:
     nuTStencilKE(const Parameters& parameters);

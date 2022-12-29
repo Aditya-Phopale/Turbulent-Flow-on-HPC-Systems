@@ -99,7 +99,7 @@ void Stencils::TurbulentVTKStencilKE::apply(TurbulentFlowFieldKE& flowField, int
 
   if ((flowField.getFlags().getValue(i, j) & OBSTACLE_SELF) == 0) {
     flowField.getPressureAndVelocity(pressure, velocity, i, j);
-    flowField.getviscosity(nuT, i, j);
+    flowField.getnuT().getScalar(i, j);
 
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " 0" << std::endl;
@@ -120,7 +120,7 @@ void Stencils::TurbulentVTKStencilKE::apply(TurbulentFlowFieldKE& flowField, int
 
   if ((flowField.getFlags().getValue(i, j, k) & OBSTACLE_SELF) == 0) {
     flowField.getPressureAndVelocity(pressure, velocity, i, j, k);
-    flowField.getviscosity(nuT, i, j, k);
+    flowField.getnuT().getScalar(i, j, k);
 
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " " << velocity[2] << std::endl;

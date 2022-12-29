@@ -218,7 +218,7 @@ GlobalTurbulentBoundaryFactory::GlobalTurbulentBoundaryFactory(Parameters& param
     // The other walls are moving walls
     for (int i = 2; i < 6; i++) {
       KStencils_[i]       = moving_[0];
-      EPsilonStencils_[i] = outflow_[1];
+      EpsilonStencils_[i] = outflow_[1];
     }
     // parameters.walls.typeLeft   = NEUMANN;
     // parameters.walls.typeRight  = NEUMANN;

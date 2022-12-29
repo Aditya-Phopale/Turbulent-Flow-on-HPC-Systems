@@ -3,10 +3,12 @@
 #include "TurbulentFlowFieldKE.hpp"
 
 #include "ParallelManagers/PetscParallelManager.hpp"
-#include "Stencils/hStencilKE.hpp"
+#include "Stencils/hStencil.cpph"
+#include "Stencils/hStencil.hpp"
 #include "Stencils/MaxUStencil.hpp"
 #include "Stencils/nuTStencilKE.hpp"
-#include "Stencils/timeStepStencilKE.hpp"
+#include "Stencils/timeStepStencil.cpph"
+#include "Stencils/timeStepStencil.hpp"
 #include "Stencils/TurbulentVTKStencilKE.hpp"
 
 class TurbulentSimulationKE: public Simulation {
@@ -28,8 +30,8 @@ protected:
   Stencils::nuTStencilKE              nuTStencilKE_;
   FieldIterator<TurbulentFlowFieldKE> nuTIteratorKE_;
 
-  Stencils::hStencilKE                hStencilKE_;
-  FieldIterator<TurbulentFlowFieldKE> hIteratorKE_;
+  Stencils::hStencil<TurbulentFlowFieldKE> hStencil_;
+  FieldIterator<TurbulentFlowFieldKE>      hIteratorKE_;
 
   // Stencils::kStencil                  kStencil_;
   // FieldIterator<TurbulentFlowFieldKE> kIterator_;
@@ -37,8 +39,8 @@ protected:
   // Stencils::eStencil                  eStencil_;
   // FieldIterator<TurbulentFlowFieldKE> eIterator_;
 
-  Stencils::timeStepStencilKE         dtStencil_;
-  FieldIterator<TurbulentFlowFieldKE> dtIterator_;
+  Stencils::timeStepStencil<TurbulentFlowFieldKE> dtStencil_;
+  FieldIterator<TurbulentFlowFieldKE>             dtIterator_;
 
   //   Stencils::VelocityStencil velocityStencil_;
   //   Stencils::ObstacleStencil obstacleStencil_;

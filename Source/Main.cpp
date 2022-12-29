@@ -58,16 +58,17 @@ int main(int argc, char* argv[]) {
 
   Parameters parameters;
   configuration.loadParameters(parameters);
-  spdlog::info(parameters.turbulent.c_mu);
-  spdlog::info(parameters.turbulent.c_e);
-  spdlog::info(parameters.turbulent.c_1);
-  spdlog::info(parameters.turbulent.c_2);
+  spdlog::info(parameters.turbulent.cmu);
+  spdlog::info(parameters.turbulent.ce);
+  spdlog::info(parameters.turbulent.c1);
+  spdlog::info(parameters.turbulent.c2);
 
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
-  FlowField*          flowField     = NULL;
-  TurbulentFlowField* Turbflowfield = NULL;
-  Simulation*         simulation    = NULL;
+  FlowField*            flowField       = NULL;
+  TurbulentFlowField*   Turbflowfield   = NULL;
+  TurbulentFlowFieldKE* TurbflowfieldKE = NULL;
+  Simulation*           simulation      = NULL;
 
   spdlog::debug(
     "Processor {} with index {}, {}, {} is computing the size of its subdomain and obtains {}, {} and {}.",
@@ -111,9 +112,9 @@ int main(int argc, char* argv[]) {
     if (rank == 0) {
       spdlog::info("Start TurbulenceKE simulation in {}D", parameters.geometry.dim);
     }
-    Turbflowfield = new TurbulentFlowField(parameters);
+    TurbflowfieldKE = new TurbulentFlowFieldKE(parameters);
 
-    simulation = new TurbulentSimulation(parameters, *Turbflowfield);
+    simulation = new TurbulentSimulationKE(parameters, *TurbflowfieldKE);
   } else {
     throw std::runtime_error("Unknown simulation type! Currently supported: dns, turbulence");
   }
@@ -138,22 +139,22 @@ int main(int argc, char* argv[]) {
 
   // Time loop
 
-  // while (time < parameters.simulation.finalTime) {
+  while (time < parameters.simulation.finalTime) {
 
-  //   simulation->solveTimestep();
-  //   timeSteps++;
-  //   time += parameters.timestep.dt;
+    simulation->solveTimestep();
+    timeSteps++;
+    time += parameters.timestep.dt;
 
-  //   if ((rank == 0) && (timeStdOut <= time)) {
-  //     spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
-  //     timeStdOut += parameters.stdOut.interval;
-  //   }
+    if ((rank == 0) && (timeStdOut <= time)) {
+      spdlog::info("Current time: {}\tTimestep: {}", time, parameters.timestep.dt);
+      timeStdOut += parameters.stdOut.interval;
+    }
 
-  //   if (timeVtk <= time) {
-  //     simulation->plotVTK(timeSteps, time);
-  //     timeVtk += parameters.vtk.interval;
-  //   }
-  // }
+    if (timeVtk <= time) {
+      simulation->plotVTK(timeSteps, time);
+      timeVtk += parameters.vtk.interval;
+    }
+  }
   spdlog::info("Finished simulation with a duration of {}ns", clock.getTime());
 
   // Plot final solution

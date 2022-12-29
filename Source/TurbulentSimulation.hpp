@@ -1,12 +1,12 @@
 #pragma once
 #include "Simulation.hpp"
 #include "TurbulentFlowField.hpp"
-#include "TurbulentFlowFieldKE.hpp"
 
 #include "ParallelManagers/PetscParallelManager.hpp"
+#include "Stencils/hStencil.cpph"
 #include "Stencils/hStencil.hpp"
-#include "Stencils/nuTKEStencil.hpp"
 #include "Stencils/nuTStencil.hpp"
+#include "Stencils/timeStepStencil.cpph"
 #include "Stencils/timeStepStencil.hpp"
 #include "Stencils/TurbulentVTKStencil.hpp"
 
@@ -29,13 +29,11 @@ protected:
   Stencils::nuTStencil              nuTStencil_;
   FieldIterator<TurbulentFlowField> nuTIterator_;
 
-  Stencils::nuTKEStencil            nuTKEStencil_;
-
   Stencils::hStencil<TurbulentFlowField> hStencil_;
   FieldIterator<TurbulentFlowField>      hIterator_;
 
-  Stencils::timeStepStencil         dtStencil_;
-  FieldIterator<TurbulentFlowField> dtIterator_;
+  Stencils::timeStepStencil<TurbulentFlowField> dtStencil_;
+  FieldIterator<TurbulentFlowField>             dtIterator_;
 
   //   Stencils::VelocityStencil velocityStencil_;
   //   Stencils::ObstacleStencil obstacleStencil_;

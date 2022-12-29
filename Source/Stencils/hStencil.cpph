@@ -1,8 +1,8 @@
+#pragma once
 #include "StdAfx.hpp"
 
-#include "hStencil.hpp"
-
 #include "Definitions.hpp"
+#include "hStencil.hpp"
 #include "StencilFunctions.hpp"
 
 template <class FlowFieldType>

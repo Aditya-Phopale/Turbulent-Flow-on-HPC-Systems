@@ -409,13 +409,6 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
       } else {
         throw std::runtime_error("Missing type in boundary layer");
       }
-      subNode = node->FirstChildElement("constants");
-      if (subNode != NULL) {
-        readFloatMandatory(parameters.turbulent.c_mu, subNode, "c_mu");
-      } else {
-        throw std::runtime_error("Missing");
-      }
-      spdlog::info("read");
     }
     if (parameters.simulation.type == "turbulenceKE") {
       node = confFile.FirstChildElement()->FirstChildElement("turbulenceParameters");
@@ -433,27 +426,27 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
       }
       subNode = node->FirstChildElement("constant1");
       if (subNode != NULL) {
-        readFloatMandatory(parameters.turbulent.c_mu, subNode, "c_mu");
+        readFloatMandatory(parameters.turbulent.cmu, subNode, "cmu");
       } else {
-        throw std::runtime_error("Missing constant c_mu");
+        throw std::runtime_error("Missing constant cmu");
       }
       subNode = node->FirstChildElement("constant2");
       if (subNode != NULL) {
-        readFloatMandatory(parameters.turbulent.c_e, subNode, "c_e");
+        readFloatMandatory(parameters.turbulent.ce, subNode, "ce");
       } else {
-        throw std::runtime_error("Missing constant c_e");
+        throw std::runtime_error("Missing constant ce");
       }
       subNode = node->FirstChildElement("constant3");
       if (subNode != NULL) {
-        readFloatMandatory(parameters.turbulent.c_1, subNode, "c_1");
+        readFloatMandatory(parameters.turbulent.c1, subNode, "c1");
       } else {
-        throw std::runtime_error("Missing constant c_1");
+        throw std::runtime_error("Missing constant c1");
       }
       subNode = node->FirstChildElement("constant4");
       if (subNode != NULL) {
-        readFloatMandatory(parameters.turbulent.c_2, subNode, "c_2");
+        readFloatMandatory(parameters.turbulent.c2, subNode, "c2");
       } else {
-        throw std::runtime_error("Missing constant c_2");
+        throw std::runtime_error("Missing constant c2");
       }
     }
   }
