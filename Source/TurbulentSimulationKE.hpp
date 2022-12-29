@@ -32,10 +32,10 @@ protected:
   FieldIterator<TurbulentFlowFieldKE> hIteratorKE_;
 
   // Stencils::kStencil                  kStencil_;
-  // FieldIterator<TurbulentKEFlowField> kIterator_;
+  // FieldIterator<TurbulentFlowFieldKE> kIterator_;
 
   // Stencils::eStencil                  eStencil_;
-  // FieldIterator<TurbulentKEFlowField> eIterator_;
+  // FieldIterator<TurbulentFlowFieldKE> eIterator_;
 
   Stencils::timeStepStencilKE         dtStencil_;
   FieldIterator<TurbulentFlowFieldKE> dtIterator_;
