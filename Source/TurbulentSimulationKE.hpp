@@ -39,8 +39,8 @@ protected:
   Stencils::kStencil                  kStencil_;
   FieldIterator<TurbulentFlowFieldKE> kIterator_;
 
-  Stencils::epsilonStencil            eStencil_;
-  FieldIterator<TurbulentFlowFieldKE> eIterator_;
+  Stencils::epsilonStencil            epsilonStencil_;
+  FieldIterator<TurbulentFlowFieldKE> epsilonIterator_;
 
   Stencils::timeStepStencil<TurbulentFlowFieldKE> dtStencil_;
   FieldIterator<TurbulentFlowFieldKE>             dtIterator_;

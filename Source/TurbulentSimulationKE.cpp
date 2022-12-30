@@ -16,8 +16,8 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
   dtIterator_(turbflowFieldKE_, parameters, dtStencil_),
   kStencil_(parameters),
   kIterator_(flowField, parameters, kStencil_),
-  eStencil_(parameters),
-  eIterator_(flowField, parameters, eStencil_),
+  epsilonStencil_(parameters),
+  epsilonIterator_(flowField, parameters, epsilonStencil_),
   ppmTurbulentKE_(parameters, turbflowFieldKE_) {}
 
 void TurbulentSimulationKE::initializeFlowField() {
@@ -35,6 +35,12 @@ void TurbulentSimulationKE::solveTimestep() {
   ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
+
+  wallkIterator_.iterate();
+  wallEpsilonIterator_.iterate();
+
+  kIterator_.iterate();
+  epsilonIterator_.iterate();
   // Compute FGH
   TurbulentFGHIteratorKE_.iterate();
   // Set global boundary values
