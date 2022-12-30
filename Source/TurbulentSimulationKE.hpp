@@ -1,10 +1,13 @@
 #pragma once
+
 #include "Simulation.hpp"
 #include "TurbulentFlowFieldKE.hpp"
 
 #include "ParallelManagers/PetscParallelManager.hpp"
+#include "Stencils/epsilonStencil.hpp"
 #include "Stencils/hStencil.cpph"
 #include "Stencils/hStencil.hpp"
+#include "Stencils/kStencil.hpp"
 #include "Stencils/MaxUStencil.hpp"
 #include "Stencils/nuTStencilKE.hpp"
 #include "Stencils/timeStepStencil.cpph"
@@ -33,11 +36,11 @@ protected:
   Stencils::hStencil<TurbulentFlowFieldKE> hStencil_;
   FieldIterator<TurbulentFlowFieldKE>      hIteratorKE_;
 
-  // Stencils::kStencil                  kStencil_;
-  // FieldIterator<TurbulentFlowFieldKE> kIterator_;
+  Stencils::kStencil                  kStencil_;
+  FieldIterator<TurbulentFlowFieldKE> kIterator_;
 
-  // Stencils::eStencil                  eStencil_;
-  // FieldIterator<TurbulentFlowFieldKE> eIterator_;
+  Stencils::epsilonStencil            eStencil_;
+  FieldIterator<TurbulentFlowFieldKE> eIterator_;
 
   Stencils::timeStepStencil<TurbulentFlowFieldKE> dtStencil_;
   FieldIterator<TurbulentFlowFieldKE>             dtIterator_;

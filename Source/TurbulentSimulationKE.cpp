@@ -14,6 +14,10 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
   hIteratorKE_(turbflowFieldKE_, parameters, hStencil_, 0, 0),
   dtStencil_(parameters),
   dtIterator_(turbflowFieldKE_, parameters, dtStencil_),
+  kStencil_(parameters),
+  kIterator_(flowField, parameters, kStencil_),
+  eStencil_(parameters),
+  eIterator_(flowField, parameters, eStencil_),
   ppmTurbulentKE_(parameters, turbflowFieldKE_) {}
 
 void TurbulentSimulationKE::initializeFlowField() {
