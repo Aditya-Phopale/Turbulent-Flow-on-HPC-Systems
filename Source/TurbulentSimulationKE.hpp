@@ -20,9 +20,9 @@ protected:
   // GlobalBoundaryIterator<TurbulentFlowFieldKE> maxUBoundaryIterator_;
 
   // // Set up the boundary conditions
-  // GlobalBoundaryFactory             globalBoundaryFactory_;
-  // GlobalBoundaryIterator<FlowField> wallVelocityIterator_;
-  // GlobalBoundaryIterator<FlowField> wallFGHIterator_;
+  GlobalTurbulentBoundaryFactory               globalTurbulentBoundaryFactory_;
+  GlobalBoundaryIterator<TurbulentFlowFieldKE> wallkIterator_;
+  GlobalBoundaryIterator<TurbulentFlowFieldKE> wallEpsilonIterator_;
 
   Stencils::TurbulentFGHStencilKE     TurbulentFGHStencilKE_;
   FieldIterator<TurbulentFlowFieldKE> TurbulentFGHIteratorKE_;
