@@ -7,6 +7,9 @@
 namespace Stencils {
   class nuTStencilKE: public FieldStencil<TurbulentFlowFieldKE> {
 
+  protected:
+    const Parameters& parameters_;
+
   public:
     nuTStencilKE(const Parameters& parameters);
     ~nuTStencilKE() override = default;

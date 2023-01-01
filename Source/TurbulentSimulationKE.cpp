@@ -11,7 +11,7 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
   wallkIterator_(globalTurbulentBoundaryFactory_.getGlobalBoundaryKIterator(turbflowFieldKE_)),
   wallEpsilonIterator_(globalTurbulentBoundaryFactory_.getGlobalBoundaryEpsilonIterator(turbflowFieldKE_)),
   hStencil_(parameters),
-  hIteratorKE_(turbflowFieldKE_, parameters, hStencil_, 0, 0),
+  hIterator_(turbflowFieldKE_, parameters, hStencil_, 0, 0),
   dtStencil_(parameters),
   dtIterator_(turbflowFieldKE_, parameters, dtStencil_),
   kStencil_(parameters),
@@ -22,19 +22,20 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
 
 void TurbulentSimulationKE::initializeFlowField() {
   Simulation::initializeFlowField();
-  // hUpdate();
-  nuTUpdate();
+  hUpdate();
+  // nuTUpdate();
 }
 
 void TurbulentSimulationKE::solveTimestep() {
   nuTUpdate();
   // std::cout << "***************************************************************************\n";
-  // turbflowField_.getnuT().show();
+  // turbflowFieldKE_.getnuT().show();
   // Communicate viscosity
 
   ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
+  std::cout << parameters_.timestep.dt << "\n";
 
   wallkIterator_.iterate();
   wallEpsilonIterator_.iterate();
@@ -105,7 +106,7 @@ void TurbulentSimulationKE::setTimeStep() {
   parameters_.timestep.dt *= parameters_.timestep.tau;
 }
 
-void TurbulentSimulationKE::hUpdate() { hIteratorKE_.iterate(); }
+void TurbulentSimulationKE::hUpdate() { hIterator_.iterate(); }
 
 void TurbulentSimulationKE::nuTUpdate() { nuTIteratorKE_.iterate(); }
 

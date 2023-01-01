@@ -7,14 +7,15 @@
 #include "TurbulentFlowFieldKE.hpp"
 
 Stencils::nuTStencilKE::nuTStencilKE(const Parameters& parameters):
-  FieldStencil<TurbulentFlowFieldKE>(parameters) {}
+  FieldStencil<TurbulentFlowFieldKE>(parameters),
+  parameters_(parameters) {}
 
 void Stencils::nuTStencilKE::apply(TurbulentFlowFieldKE& flowField, int i, int j) {
-
+  std::cout << fu(parameters_, flowField, i, j);
   flowField.getnuT().getScalar(
     i, j
-  ) = parameters_.turbulent.cmu * fu(flowField, i, j) * flowField.getk().getScalar(i, j)
-      * flowField.getk().getScalar(i, j) / flowField.geteps().getScalar(i, j);
+  ) = parameters_.turbulent.cmu * fu(parameters_, flowField, i, j) * flowField.getk().getScalar(i, j)
+      * flowField.getk().getScalar(i, j) / (flowField.geteps().getScalar(i, j) + MY_FLOAT_MIN);
 }
 
 void Stencils::nuTStencilKE::apply(
@@ -23,6 +24,6 @@ void Stencils::nuTStencilKE::apply(
 
   flowField.getnuT().getScalar(
     i, j
-  ) = parameters_.turbulent.cmu * fu(flowField, i, j) * flowField.getk().getScalar(i, j)
+  ) = parameters_.turbulent.cmu * fu(parameters_, flowField, i, j) * flowField.getk().getScalar(i, j)
       * flowField.getk().getScalar(i, j) / flowField.geteps().getScalar(i, j);
 }

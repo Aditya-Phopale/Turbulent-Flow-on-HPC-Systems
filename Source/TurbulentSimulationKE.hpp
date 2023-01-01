@@ -34,7 +34,7 @@ protected:
   FieldIterator<TurbulentFlowFieldKE> nuTIteratorKE_;
 
   Stencils::hStencil<TurbulentFlowFieldKE> hStencil_;
-  FieldIterator<TurbulentFlowFieldKE>      hIteratorKE_;
+  FieldIterator<TurbulentFlowFieldKE>      hIterator_;
 
   Stencils::kStencil                  kStencil_;
   FieldIterator<TurbulentFlowFieldKE> kIterator_;
