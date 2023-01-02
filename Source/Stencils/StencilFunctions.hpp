@@ -1557,6 +1557,14 @@ namespace Stencils {
     int                   i,
     int                   j
   ) {
+    // std::cout
+    //   << "Hello from "
+    //      "k2d**************************************************************************************************"
+    //      "**************\n";
+    // std::cout << "dnuTkd2x = " << dnuTkd2x(localVelocity, parameters, localViscosity, localk, localMeshsize) << "\n";
+    // std::cout << "dnuTkd2y = " << dnuTkd2y(localVelocity, parameters, localViscosity, localk, localMeshsize) << "\n";
+    // std::cout << "dukdx = " << dukdx(localVelocity, parameters, localk, localMeshsize) << "\n";
+    // std::cout << "dvkdy = " << dvkdy(localVelocity, parameters, localk, localMeshsize) << "\n";
     return localk[mapd(0, 0, 0, 0)]
            + dt
                * (dnuTkd2x(localVelocity, parameters, localViscosity, localk, localMeshsize) 
@@ -1587,7 +1595,7 @@ namespace Stencils {
                 - duepsdx(localVelocity, parameters, localEpsilon, localk, localMeshsize) 
                 - dvepsdy(localVelocity, parameters, localEpsilon, localk, localMeshsize)
                 + 0.5*parameters.turbulent.c1*flowField.getk().getScalar(i,j)*f1(parameters, flowField,i,j)*(4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize) ,2))
-                - parameters.turbulent.c2*f2(parameters, flowField,i,j)*flowField.geteps().getScalar(i,j)*flowField.geteps().getScalar(i,j)/flowField.getk().getScalar(i,j));
+                - parameters.turbulent.c2*f2(parameters, flowField,i,j)*pow(flowField.geteps().getScalar(i,j),2)/flowField.getk().getScalar(i,j));
   }
 
   inline RealType computeF3D(

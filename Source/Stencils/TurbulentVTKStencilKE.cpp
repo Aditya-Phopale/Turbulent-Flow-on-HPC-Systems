@@ -96,18 +96,26 @@ void Stencils::TurbulentVTKStencilKE::apply(TurbulentFlowFieldKE& flowField, int
   RealType pressure    = 0.0;
   RealType velocity[2] = {0.0, 0.0};
   RealType nuT         = 0.0;
+  RealType kE          = 0.0;
+  RealType epsilon     = 0.0;
 
   if ((flowField.getFlags().getValue(i, j) & OBSTACLE_SELF) == 0) {
     flowField.getPressureAndVelocity(pressure, velocity, i, j);
-    flowField.getnuT().getScalar(i, j);
+    flowField.getviscosity(nuT, i, j);
+    kE      = flowField.getk().getScalar(i, j);
+    epsilon = flowField.geteps().getScalar(i, j);
 
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " 0" << std::endl;
     nuTStream_ << nuT << std::endl;
+    kStream_ << kE << std::endl;
+    epsilonStream_ << epsilon << std::endl;
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;
     nuTStream_ << "0.0" << std::endl;
+    kStream_ << "0.0" << std::endl;
+    epsilonStream_ << "0.0" << std::endl;
   }
 }
 
@@ -117,18 +125,26 @@ void Stencils::TurbulentVTKStencilKE::apply(TurbulentFlowFieldKE& flowField, int
   RealType pressure    = 0.0;
   RealType velocity[3] = {0.0, 0.0, 0.0};
   RealType nuT         = 0.0;
+  RealType kE          = 0.0;
+  RealType epsilon     = 0.0;
 
   if ((flowField.getFlags().getValue(i, j, k) & OBSTACLE_SELF) == 0) {
     flowField.getPressureAndVelocity(pressure, velocity, i, j, k);
-    flowField.getnuT().getScalar(i, j, k);
+    flowField.getviscosity(nuT, i, j, k);
+    kE      = flowField.getk().getScalar(i, j, k);
+    epsilon = flowField.geteps().getScalar(i, j, k);
 
     pressureStream_ << pressure << std::endl;
     velocityStream_ << velocity[0] << " " << velocity[1] << " " << velocity[2] << std::endl;
     nuTStream_ << nuT << std::endl;
+    kStream_ << kE << std::endl;
+    epsilonStream_ << epsilon << std::endl;
   } else {
     pressureStream_ << "0.0" << std::endl;
     velocityStream_ << "0.0 0.0 0.0" << std::endl;
     nuTStream_ << "0.0" << std::endl;
+    kStream_ << "0.0" << std::endl;
+    epsilonStream_ << "0.0" << std::endl;
   }
 }
 
@@ -168,6 +184,14 @@ void Stencils::TurbulentVTKStencilKE::write(TurbulentFlowFieldKE& flowField, int
     ofile_ << "SCALARS nuT float 1" << std::endl << "LOOKUP_TABLE SCALAR" << std::endl;
     ofile_ << nuTStream_.str() << std::endl;
     nuTStream_.str("");
+
+    ofile_ << "SCALARS k float 1" << std::endl << "LOOKUP_TABLE SCALAR" << std::endl;
+    ofile_ << kStream_.str() << std::endl;
+    kStream_.str("");
+
+    ofile_ << "SCALARS epsilon float 1" << std::endl << "LOOKUP_TABLE SCALAR" << std::endl;
+    ofile_ << epsilonStream_.str() << std::endl;
+    epsilonStream_.str("");
   }
 
   if (FieldStencil<TurbulentFlowFieldKE>::parameters_.geometry.dim == 3) {
@@ -188,6 +212,14 @@ void Stencils::TurbulentVTKStencilKE::write(TurbulentFlowFieldKE& flowField, int
     ofile_ << "SCALARS nuT float 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
     ofile_ << nuTStream_.str() << std::endl;
     nuTStream_.str("");
+
+    ofile_ << "SCALARS k float 1" << std::endl << "LOOKUP_TABLE SCALAR" << std::endl;
+    ofile_ << kStream_.str() << std::endl;
+    kStream_.str("");
+
+    ofile_ << "SCALARS epsilon float 1" << std::endl << "LOOKUP_TABLE SCALAR" << std::endl;
+    ofile_ << epsilonStream_.str() << std::endl;
+    epsilonStream_.str("");
   }
 
   written_ = true;

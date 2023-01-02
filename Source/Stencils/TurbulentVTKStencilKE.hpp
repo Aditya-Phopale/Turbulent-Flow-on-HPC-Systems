@@ -6,6 +6,7 @@
 #include "FlowField.hpp"
 #include "Parameters.hpp"
 #include "TurbulentFlowFieldKE.hpp"
+
 namespace Stencils {
 
   /** Stencil for writting VTK files
@@ -21,6 +22,8 @@ namespace Stencils {
     std::stringstream pressureStream_; //! Stream for the pressure data
     std::stringstream velocityStream_; //! Stream for the velocity data
     std::stringstream nuTStream_;
+    std::stringstream kStream_;
+    std::stringstream epsilonStream_;
 
     void writeVTKHeader(std::ostream& file) const;
     void writePoints(std::ostream& file, RealType simulationTime) const;

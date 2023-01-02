@@ -18,7 +18,7 @@ void Stencils::epsilonStencil::apply(TurbulentFlowFieldKE& flowField, int i, int
   loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
   loadLocalK2D(flowField, localk_, i, j);
 
-  computeEpsilon2D(
+  flowField.geteps().getScalar(i, j) = computeEpsilon2D(
     flowField,
     localVelocity_,
     localViscosity_,

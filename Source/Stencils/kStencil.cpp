@@ -17,7 +17,7 @@ void Stencils::kStencil::apply(TurbulentFlowFieldKE& flowField, int i, int j) /*
   loadLocalK2D(flowField, localk_, i, j);
   loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
 
-  computek2D(
+  flowField.getk().getScalar(i, j) = computek2D(
     flowField, localVelocity_, localViscosity_, localk_, localMeshsize_, parameters_, parameters_.timestep.dt, i, j
   );
 }
