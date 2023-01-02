@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
     <flow Re="10000" />
-    <simulation finalTime="50" >
+    <simulation finalTime="10" >
         <type>turbulenceKE</type>
         <scenario>channel</scenario>
     </simulation>
@@ -11,6 +11,7 @@
         <constant2 ce = "0.07"/>
         <constant3 c1 = "0.126"/>
         <constant4 c2 = "1.92"/>
+        <constant5 I = "0.2"/>
     </turbulenceParameters>
     <timestep dt="1" tau="0.5" />
     <solver gamma="0.5" />

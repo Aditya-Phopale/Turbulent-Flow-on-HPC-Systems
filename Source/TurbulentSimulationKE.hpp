@@ -7,6 +7,8 @@
 #include "Stencils/epsilonStencil.hpp"
 #include "Stencils/hStencil.cpph"
 #include "Stencils/hStencil.hpp"
+#include "Stencils/InitEpsilonFlowFieldStencil.hpp"
+#include "Stencils/InitkFlowFieldStencil.hpp"
 #include "Stencils/kStencil.hpp"
 #include "Stencils/MaxUStencil.hpp"
 #include "Stencils/nuTStencilKE.hpp"

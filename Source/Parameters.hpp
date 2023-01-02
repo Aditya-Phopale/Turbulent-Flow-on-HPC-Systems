@@ -142,6 +142,7 @@ public:
   RealType ce  = 0;
   RealType c1  = 0;
   RealType c2  = 0;
+  RealType I   = 0;
 };
 
 /** A class to store and pass around the parameters

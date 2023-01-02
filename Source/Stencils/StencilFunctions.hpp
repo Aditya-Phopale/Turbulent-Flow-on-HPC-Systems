@@ -1279,7 +1279,7 @@ namespace Stencils {
     RealType Rd = sqrt(flowField.getk().getScalar(i, j)) * flowField.getheight().getScalar(i, j) * parameters.flow.Re;
 
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
-                  / (flowField.geteps().getScalar(i, j) + MY_FLOAT_MIN);
+                  / (flowField.geteps().getScalar(i, j));
 
     return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
   }
@@ -1292,7 +1292,7 @@ namespace Stencils {
 
   inline RealType f2(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
-                  / (flowField.geteps().getScalar(i, j) + MY_FLOAT_MIN);
+                  / (flowField.geteps().getScalar(i, j));
 
     return 1 - exp(-Rt * Rt);
   }

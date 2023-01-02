@@ -6,7 +6,7 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
   TurbulentFGHStencilKE_(parameters),
   TurbulentFGHIteratorKE_(turbflowFieldKE_, parameters, TurbulentFGHStencilKE_),
   nuTStencilKE_(parameters),
-  nuTIteratorKE_(turbflowFieldKE_, parameters, nuTStencilKE_, 0, 0),
+  nuTIteratorKE_(turbflowFieldKE_, parameters, nuTStencilKE_, 1, 0),
   globalTurbulentBoundaryFactory_(parameters),
   wallkIterator_(globalTurbulentBoundaryFactory_.getGlobalBoundaryKIterator(turbflowFieldKE_)),
   wallEpsilonIterator_(globalTurbulentBoundaryFactory_.getGlobalBoundaryEpsilonIterator(turbflowFieldKE_)),
@@ -23,16 +23,26 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
 void TurbulentSimulationKE::initializeFlowField() {
   Simulation::initializeFlowField();
   hUpdate();
+  if (parameters_.simulation.scenario == "channel") {
+    // Currently, a particular initialisation is only required for the taylor-green vortex.
+    Stencils::InitkFlowFieldStencil     kInitStencil(parameters_);
+    FieldIterator<TurbulentFlowFieldKE> kInitIterator(turbflowFieldKE_, parameters_, kInitStencil);
+    kInitIterator.iterate();
+
+    Stencils::InitEpsilonFlowFieldStencil epsInitStencil(parameters_);
+    FieldIterator<TurbulentFlowFieldKE>   epsInitIterator(turbflowFieldKE_, parameters_, epsInitStencil);
+    epsInitIterator.iterate();
+  }
   // nuTUpdate();
 }
 
 void TurbulentSimulationKE::solveTimestep() {
-  nuTUpdate();
+  // nuTUpdate();
   // std::cout << "***************************************************************************\n";
   // turbflowFieldKE_.getnuT().show();
   // Communicate viscosity
 
-  ppmTurbulentKE_.communicateViscosity();
+  // ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
   std::cout << parameters_.timestep.dt << "\n";
@@ -42,6 +52,9 @@ void TurbulentSimulationKE::solveTimestep() {
 
   kIterator_.iterate();
   epsilonIterator_.iterate();
+  nuTUpdate();
+  std::cout << "***************************************************************************\n";
+  turbflowFieldKE_.getnuT().show();
   // Compute FGH
   TurbulentFGHIteratorKE_.iterate();
   // Set global boundary values

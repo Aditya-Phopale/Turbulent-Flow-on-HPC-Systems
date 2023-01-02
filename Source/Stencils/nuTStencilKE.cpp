@@ -11,7 +11,6 @@ Stencils::nuTStencilKE::nuTStencilKE(const Parameters& parameters):
   parameters_(parameters) {}
 
 void Stencils::nuTStencilKE::apply(TurbulentFlowFieldKE& flowField, int i, int j) {
-  std::cout << fu(parameters_, flowField, i, j);
   flowField.getnuT().getScalar(
     i, j
   ) = parameters_.turbulent.cmu * fu(parameters_, flowField, i, j) * flowField.getk().getScalar(i, j)
