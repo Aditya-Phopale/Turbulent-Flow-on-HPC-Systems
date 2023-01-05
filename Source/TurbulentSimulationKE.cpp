@@ -46,16 +46,21 @@ void TurbulentSimulationKE::solveTimestep() {
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
   std::cout << parameters_.timestep.dt << "\n";
-  // std::cout << "***************************************************************************\n";
-  // turbflowFieldKE_.geteps().show();
+  // parameters_.timestep.dt = 1e-4;
   // std::cout << "***************************************************************************\n";
   // turbflowFieldKE_.getk().show();
   wallkIterator_.iterate();
   wallEpsilonIterator_.iterate();
 
   kIterator_.iterate();
+  std::cout << "******************************k*********************************************\n";
+  turbflowFieldKE_.getk().show();
   epsilonIterator_.iterate();
+  std::cout << "*****************************epsilon**********************************************\n";
+  turbflowFieldKE_.geteps().show();
   nuTUpdate();
+  std::cout << "*****************************nuT**********************************************\n";
+  turbflowFieldKE_.getnuT().show();
 
   // Compute FGH
   TurbulentFGHIteratorKE_.iterate();

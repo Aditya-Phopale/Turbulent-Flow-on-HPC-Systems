@@ -234,14 +234,14 @@ namespace Stencils {
     // given in pg 164 (followed same as pressure)
     const int index0 = mapd(1, 0, 0, 0);
     const int index1 = mapd(0, 0, 0, 0);
-    return (lk[index0] - lk[index1]) / lm[index0];
+    return (lk[index0] - lk[index1]) / 0.5 * (lm[index0] + lm[index1]);
   }
 
   inline RealType dkdy(const RealType* const lk, const RealType* const lm) {
     // given in pg 164 (followed same as pressure)
-    const int index0 = mapd(0, 1, 0, 0);
-    const int index1 = mapd(0, 0, 0, 0);
-    return (lk[index0] - lk[index1]) / lm[index0];
+    const int index0 = mapd(0, 1, 0, 1);
+    const int index1 = mapd(0, 0, 0, 1);
+    return (lk[index0] - lk[index1]) / 0.5 * (lm[index0] + lm[index1]);
   }
 
   inline RealType d2udx2(const RealType* const lv, const RealType* const lm) {
@@ -1276,15 +1276,26 @@ namespace Stencils {
   //************************************************************************************************************************//
   inline RealType fu(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
 
-    RealType Rd = sqrt(flowField.getk().getScalar(i, j)) * flowField.getheight().getScalar(i, j) * parameters.flow.Re;
+    RealType Rd = sqrt(fabs(flowField.getk().getScalar(i, j))) * flowField.getheight().getScalar(i, j)
+                  * parameters.flow.Re;
 
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
                   / (flowField.geteps().getScalar(i, j));
+
+    // std::cout
+    //   << "Rd" << Rd << " "
+    //   << "Rt" << Rt << "\n ";
 
     return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
   }
 
   inline RealType f1(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
+    std::cout
+      << "f1"
+      << 1
+           + (0.05 / fu(parameters, flowField, i, j)) * (0.05 / fu(parameters, flowField, i, j))
+               * (0.05 / fu(parameters, flowField, i, j))
+      << "\n";
     return 1
            + (0.05 / fu(parameters, flowField, i, j)) * (0.05 / fu(parameters, flowField, i, j))
                * (0.05 / fu(parameters, flowField, i, j));
@@ -1293,7 +1304,7 @@ namespace Stencils {
   inline RealType f2(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
                   / (flowField.geteps().getScalar(i, j));
-
+    std::cout << "f2" << 1 - exp(-Rt * Rt) << "\n";
     return 1 - exp(-Rt * Rt);
   }
 
@@ -1309,11 +1320,11 @@ namespace Stencils {
     const RealType kR = (0.5 * dx_P1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lk[mapd(1, 0, 0, 0)]) / dx1;
     const RealType kL = (0.5 * dx_M1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lk[mapd(-1, 0, 0, 0)]) / dx0;
 
-    // const RealType kR = (0.5 * dx_P1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(1, 0, 0, 0)]) / dx1;
-    // const RealType kL = (0.5 * dx_M1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(-1, 0, 0, 0)]) / dx0;
+    const RealType kr = (0.5 * dx_P1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(1, 0, 0, 0)]) / dx1;
+    const RealType kl = (0.5 * dx_M1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(-1, 0, 0, 0)]) / dx0;
 
     return (kR * lv[mapd(0, 0, 0, 0)] - kL * lv[mapd(-1, 0, 0, 0)]) / dx_0
-           + (parameters.solver.gamma / dx_0) * (kR * fabs(lv[mapd(0, 0, 0, 0)]) - kL * fabs(lv[mapd(-1, 0, 0, 0)]));
+           + (parameters.solver.gamma / dx_0) * (kr * fabs(lv[mapd(0, 0, 0, 0)]) - kl * fabs(lv[mapd(-1, 0, 0, 0)]));
   }
 
   inline RealType dvkdy(
@@ -1328,8 +1339,11 @@ namespace Stencils {
     const RealType kT = (0.5 * dy_P1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lk[mapd(0, 1, 0, 0)]) / dy1;
     const RealType kB = (0.5 * dy_M1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lk[mapd(0, -1, 0, 0)]) / dy0;
 
+    const RealType kt = (0.5 * dy_P1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * lk[mapd(0, 1, 0, 0)]) / dy1;
+    const RealType kb = (0.5 * dy_M1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * lk[mapd(0, -1, 0, 0)]) / dy0;
+
     return (kT * lv[mapd(0, 0, 0, 1)] - kB * lv[mapd(0, -1, 0, 1)]) / dy_0
-           + (parameters.solver.gamma / dy_0) * (kT * fabs(lv[mapd(0, 0, 0, 1)]) - kB * fabs(lv[mapd(0, -1, 0, 1)]));
+           + (parameters.solver.gamma / dy_0) * (kt * fabs(lv[mapd(0, 0, 0, 1)]) - kb * fabs(lv[mapd(0, -1, 0, 1)]));
   }
 
   inline RealType dnuTkd2x( //
@@ -1390,9 +1404,12 @@ namespace Stencils {
     const RealType lepsR = (0.5 * dx_P1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lk[mapd(1, 0, 0, 0)]) / dx1;
     const RealType lepsL = (0.5 * dx_M1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lk[mapd(-1, 0, 0, 0)]) / dx0;
 
+    const RealType lepsr = (0.5 * dx_P1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(1, 0, 0, 0)]) / dx1;
+    const RealType lepsl = (0.5 * dx_M1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(-1, 0, 0, 0)]) / dx0;
+
     return (lepsR * lv[mapd(0, 0, 0, 0)] - lepsL * lv[mapd(-1, 0, 0, 0)]) / dx_0
            + (parameters.solver.gamma / dx_0
-             ) * (lepsR * fabs(lv[mapd(0, 0, 0, 0)]) - lepsL * fabs(lv[mapd(-1, 0, 0, 0)]));
+             ) * (lepsr * fabs(lv[mapd(0, 0, 0, 0)]) - lepsl * fabs(lv[mapd(-1, 0, 0, 0)]));
   }
 
   inline RealType dvepsdy(
@@ -1411,9 +1428,12 @@ namespace Stencils {
     const RealType lepsT = (0.5 * dy_P1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lk[mapd(0, 1, 0, 0)]) / dy1;
     const RealType lepsB = (0.5 * dy_M1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lk[mapd(0, -1, 0, 0)]) / dy0;
 
+    const RealType lepst = (0.5 * dy_P1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * lk[mapd(0, 1, 0, 0)]) / dy1;
+    const RealType lepsb = (0.5 * dy_M1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * lk[mapd(0, -1, 0, 0)]) / dy0;
+
     return (lepsT * lv[mapd(0, 0, 0, 1)] - lepsB * lv[mapd(0, -1, 0, 1)]) / dy_0
            + (parameters.solver.gamma / dy_0
-             ) * (lepsT * fabs(lv[mapd(0, 0, 0, 1)]) - lepsB * fabs(lv[mapd(0, -1, 0, 1)]));
+             ) * (lepst * fabs(lv[mapd(0, 0, 0, 1)]) - lepsb * fabs(lv[mapd(0, -1, 0, 1)]));
   }
 
   inline RealType dfunuTepsd2x(
@@ -1558,14 +1578,7 @@ namespace Stencils {
     int                   i,
     int                   j
   ) {
-    // std::cout
-    //   << "Hello from "
-    //      "k2d**************************************************************************************************"
-    //      "**************\n";
-    // std::cout << "dnuTkd2x = " << dnuTkd2x(localVelocity, parameters, localViscosity, localk, localMeshsize) << "\n";
-    // std::cout << "dnuTkd2y = " << dnuTkd2y(localVelocity, parameters, localViscosity, localk, localMeshsize) << "\n";
-    // std::cout << "dukdx = " << dukdx(localVelocity, parameters, localk, localMeshsize) << "\n";
-    // std::cout << "dvkdy = " << dvkdy(localVelocity, parameters, localk, localMeshsize) << "\n";
+
     return localk[mapd(0, 0, 0, 0)]
            + dt
                * (dnuTkd2x(parameters, localViscosity, localk, localMeshsize) 
