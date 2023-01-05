@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
     <flow Re="10000" />
-    <simulation finalTime="10" >
+    <simulation finalTime="100" >
         <type>turbulenceKE</type>
         <scenario>channel</scenario>
     </simulation>

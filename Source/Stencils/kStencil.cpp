@@ -12,14 +12,16 @@ Stencils::kStencil::kStencil(const Parameters& parameters):
 
 void Stencils::kStencil::apply(TurbulentFlowFieldKE& flowField, int i, int j) /*change flowfield here??*/ {
   // Load local velocities into the center layer of the local array
-  loadLocalVelocity2D(flowField, localVelocity_, i, j);
-  loadLocalViscosity2D(flowField, localViscosity_, i, j);
-  loadLocalK2D(flowField, localk_, i, j);
-  loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
-
-  flowField.getk().getScalar(i, j) = computek2D(
-    flowField, localVelocity_, localViscosity_, localk_, localMeshsize_, parameters_, parameters_.timestep.dt, i, j
-  );
+  const int obstacle = flowField.getFlags().getValue(i, j);
+  if ((obstacle & OBSTACLE_SELF) == 0) { // If the cell is fluid
+    loadLocalVelocity2D(flowField, localVelocity_, i, j);
+    loadLocalViscosity2D(flowField, localViscosity_, i, j);
+    loadLocalK2D(flowField, localk_, i, j);
+    loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
+    flowField.getk().getScalar(i, j) = computek2D(
+      flowField, localVelocity_, localViscosity_, localk_, localMeshsize_, parameters_, parameters_.timestep.dt, i, j
+    );
+  }
 }
 
 void Stencils::kStencil::apply(

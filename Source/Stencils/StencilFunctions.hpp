@@ -1282,20 +1282,11 @@ namespace Stencils {
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
                   / (flowField.geteps().getScalar(i, j));
 
-    // std::cout
-    //   << "Rd" << Rd << " "
-    //   << "Rt" << Rt << "\n ";
-
     return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
   }
 
   inline RealType f1(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
-    std::cout
-      << "f1"
-      << 1
-           + (0.05 / fu(parameters, flowField, i, j)) * (0.05 / fu(parameters, flowField, i, j))
-               * (0.05 / fu(parameters, flowField, i, j))
-      << "\n";
+
     return 1
            + (0.05 / fu(parameters, flowField, i, j)) * (0.05 / fu(parameters, flowField, i, j))
                * (0.05 / fu(parameters, flowField, i, j));
@@ -1304,7 +1295,6 @@ namespace Stencils {
   inline RealType f2(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
                   / (flowField.geteps().getScalar(i, j));
-    std::cout << "f2" << 1 - exp(-Rt * Rt) << "\n";
     return 1 - exp(-Rt * Rt);
   }
 
