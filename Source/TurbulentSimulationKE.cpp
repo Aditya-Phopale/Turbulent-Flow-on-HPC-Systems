@@ -33,7 +33,9 @@ void TurbulentSimulationKE::initializeFlowField() {
     FieldIterator<TurbulentFlowFieldKE>   epsInitIterator(turbflowFieldKE_, parameters_, epsInitStencil);
     epsInitIterator.iterate();
   }
-  // nuTUpdate();
+  nuTUpdate();
+  std::cout << "*****************************nuT**********************************************\n";
+  turbflowFieldKE_.getnuT().show();
 }
 
 void TurbulentSimulationKE::solveTimestep() {
@@ -41,6 +43,8 @@ void TurbulentSimulationKE::solveTimestep() {
   // std::cout << "***************************************************************************\n";
   // turbflowFieldKE_.getnuT().show();
   // Communicate viscosity
+  std::cout << "******************************U*********************************************\n";
+  turbflowFieldKE_.getVelocity().show();
 
   // ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
@@ -48,11 +52,13 @@ void TurbulentSimulationKE::solveTimestep() {
   // std::cout << "***************************************************************************\n";
   // turbflowFieldKE_.getk().show();
   wallkIterator_.iterate();
+  std::cout << "******************************k*********************************************\n";
+  turbflowFieldKE_.getk().show();
   wallEpsilonIterator_.iterate();
 
   kIterator_.iterate();
-  std::cout << "******************************k*********************************************\n";
-  turbflowFieldKE_.getk().show();
+  // std::cout << "******************************k*********************************************\n";
+  // turbflowFieldKE_.getk().show();
   epsilonIterator_.iterate();
   std::cout << "*****************************epsilon**********************************************\n";
   turbflowFieldKE_.geteps().show();

@@ -42,7 +42,9 @@ RealType computeVelocity2D(int i, int j, RealType stepSize, const Parameters& pa
   }
 }
 
-RealType computeK3D(int i, int j, int k, RealType stepSize, const Parameters& parameters) {
+RealType computeK3D(
+  int i, int j, int k, RealType stepSize, TurbulentFlowFieldKE& flowField, const Parameters& parameters
+) {
   const RealType posY = parameters.meshsize->getPosY(i, j, k);
   const RealType posZ = parameters.meshsize->getPosZ(i, j, k);
   const RealType dy   = parameters.meshsize->getDy(i, j, k);
@@ -56,7 +58,8 @@ RealType computeK3D(int i, int j, int k, RealType stepSize, const Parameters& pa
     const RealType y = posY + 0.5 * dy - stepSize;
     const RealType z = posZ + 0.5 * dz;
 
-    return 0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0];
+    return 2 * 0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]
+           - flowField.getk().getScalar(i + 1, j, k);
     // return 36.0 * parameters.walls.vectorLeft[0] / (inletZSize * inletZSize * inletYSize * inletYSize) * y *(y -
     // inletYSize) * z*(z - inletZSize);
   } else {
@@ -64,7 +67,7 @@ RealType computeK3D(int i, int j, int k, RealType stepSize, const Parameters& pa
   }
 }
 
-RealType computeK2D(int i, int j, RealType stepSize, const Parameters& parameters) {
+RealType computeK2D(int i, int j, RealType stepSize, TurbulentFlowFieldKE& flowField, const Parameters& parameters) {
   const RealType posY = parameters.meshsize->getPosY(i, j);
   const RealType dy   = parameters.meshsize->getDy(i, j);
 
@@ -75,14 +78,17 @@ RealType computeK2D(int i, int j, RealType stepSize, const Parameters& parameter
     const RealType y = posY + 0.5 * dy - stepSize;
 
     // For turbulence, please use:
-    return 0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0];
+    return 2 * 0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]
+           - flowField.getk().getScalar(i + 1, j);
     // return 6.0 * parameters.walls.vectorLeft[0] / (inletYSize * inletYSize) * y * (inletYSize - y);
   } else {
     return 0.0;
   }
 }
 
-RealType computeEpsilon3D(int i, int j, int k, RealType stepSize, const Parameters& parameters) {
+RealType computeEpsilon3D(
+  int i, int j, int k, RealType stepSize, TurbulentFlowFieldKE& flowField, const Parameters& parameters
+) {
   const RealType posY = parameters.meshsize->getPosY(i, j, k);
   const RealType posZ = parameters.meshsize->getPosZ(i, j, k);
   const RealType dy   = parameters.meshsize->getDy(i, j, k);
@@ -96,14 +102,17 @@ RealType computeEpsilon3D(int i, int j, int k, RealType stepSize, const Paramete
     const RealType y = posY + 0.5 * dy - stepSize;
     const RealType z = posZ + 0.5 * dz;
 
-    return parameters.turbulent.cmu
-           * pow((0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]), 1.5) / (0.03 * inletYSize);
+    return 2 * parameters.turbulent.cmu
+             * pow((0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]), 1.5) / (0.03 * inletYSize)
+           - flowField.geteps().getScalar(i + 1, j, k);
   } else {
     return 0.0;
   }
 }
 
-RealType computeEpsilon2D(int i, int j, RealType stepSize, const Parameters& parameters) {
+RealType computeEpsilon2D(
+  int i, int j, RealType stepSize, TurbulentFlowFieldKE& flowField, const Parameters& parameters
+) {
   const RealType posY = parameters.meshsize->getPosY(i, j);
   const RealType dy   = parameters.meshsize->getDy(i, j);
 
@@ -114,8 +123,9 @@ RealType computeEpsilon2D(int i, int j, RealType stepSize, const Parameters& par
     const RealType y = posY + 0.5 * dy - stepSize;
 
     // For turbulence, please use:
-    return parameters.turbulent.cmu
-           * pow((0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]), 1.5) / (0.03 * inletYSize);
+    return 2 * parameters.turbulent.cmu
+             * pow((0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]), 1.5) / (0.03 * inletYSize)
+           - flowField.geteps().getScalar(i + 1, j);
     // return 6.0 * parameters.walls.vectorLeft[0] / (inletYSize * inletYSize) * y * (inletYSize - y);
   } else {
     return 0.0;
@@ -291,11 +301,11 @@ Stencils::BFInputKStencil::BFInputKStencil(const Parameters& parameters):
 }
 
 void Stencils::BFInputKStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) {
-  flowField.getk().getScalar(i, j) = computeK2D(i, j, stepSize_, parameters_);
+  flowField.getk().getScalar(i, j) = computeK2D(i, j, stepSize_, flowField, parameters_);
 }
 
 void Stencils::BFInputKStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
-  flowField.getk().getScalar(i, j, k) = computeK3D(i, j, k, stepSize_, parameters_);
+  flowField.getk().getScalar(i, j, k) = computeK3D(i, j, k, stepSize_, flowField, parameters_);
   // flowField.getVelocity().getVector(i, j, k)[1] = -flowField.getVelocity().getVector(i + 1, j, k)[1];
   // flowField.getVelocity().getVector(i, j, k)[2] = -flowField.getVelocity().getVector(i + 1, j, k)[2];
 }
@@ -382,11 +392,11 @@ Stencils::BFInputEpsilonStencil::BFInputEpsilonStencil(const Parameters& paramet
 }
 
 void Stencils::BFInputEpsilonStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) {
-  flowField.geteps().getScalar(i, j) = computeEpsilon2D(i, j, stepSize_, parameters_);
+  flowField.geteps().getScalar(i, j) = computeEpsilon2D(i, j, stepSize_, flowField, parameters_);
 }
 
 void Stencils::BFInputEpsilonStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
-  flowField.geteps().getScalar(i, j, k) = computeEpsilon3D(i, j, k, stepSize_, parameters_);
+  flowField.geteps().getScalar(i, j, k) = computeEpsilon3D(i, j, k, stepSize_, flowField, parameters_);
   // flowField.getVelocity().getVector(i, j, k)[1] = -flowField.getVelocity().getVector(i + 1, j, k)[1];
   // flowField.getVelocity().getVector(i, j, k)[2] = -flowField.getVelocity().getVector(i + 1, j, k)[2];
 }

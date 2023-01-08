@@ -17,7 +17,8 @@ namespace Stencils {
 
     void apply(TurbulentFlowFieldKE& flowField, int i, int j) override {
       flowField.getk().getScalar(i, j) = 0.003;
-      // 1.5 * (parameters_.turbulent.I * parameters_.walls.vectorLeft[0]);
+      // flowField.getk().getScalar(i, j) = 1e-5;
+      //  1.5 * (parameters_.turbulent.I * parameters_.walls.vectorLeft[0]);
     }
     void apply(TurbulentFlowFieldKE& flowField, int i, int j, int k) override {
       flowField.getk().getScalar(i, j, k) = 1.5 * (parameters_.turbulent.I * parameters_.walls.vectorLeft[0]);
