@@ -35,6 +35,7 @@ public:
 class GlobalTurbulentBoundaryFactory {
   Stencils::BoundaryStencil<TurbulentFlowFieldKE>* KStencils_[6];
   Stencils::BoundaryStencil<TurbulentFlowFieldKE>* EpsilonStencils_[6];
+  Stencils::BoundaryStencil<TurbulentFlowFieldKE>* nuTStencils_[6];
   Stencils::BoundaryStencil<TurbulentFlowFieldKE>* moving_[2];       //! Pointers to the moving wall stencils, if any
   Stencils::BoundaryStencil<TurbulentFlowFieldKE>* outflow_[2];      //! Pointers for the outflow conditions
   Stencils::BoundaryStencil<TurbulentFlowFieldKE>* channelInput_[2]; //! For the velocity input
@@ -46,4 +47,5 @@ public:
 
   GlobalBoundaryIterator<TurbulentFlowFieldKE> getGlobalBoundaryKIterator(TurbulentFlowFieldKE& flowField);
   GlobalBoundaryIterator<TurbulentFlowFieldKE> getGlobalBoundaryEpsilonIterator(TurbulentFlowFieldKE& flowField);
+  GlobalBoundaryIterator<TurbulentFlowFieldKE> getGlobalBoundarynuTIterator(TurbulentFlowFieldKE& flowField);
 };

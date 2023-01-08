@@ -232,3 +232,71 @@ void Stencils::NeumannEpsilonBoundaryStencil::applyBackWall(TurbulentFlowFieldKE
   // flowField.getVelocity().getVector(i, j, k)[1] = flowField.getVelocity().getVector(i, j, k - 1)[1];
   // flowField.getVelocity().getVector(i, j, k)[2] = flowField.getVelocity().getVector(i, j, k - 1)[2];
 }
+
+Stencils::NeumannnuTBoundaryStencil::NeumannnuTBoundaryStencil(const Parameters& parameters):
+  BoundaryStencil<TurbulentFlowFieldKE>(parameters) {}
+
+void Stencils::NeumannnuTBoundaryStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) {
+  flowField.getnuT().getScalar(i, j) = flowField.getnuT().getScalar(i + 1, j);
+  // flowField.getVelocity().getVector(i, j)[1]     = flowField.getVelocity().getVector(i + 1, j)[1];
+}
+
+void Stencils::NeumannnuTBoundaryStencil::applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j) {
+  flowField.getnuT().getScalar(i, j) = flowField.getnuT().getScalar(i - 1, j);
+  // flowField.getVelocity().getVector(i, j)[0] = flowField.getVelocity().getVector(i - 1, j)[0];
+  // flowField.getVelocity().getVector(i, j)[1] = flowField.getVelocity().getVector(i - 1, j)[1];
+}
+
+void Stencils::NeumannnuTBoundaryStencil::applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j) {
+  flowField.getnuT().getScalar(i, j) = flowField.getnuT().getScalar(i, j + 1);
+  // flowField.getVelocity().getVector(i, j)[0]     = flowField.getVelocity().getVector(i, j + 1)[0];
+  // flowField.getVelocity().getVector(i, j - 1)[1] = flowField.getVelocity().getVector(i, j)[1];
+}
+
+void Stencils::NeumannnuTBoundaryStencil::applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j) {
+  flowField.getnuT().getScalar(i, j) = flowField.getnuT().getScalar(i, j - 1);
+  // flowField.getVelocity().getVector(i, j)[0] = flowField.getVelocity().getVector(i, j - 1)[0];
+  // flowField.getVelocity().getVector(i, j)[1] = flowField.getVelocity().getVector(i, j - 1)[1];
+}
+
+void Stencils::NeumannnuTBoundaryStencil::applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
+  flowField.getnuT().getScalar(i, j, k) = flowField.getnuT().getScalar(i + 1, j, k);
+  // flowField.getVelocity().getVector(i - 1, j, k)[0] = flowField.getVelocity().getVector(i, j, k)[0];
+  // flowField.getVelocity().getVector(i, j, k)[1]     = flowField.getVelocity().getVector(i + 1, j, k)[1];
+  // flowField.getVelocity().getVector(i, j, k)[2]     = flowField.getVelocity().getVector(i + 1, j, k)[2];
+}
+
+void Stencils::NeumannnuTBoundaryStencil::applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
+  flowField.getnuT().getScalar(i, j, k) = flowField.getnuT().getScalar(i - 1, j, k);
+  // flowField.getVelocity().getVector(i, j, k)[0] = flowField.getVelocity().getVector(i - 1, j, k)[0];
+  // flowField.getVelocity().getVector(i, j, k)[1] = flowField.getVelocity().getVector(i - 1, j, k)[1];
+  // flowField.getVelocity().getVector(i, j, k)[2] = flowField.getVelocity().getVector(i - 1, j, k)[2];
+}
+
+void Stencils::NeumannnuTBoundaryStencil::applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
+  flowField.getnuT().getScalar(i, j, k) = flowField.getnuT().getScalar(i, j + 1, k);
+  // flowField.getVelocity().getVector(i, j, k)[0]     = flowField.getVelocity().getVector(i, j + 1, k)[0];
+  // flowField.getVelocity().getVector(i, j - 1, k)[1] = flowField.getVelocity().getVector(i, j, k)[1];
+  // flowField.getVelocity().getVector(i, j, k)[2]     = flowField.getVelocity().getVector(i, j + 1, k)[2];
+}
+
+void Stencils::NeumannnuTBoundaryStencil::applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
+  flowField.getnuT().getScalar(i, j, k) = flowField.getnuT().getScalar(i, j - 1, k);
+  // flowField.getVelocity().getVector(i, j, k)[0] = flowField.getVelocity().getVector(i, j - 1, k)[0];
+  // flowField.getVelocity().getVector(i, j, k)[1] = flowField.getVelocity().getVector(i, j - 1, k)[1];
+  // flowField.getVelocity().getVector(i, j, k)[2] = flowField.getVelocity().getVector(i, j - 1, k)[2];
+}
+
+void Stencils::NeumannnuTBoundaryStencil::applyFrontWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
+  flowField.getnuT().getScalar(i, j, k) = flowField.getnuT().getScalar(i, j, k + 1);
+  // flowField.getVelocity().getVector(i, j, k)[0]     = flowField.getVelocity().getVector(i, j, k + 1)[0];
+  // flowField.getVelocity().getVector(i, j, k)[1]     = flowField.getVelocity().getVector(i, j, k + 1)[1];
+  // flowField.getVelocity().getVector(i, j, k - 1)[2] = flowField.getVelocity().getVector(i, j, k)[2];
+}
+
+void Stencils::NeumannnuTBoundaryStencil::applyBackWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) {
+  flowField.getnuT().getScalar(i, j, k) = flowField.getnuT().getScalar(i, j, k - 1);
+  // flowField.getVelocity().getVector(i, j, k)[0] = flowField.getVelocity().getVector(i, j, k - 1)[0];
+  // flowField.getVelocity().getVector(i, j, k)[1] = flowField.getVelocity().getVector(i, j, k - 1)[1];
+  // flowField.getVelocity().getVector(i, j, k)[2] = flowField.getVelocity().getVector(i, j, k - 1)[2];
+}

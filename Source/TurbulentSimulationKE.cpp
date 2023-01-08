@@ -10,6 +10,7 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
   globalTurbulentBoundaryFactory_(parameters),
   wallkIterator_(globalTurbulentBoundaryFactory_.getGlobalBoundaryKIterator(turbflowFieldKE_)),
   wallEpsilonIterator_(globalTurbulentBoundaryFactory_.getGlobalBoundaryEpsilonIterator(turbflowFieldKE_)),
+  wallnuTIterator_(globalTurbulentBoundaryFactory_.getGlobalBoundarynuTIterator(turbflowFieldKE_)),
   hStencil_(parameters),
   hIterator_(turbflowFieldKE_, parameters, hStencil_, 0, 0),
   dtStencil_(parameters),
@@ -36,6 +37,7 @@ void TurbulentSimulationKE::initializeFlowField() {
   nuTUpdate();
   std::cout << "*****************************nuT**********************************************\n";
   turbflowFieldKE_.getnuT().show();
+  wallnuTIterator_.iterate();
 }
 
 void TurbulentSimulationKE::solveTimestep() {
@@ -64,7 +66,10 @@ void TurbulentSimulationKE::solveTimestep() {
   std::cout << "*****************************epsilon**********************************************\n";
   turbflowFieldKE_.geteps().show();
   nuTUpdate();
-  std::cout << "*****************************nuT**********************************************\n";
+  wallnuTIterator_.iterate();
+  std::cout
+    << "*****************************nuT********************************************"
+       "**\n";
   turbflowFieldKE_.getnuT().show();
 
   turbflowFieldKE_.updatekold();

@@ -28,6 +28,7 @@ protected:
   GlobalTurbulentBoundaryFactory               globalTurbulentBoundaryFactory_;
   GlobalBoundaryIterator<TurbulentFlowFieldKE> wallkIterator_;
   GlobalBoundaryIterator<TurbulentFlowFieldKE> wallEpsilonIterator_;
+  GlobalBoundaryIterator<TurbulentFlowFieldKE> wallnuTIterator_;
 
   Stencils::TurbulentFGHStencilKE     TurbulentFGHStencilKE_;
   FieldIterator<TurbulentFlowFieldKE> TurbulentFGHIteratorKE_;

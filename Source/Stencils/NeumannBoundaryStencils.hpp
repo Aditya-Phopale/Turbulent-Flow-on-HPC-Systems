@@ -80,4 +80,22 @@ namespace Stencils {
     void applyBackWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
   };
 
+  class NeumannnuTBoundaryStencil: public BoundaryStencil<TurbulentFlowFieldKE> {
+  public:
+    NeumannnuTBoundaryStencil(const Parameters& parameters);
+    ~NeumannnuTBoundaryStencil() override = default;
+
+    void applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+    void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j) override;
+
+    void applyLeftWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyRightWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyBottomWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyTopWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyFrontWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+    void applyBackWall(TurbulentFlowFieldKE& flowField, int i, int j, int k) override;
+  };
+
 } // namespace Stencils

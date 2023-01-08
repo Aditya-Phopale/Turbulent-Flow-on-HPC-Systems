@@ -166,6 +166,7 @@ GlobalTurbulentBoundaryFactory::GlobalTurbulentBoundaryFactory(Parameters& param
 
   outflow_[0] = new Stencils::NeumannKBoundaryStencil(parameters);
   outflow_[1] = new Stencils::NeumannEpsilonBoundaryStencil(parameters);
+  outflow_[2] = new Stencils::NeumannnuTBoundaryStencil(parameters);
 
   channelInput_[0] = new Stencils::BFInputKStencil(parameters);
   channelInput_[1] = new Stencils::BFInputEpsilonStencil(parameters);
@@ -178,6 +179,7 @@ GlobalTurbulentBoundaryFactory::GlobalTurbulentBoundaryFactory(Parameters& param
     for (int i = 0; i < 6; i++) {
       KStencils_[i]       = moving_[0];
       EpsilonStencils_[i] = moving_[1];
+      nuTStencils_[i]     = outflow_[2];
     }
     // parameters.walls.typeLeft   = DIRICHLET;
     // parameters.walls.typeRight  = DIRICHLET;
@@ -189,15 +191,18 @@ GlobalTurbulentBoundaryFactory::GlobalTurbulentBoundaryFactory(Parameters& param
     // To the left, we have the input
     KStencils_[0]       = channelInput_[0];
     EpsilonStencils_[0] = channelInput_[1];
+    nuTStencils_[0]     = outflow_[2];
 
     // To the right, there is an outflow boundary
     KStencils_[1]       = outflow_[0];
     EpsilonStencils_[1] = outflow_[1];
+    nuTStencils_[1]     = outflow_[2];
 
     // The other walls are moving walls
     for (int i = 2; i < 6; i++) {
       KStencils_[i]       = moving_[0];
       EpsilonStencils_[i] = outflow_[1];
+      nuTStencils_[i]     = outflow_[2];
     }
     // parameters.walls.typeLeft   = DIRICHLET;
     // parameters.walls.typeRight  = NEUMANN;
@@ -210,15 +215,18 @@ GlobalTurbulentBoundaryFactory::GlobalTurbulentBoundaryFactory(Parameters& param
     // hence outflow conditions for the velocities.
     KStencils_[0]       = outflow_[0];
     EpsilonStencils_[0] = outflow_[1];
+    nuTStencils_[0]     = outflow_[2];
 
     // To the right, there is an outflow boundary
     KStencils_[1]       = outflow_[0];
     EpsilonStencils_[1] = outflow_[1];
+    nuTStencils_[1]     = outflow_[2];
 
     // The other walls are moving walls
     for (int i = 2; i < 6; i++) {
       KStencils_[i]       = moving_[0];
       EpsilonStencils_[i] = outflow_[1];
+      nuTStencils_[i]     = outflow_[2];
     }
     // parameters.walls.typeLeft   = NEUMANN;
     // parameters.walls.typeRight  = NEUMANN;
@@ -249,6 +257,7 @@ GlobalTurbulentBoundaryFactory::~GlobalTurbulentBoundaryFactory() {
 
   delete outflow_[0];
   delete outflow_[1];
+  delete outflow_[2];
 
   delete channelInput_[0];
   delete channelInput_[1];
@@ -300,6 +309,28 @@ GlobalBoundaryIterator<TurbulentFlowFieldKE> GlobalTurbulentBoundaryFactory::get
     *(EpsilonStencils_[3]),
     *(EpsilonStencils_[4]),
     *(EpsilonStencils_[5]),
+    1,
+    0
+  );
+}
+
+GlobalBoundaryIterator<TurbulentFlowFieldKE> GlobalTurbulentBoundaryFactory::getGlobalBoundarynuTIterator(
+  TurbulentFlowFieldKE& flowField
+) {
+  if (parameters_.geometry.dim == 2) {
+    return GlobalBoundaryIterator<TurbulentFlowFieldKE>(
+      flowField, parameters_, *(nuTStencils_[0]), *(nuTStencils_[1]), *(nuTStencils_[2]), *(nuTStencils_[3]), 1, 0
+    );
+  }
+  return GlobalBoundaryIterator<TurbulentFlowFieldKE>(
+    flowField,
+    parameters_,
+    *(nuTStencils_[0]),
+    *(nuTStencils_[1]),
+    *(nuTStencils_[2]),
+    *(nuTStencils_[3]),
+    *(nuTStencils_[4]),
+    *(nuTStencils_[5]),
     1,
     0
   );
