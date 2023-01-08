@@ -37,7 +37,7 @@ namespace Stencils {
   inline void loadLocalK2D(TurbulentFlowFieldKE& flowField, RealType* const localK, int i, int j) {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
-        localK[39 + 9 * row + 3 * column] = flowField.getk().getScalar(i + column, j + row); // x-component
+        localK[39 + 9 * row + 3 * column] = flowField.getkold().getScalar(i + column, j + row); // x-component
       }
     }
   }
@@ -45,7 +45,7 @@ namespace Stencils {
   inline void loadLocalEpsilon2D(TurbulentFlowFieldKE& flowField, RealType* const localEpsilon, int i, int j) {
     for (int row = -1; row <= 1; row++) {
       for (int column = -1; column <= 1; column++) {
-        localEpsilon[39 + 9 * row + 3 * column] = flowField.geteps().getScalar(i + column, j + row); // x-component
+        localEpsilon[39 + 9 * row + 3 * column] = flowField.getepsold().getScalar(i + column, j + row); // x-component
       }
     }
   }
@@ -1562,14 +1562,13 @@ namespace Stencils {
     int                   i,
     int                   j
   ) {
-
     return localk[mapd(0, 0, 0, 0)]
            + dt
                * (dnuTkd2x(parameters, localViscosity, localk, localMeshsize) 
                 + dnuTkd2y(parameters, localViscosity, localk, localMeshsize) 
                 - dukdx(localVelocity, parameters, localk, localMeshsize) 
                 - dvkdy(localVelocity, parameters, localk, localMeshsize) 
-                + 0.5 * flowField.getnuT().getScalar(i,j) * (2 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 2 * pow(dvdy(localVelocity, localMeshsize),2)) 
+                + 0.5 * flowField.getnuT().getScalar(i,j) * (4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize),2)) 
                 - flowField.geteps().getScalar(i, j));
   }
 
@@ -1592,7 +1591,7 @@ namespace Stencils {
                 + dfunuTepsd2y(flowField, parameters, localViscosity, localEpsilon, localMeshsize,i, j)) 
                 - duepsdx(localVelocity, parameters, localEpsilon, localMeshsize) 
                 - dvepsdy(localVelocity, parameters, localEpsilon, localMeshsize)
-                + 0.5*parameters.turbulent.c1*flowField.getk().getScalar(i,j)*f1(parameters, flowField,i,j)*(2 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 2 * pow(dvdy(localVelocity, localMeshsize) ,2))
+                + 0.5*parameters.turbulent.c1*flowField.getk().getScalar(i,j)*f1(parameters, flowField,i,j)*(4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize) ,2))
                 - parameters.turbulent.c2*f2(parameters, flowField,i,j)*pow(flowField.geteps().getScalar(i,j),2)/flowField.getk().getScalar(i,j));
   }
 

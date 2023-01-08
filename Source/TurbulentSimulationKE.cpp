@@ -52,13 +52,14 @@ void TurbulentSimulationKE::solveTimestep() {
   // std::cout << "***************************************************************************\n";
   // turbflowFieldKE_.getk().show();
   wallkIterator_.iterate();
-  std::cout << "******************************k*********************************************\n";
-  turbflowFieldKE_.getk().show();
   wallEpsilonIterator_.iterate();
 
+  turbflowFieldKE_.updatekold();
+  turbflowFieldKE_.updateepsold();
+
   kIterator_.iterate();
-  // std::cout << "******************************k*********************************************\n";
-  // turbflowFieldKE_.getk().show();
+  std::cout << "******************************k*********************************************\n";
+  turbflowFieldKE_.getk().show();
   epsilonIterator_.iterate();
   std::cout << "*****************************epsilon**********************************************\n";
   turbflowFieldKE_.geteps().show();
@@ -66,6 +67,8 @@ void TurbulentSimulationKE::solveTimestep() {
   std::cout << "*****************************nuT**********************************************\n";
   turbflowFieldKE_.getnuT().show();
 
+  turbflowFieldKE_.updatekold();
+  turbflowFieldKE_.updateepsold();
   // Compute FGH
   TurbulentFGHIteratorKE_.iterate();
   // Set global boundary values
