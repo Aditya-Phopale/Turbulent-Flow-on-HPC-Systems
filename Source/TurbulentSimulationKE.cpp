@@ -21,7 +21,9 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
   epsilonIterator_(flowField, parameters, epsilonStencil_, 1, 0),
   ppmTurbulentKE_(parameters, turbflowFieldKE_),
   MaxKStencil_(parameters),
-  MaxKIterator_(flowField, parameters, MaxKStencil_) {}
+  MaxKIterator_(flowField, parameters, MaxKStencil_, 1, 0),
+  MaxEpsStencil_(parameters),
+  MaxEpsIterator_(flowField, parameters, MaxEpsStencil_, 1, 0) {}
 
 void TurbulentSimulationKE::initializeFlowField() {
   Simulation::initializeFlowField();
@@ -53,6 +55,7 @@ void TurbulentSimulationKE::solveTimestep() {
   // ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
+  std::cout << parameters_.timestep.dt;
   // std::cout << "***************************************************************************\n";
   // turbflowFieldKE_.getk().show();
   wallVelocityIterator_.iterate();
@@ -104,12 +107,19 @@ void TurbulentSimulationKE::setTimeStep() {
 
   // Determine maximum velocity
   maxUStencil_.reset();
+  MaxKStencil_.reset();
+  MaxEpsStencil_.reset();
+
   maxUFieldIterator_.iterate();
   maxUBoundaryIterator_.iterate();
+
   dtStencil_.reset();
   dtIterator_.iterate();
 
   localMin = dtStencil_.getDt();
+
+  MaxKIterator_.iterate();
+  MaxEpsIterator_.iterate();
 
   if (parameters_.geometry.dim == 3) {
     parameters_.timestep.dt = 1.0 / (maxUStencil_.getMaxValues()[2] + std::numeric_limits<double>::min());
@@ -123,9 +133,13 @@ void TurbulentSimulationKE::setTimeStep() {
       parameters_.timestep.dt,
       std::min(
         1 / (maxUStencil_.getMaxValues()[1] + std::numeric_limits<double>::min()),
-        1 / (maxUStencil_.getMaxValues()[0] + std::numeric_limits<double>::min())
+        std::min(
+          0.5 / (MaxKStencil_.getMaxValues() + std::numeric_limits<double>::min()),
+          0.5 / (MaxEpsStencil_.getMaxValues() + std::numeric_limits<double>::min())
+        )
       )
     )
+
   );
   // if (fetestexcept(FE_DIVBYZERO))
   //     std::cout <<"Exception occured\n";

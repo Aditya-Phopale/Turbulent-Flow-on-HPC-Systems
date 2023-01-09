@@ -10,6 +10,7 @@
 #include "Stencils/InitEpsilonFlowFieldStencil.hpp"
 #include "Stencils/InitkFlowFieldStencil.hpp"
 #include "Stencils/kStencil.hpp"
+#include "Stencils/MaxEpsStencil.hpp"
 #include "Stencils/MaxKStencil.hpp"
 #include "Stencils/nuTStencilKE.hpp"
 #include "Stencils/timeStepStencil.cpph"
@@ -41,6 +42,9 @@ protected:
 
   Stencils::MaxKStencil               MaxKStencil_;
   FieldIterator<TurbulentFlowFieldKE> MaxKIterator_;
+
+  Stencils::MaxEpsStencil             MaxEpsStencil_;
+  FieldIterator<TurbulentFlowFieldKE> MaxEpsIterator_;
 
   Stencils::kStencil                  kStencil_;
   FieldIterator<TurbulentFlowFieldKE> kIterator_;
