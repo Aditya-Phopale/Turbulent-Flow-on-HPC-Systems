@@ -19,7 +19,9 @@ TurbulentSimulationKE::TurbulentSimulationKE(Parameters& parameters, TurbulentFl
   kIterator_(flowField, parameters, kStencil_, 1, 0),
   epsilonStencil_(parameters),
   epsilonIterator_(flowField, parameters, epsilonStencil_, 1, 0),
-  ppmTurbulentKE_(parameters, turbflowFieldKE_) {}
+  ppmTurbulentKE_(parameters, turbflowFieldKE_),
+  MaxKStencil_(parameters),
+  MaxKIterator_(flowField, parameters, MaxKStencil_) {}
 
 void TurbulentSimulationKE::initializeFlowField() {
   Simulation::initializeFlowField();
@@ -45,52 +47,53 @@ void TurbulentSimulationKE::solveTimestep() {
   // std::cout << "***************************************************************************\n";
   // turbflowFieldKE_.getnuT().show();
   // Communicate viscosity
-  std::cout << "******************************U*********************************************\n";
-  turbflowFieldKE_.getVelocity().show();
-
+  // std::cout << "******************************U*********************************************\n";
+  // turbflowFieldKE_.getVelocity().show();
+  // parameters_.timestep.dt = 1e-5;
   // ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
   // std::cout << "***************************************************************************\n";
   // turbflowFieldKE_.getk().show();
+  wallVelocityIterator_.iterate();
+  TurbulentFGHIteratorKE_.iterate();
+  wallFGHIterator_.iterate();
+  rhsIterator_.iterate();
+  solver_->solve();
+  velocityIterator_.iterate();
+  obstacleIterator_.iterate();
+  nuTUpdate();
+  wallnuTIterator_.iterate();
+  turbflowFieldKE_.updatekold();
+  turbflowFieldKE_.updateepsold();
+  kIterator_.iterate();
+  epsilonIterator_.iterate();
   wallkIterator_.iterate();
   wallEpsilonIterator_.iterate();
 
-  turbflowFieldKE_.updatekold();
-  turbflowFieldKE_.updateepsold();
+  // std::cout << "******************************k*********************************************\n";
+  // turbflowFieldKE_.getk().show();
+  // std::cout << "*****************************epsilon**********************************************\n";
+  // turbflowFieldKE_.geteps().show();
 
-  kIterator_.iterate();
-  std::cout << "******************************k*********************************************\n";
-  turbflowFieldKE_.getk().show();
-  epsilonIterator_.iterate();
-  std::cout << "*****************************epsilon**********************************************\n";
-  turbflowFieldKE_.geteps().show();
-  nuTUpdate();
-  wallnuTIterator_.iterate();
-  std::cout
-    << "*****************************nuT********************************************"
-       "**\n";
-  turbflowFieldKE_.getnuT().show();
+  // std::cout
+  //   << "*****************************nuT********************************************"
+  //      "**\n";
+  // turbflowFieldKE_.getnuT().show();
 
-  turbflowFieldKE_.updatekold();
-  turbflowFieldKE_.updateepsold();
+  // turbflowFieldKE_.updatekold();
+  // turbflowFieldKE_.updateepsold();
   // Compute FGH
-  TurbulentFGHIteratorKE_.iterate();
   // Set global boundary values
-  wallFGHIterator_.iterate();
   // TODO WS1: compute the right hand side (RHS)
-  rhsIterator_.iterate();
   // Solve for pressure
-  solver_->solve();
   // TODO WS2: communicate pressure values
   ppmTurbulentKE_.communicatePressure();
   // Compute velocity
-  velocityIterator_.iterate();
-  obstacleIterator_.iterate();
+
   // TODO WS2: communicate velocity values
   ppmTurbulentKE_.communicateVelocities();
   // Iterate for velocities on the boundary
-  wallVelocityIterator_.iterate();
 
   // Calculate viscosity
 }
