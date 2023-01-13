@@ -39,8 +39,8 @@ void TurbulentSimulationKE::initializeFlowField() {
     epsInitIterator.iterate();
   }
   nuTUpdate();
-  std::cout << "*****************************nuT**********************************************\n";
-  turbflowFieldKE_.getnuT().show();
+  // std::cout << "*****************************nuT**********************************************\n";
+  // turbflowFieldKE_.getnuT().show();
   wallnuTIterator_.iterate();
 }
 
@@ -54,21 +54,33 @@ void TurbulentSimulationKE::solveTimestep() {
   // parameters_.timestep.dt = 1e-5;
   // ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
-  setTimeStep();
-  std::cout << parameters_.timestep.dt;
+
+  parameters_.timestep.dt = 1e-5;
+  // std::cout << parameters_.timestep.dt;
   // std::cout << "***************************************************************************\n";
   // turbflowFieldKE_.getk().show();
+  // setTimeStep();
   wallVelocityIterator_.iterate();
   TurbulentFGHIteratorKE_.iterate();
   wallFGHIterator_.iterate();
   rhsIterator_.iterate();
   solver_->solve();
+  // std::cout << "******************************U*********************************************\n";
+  // turbflowFieldKE_.getVelocity().show();
+  // std::cout << "******************************nuT*********************************************\n";
+  // turbflowFieldKE_.getnuT().show();
   velocityIterator_.iterate();
+  // std::cout << "******************************U*********************************************\n";
+  // turbflowFieldKE_.getVelocity().show();
   obstacleIterator_.iterate();
   nuTUpdate();
   wallnuTIterator_.iterate();
   turbflowFieldKE_.updatekold();
   turbflowFieldKE_.updateepsold();
+  // std::cout << "******************************k*********************************************\n";
+  // turbflowFieldKE_.getk().show();
+  // std::cout << "*****************************epsilon**********************************************\n";
+  // turbflowFieldKE_.geteps().show();
   kIterator_.iterate();
   epsilonIterator_.iterate();
   wallkIterator_.iterate();
@@ -134,12 +146,11 @@ void TurbulentSimulationKE::setTimeStep() {
       std::min(
         1 / (maxUStencil_.getMaxValues()[1] + std::numeric_limits<double>::min()),
         std::min(
-          0.5 / (MaxKStencil_.getMaxValues() + std::numeric_limits<double>::min()),
-          0.5 / (MaxEpsStencil_.getMaxValues() + std::numeric_limits<double>::min())
+          1 / (2 * MaxKStencil_.getMaxValues() + std::numeric_limits<double>::min()),
+          1 / (2 * MaxEpsStencil_.getMaxValues() + std::numeric_limits<double>::min())
         )
       )
     )
-
   );
   // if (fetestexcept(FE_DIVBYZERO))
   //     std::cout <<"Exception occured\n";
