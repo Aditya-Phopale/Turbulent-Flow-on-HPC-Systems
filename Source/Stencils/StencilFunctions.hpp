@@ -1521,8 +1521,17 @@ namespace Stencils {
     const RealType* const localKineticEnergy,
     const RealType* const localMeshsize,
     const Parameters&     parameters,
-    RealType              dt
+    RealType              dt,
+    bool                  check
   ) {
+    if (check) {
+      std::cout
+        << d2vdx2(localVelocity, localViscosity, parameters, localMeshsize) << " "
+        << d2udxdy(localVelocity, localViscosity, parameters, localMeshsize) << " "
+        << d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) << " "
+        << duvdx(localVelocity, parameters, localMeshsize) << " " << dv2dy(localVelocity, parameters, localMeshsize)
+        << "\n";
+    }
     return localVelocity[mapd(0, 0, 0, 1)]
         + dt * ( d2vdx2(localVelocity, localViscosity, parameters, localMeshsize) + d2udxdy(localVelocity, localViscosity, parameters, localMeshsize)
             + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
@@ -1545,6 +1554,7 @@ namespace Stencils {
     const Parameters&     parameters,
     RealType              dt
   ) {
+
     return localVelocity[mapd(0, 0, 0, 1)]
         + dt * ( d2vdx2(localVelocity, localViscosity, parameters, localMeshsize) + d2udxdy(localVelocity, localViscosity, parameters, localMeshsize)
             + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)

@@ -20,7 +20,7 @@ Simulation::Simulation(Parameters& parameters, FlowField& flowField):
   rhsIterator_(flowField_, parameters, rhsStencil_),
   velocityStencil_(parameters),
   obstacleStencil_(parameters),
-  velocityIterator_(flowField_, parameters, velocityStencil_, 1, 0),
+  velocityIterator_(flowField_, parameters, velocityStencil_),
   obstacleIterator_(flowField_, parameters, obstacleStencil_),
   ppm_(parameters, flowField_)
 #ifdef ENABLE_PETSC
