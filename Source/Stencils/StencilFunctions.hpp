@@ -1603,7 +1603,7 @@ namespace Stencils {
                 + dfunuTepsd2y(flowField, parameters, localViscosity, localEpsilon, localMeshsize,i, j)) 
                 - duepsdx(localVelocity, parameters, localEpsilon, localMeshsize) 
                 - dvepsdy(localVelocity, parameters, localEpsilon, localMeshsize)
-                + 0.5*parameters.turbulent.c1*flowField.getk().getScalar(i,j)*f1(parameters, flowField,i,j)*(4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize) ,2))
+                + 0.5*parameters.turbulent.c1*flowField.getk().getScalar(i,j)*f1(parameters, flowField,i,j)*(4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize),2))
                 - parameters.turbulent.c2*f2(parameters, flowField,i,j)*pow(flowField.geteps().getScalar(i,j),2)/flowField.getk().getScalar(i,j)) < 1e-6)
       return 1e-6;
 

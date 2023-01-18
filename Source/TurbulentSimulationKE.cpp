@@ -41,27 +41,46 @@ void TurbulentSimulationKE::initializeFlowField() {
     wallEpsilonIterator_.iterate();
   }
   nuTUpdate();
-  std::cout << "*****************************nuT**********************************************\n";
-  turbflowFieldKE_.getnuT().show();
-  wallnuTIterator_.iterate();
+  // std::cout << "*****************************nuT**********************************************\n";
+  // turbflowFieldKE_.getnuT().show();
+  // wallnuTIterator_.iterate();
 }
 
 void TurbulentSimulationKE::solveTimestep() {
 
   // ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
-  setTimeStep();
+  // setTimeStep();
+  parameters_.timestep.dt = 1e-4;
+  wallVelocityIterator_.iterate();
+  wallFGHIterator_.iterate();
+  wallkIterator_.iterate();
+  wallEpsilonIterator_.iterate();
   // std::cout << "timestep****" << parameters_.timestep.dt << "\n";
   turbflowFieldKE_.updatekold();
+  kIterator_.iterate();
+
   turbflowFieldKE_.updateepsold();
+  epsilonIterator_.iterate();
+
+  nuTUpdate();
+
+  TurbulentFGHIteratorKE_.iterate();
+
+  rhsIterator_.iterate();
+
+  solver_->solve();
+
+  // ppmTurbulentKE_.communicatePressure();
+
+  velocityIterator_.iterate();
+  obstacleIterator_.iterate();
+
+  // ppmTurbulentKE_.communicateVelocities();
   // std::cout << "******************************k*********************************************\n";
   // turbflowFieldKE_.getk().show();
 
-  kIterator_.iterate();
-  epsilonIterator_.iterate();
-
-  wallkIterator_.iterate();
-  wallEpsilonIterator_.iterate();
+  // wallkIterator_.iterate();
 
   // std::cout << "******************************P*********************************************\n";
   // turbflowFieldKE_.getPressure().show();
@@ -72,34 +91,29 @@ void TurbulentSimulationKE::solveTimestep() {
   // std::cout << "*****************************epsilon**********************************************\n";
   // turbflowFieldKE_.geteps().show();
 
-  nuTUpdate();
-  wallnuTIterator_.iterate();
+  // wallnuTIterator_.iterate();
   // std::cout
   //   << "*****************************nuT********************************************"
   //      "**\n";
   // turbflowFieldKE_.getnuT().show();
 
   // Compute FGH
-  TurbulentFGHIteratorKE_.iterate();
+
   // std::cout
   //   << "*****************************F&G********************************************"
   //      "**\n";
   // turbflowFieldKE_.getFGH().show();
   // Set global boundary values
-  wallFGHIterator_.iterate();
 
-  rhsIterator_.iterate();
   // Solve for pressure
-  solver_->solve();
+
   // TODO WS2: communicate pressure values
-  ppmTurbulentKE_.communicatePressure();
+
   // Compute velocity
-  velocityIterator_.iterate();
-  obstacleIterator_.iterate();
+
   // TODO WS2: communicate velocity values
-  ppmTurbulentKE_.communicateVelocities();
+
   // Iterate for velocities on the boundary
-  wallVelocityIterator_.iterate();
 }
 
 void TurbulentSimulationKE::setTimeStep() {
