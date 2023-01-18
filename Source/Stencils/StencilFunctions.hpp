@@ -1283,11 +1283,11 @@ namespace Stencils {
                   / (flowField.geteps().getScalar(i, j));
 
     // return 1;
+
     return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
   }
 
   inline RealType f1(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
-
     return 1
            + (0.05 / fu(parameters, flowField, i, j)) * (0.05 / fu(parameters, flowField, i, j))
                * (0.05 / fu(parameters, flowField, i, j));
@@ -1296,8 +1296,9 @@ namespace Stencils {
   inline RealType f2(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
                   / (flowField.geteps().getScalar(i, j));
-    return 1 - exp(-Rt * Rt);
-    // return 1;
+    // std::cout << Rt << "\n";
+    // return 1 - exp(-Rt * Rt);
+    return 1;
   }
 
   inline RealType dukdx(
@@ -1521,17 +1522,8 @@ namespace Stencils {
     const RealType* const localKineticEnergy,
     const RealType* const localMeshsize,
     const Parameters&     parameters,
-    RealType              dt,
-    bool                  check
+    RealType              dt
   ) {
-    if (check) {
-      std::cout
-        << d2vdx2(localVelocity, localViscosity, parameters, localMeshsize) << " "
-        << d2udxdy(localVelocity, localViscosity, parameters, localMeshsize) << " "
-        << d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) << " "
-        << duvdx(localVelocity, parameters, localMeshsize) << " " << dv2dy(localVelocity, parameters, localMeshsize)
-        << "\n";
-    }
     return localVelocity[mapd(0, 0, 0, 1)]
         + dt * ( d2vdx2(localVelocity, localViscosity, parameters, localMeshsize) + d2udxdy(localVelocity, localViscosity, parameters, localMeshsize)
             + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
@@ -1572,6 +1564,16 @@ namespace Stencils {
     int                   i,
     int                   j
   ) {
+    if(localk[mapd(0, 0, 0, 0)]
+           + dt
+               * (dnuTkd2x(parameters, localViscosity, localk, localMeshsize) 
+                + dnuTkd2y(parameters, localViscosity, localk, localMeshsize) 
+                - dukdx(localVelocity, parameters, localk, localMeshsize) 
+                - dvkdy(localVelocity, parameters, localk, localMeshsize) 
+                + 0.5 * flowField.getnuT().getScalar(i,j) * (4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize),2)) 
+                - flowField.geteps().getScalar(i, j)) < 1e-6)
+      return 1e-6;
+
     return localk[mapd(0, 0, 0, 0)]
            + dt
                * (dnuTkd2x(parameters, localViscosity, localk, localMeshsize) 
@@ -1594,6 +1596,17 @@ namespace Stencils {
     int                   i,
     int                   j
   ) {
+    if(localEpsilon[mapd(0, 0, 0, 0)]
+           + dt
+               * ((parameters.turbulent.ce / parameters.turbulent.cmu) 
+               * (dfunuTepsd2x(flowField, parameters, localViscosity, localEpsilon, localMeshsize, i, j) 
+                + dfunuTepsd2y(flowField, parameters, localViscosity, localEpsilon, localMeshsize,i, j)) 
+                - duepsdx(localVelocity, parameters, localEpsilon, localMeshsize) 
+                - dvepsdy(localVelocity, parameters, localEpsilon, localMeshsize)
+                + 0.5*parameters.turbulent.c1*flowField.getk().getScalar(i,j)*f1(parameters, flowField,i,j)*(4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize) ,2))
+                - parameters.turbulent.c2*f2(parameters, flowField,i,j)*pow(flowField.geteps().getScalar(i,j),2)/flowField.getk().getScalar(i,j)) < 1e-6)
+      return 1e-6;
+
     return localEpsilon[mapd(0, 0, 0, 0)]
            + dt
                * ((parameters.turbulent.ce / parameters.turbulent.cmu) 

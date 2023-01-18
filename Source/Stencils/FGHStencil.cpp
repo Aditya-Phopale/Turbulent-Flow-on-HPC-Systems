@@ -103,17 +103,13 @@ void Stencils::TurbulentFGHStencilKE::apply(TurbulentFlowFieldKE& flowField, int
   loadLocalMeshsize2D(parameters_, localMeshsize_, i, j);
 
   RealType* const values = flowField.getFGH().getVector(i, j);
-  bool            check  = 0;
-  if ((i == 4 && j == 2) || (i == 4 && j == 7))
-    check = 1;
   // Now the localVelocity array should contain lexicographically ordered elements around the given index
   values[0] = computeF2D_turbulent_KE(
     localVelocity_, localViscosity_, localKineticEnergy_, localMeshsize_, parameters_, parameters_.timestep.dt
   );
   values[1] = computeG2D_turbulent_KE(
-    localVelocity_, localViscosity_, localKineticEnergy_, localMeshsize_, parameters_, parameters_.timestep.dt, check
+    localVelocity_, localViscosity_, localKineticEnergy_, localMeshsize_, parameters_, parameters_.timestep.dt
   );
-  // std::cout << "Hello from turbulent apply\n";
 }
 
 void Stencils::TurbulentFGHStencilKE::apply(

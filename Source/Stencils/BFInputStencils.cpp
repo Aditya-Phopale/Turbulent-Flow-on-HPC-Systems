@@ -35,8 +35,8 @@ RealType computeVelocity2D(int i, int j, RealType stepSize, const Parameters& pa
     const RealType y = posY + 0.5 * dy - stepSize;
 
     // For turbulence, please use:
-    // return parameters.walls.vectorLeft[0];
-    return 6.0 * parameters.walls.vectorLeft[0] / (inletYSize * inletYSize) * y * (inletYSize - y);
+    return parameters.walls.vectorLeft[0];
+    // return 6.0 * parameters.walls.vectorLeft[0] / (inletYSize * inletYSize) * y * (inletYSize - y);
   } else {
     return 0.0;
   }
@@ -78,8 +78,9 @@ RealType computeK2D(int i, int j, RealType stepSize, TurbulentFlowFieldKE& flowF
     const RealType y = posY + 0.5 * dy - stepSize;
 
     // For turbulence, please use:
-    return 2 * 0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]
-           - flowField.getk().getScalar(i + 1, j);
+    // return 2 * 0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]
+    //        - flowField.getk().getScalar(i + 1, j);
+    return 0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0];
     // return 6.0 * parameters.walls.vectorLeft[0] / (inletYSize * inletYSize) * y * (inletYSize - y);
   } else {
     return 0.0;
@@ -123,9 +124,13 @@ RealType computeEpsilon2D(
     const RealType y = posY + 0.5 * dy - stepSize;
 
     // For turbulence, please use:
-    return 2 * parameters.turbulent.cmu
-             * pow((0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]), 1.5) / (0.03 * inletYSize)
-           - flowField.geteps().getScalar(i + 1, j);
+    // return 2 * parameters.turbulent.cmu
+    //          * pow((0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]), 1.5) / (0.03 *
+    //          inletYSize)
+    //        - flowField.geteps().getScalar(i + 1, j);
+    return parameters.turbulent.cmu
+           * pow((0.003 * parameters.walls.vectorLeft[0] * parameters.walls.vectorLeft[0]), 1.5) / (0.03 * inletYSize);
+    //        - flowField.geteps().getScalar(i + 1, j);
     // return 6.0 * parameters.walls.vectorLeft[0] / (inletYSize * inletYSize) * y * (inletYSize - y);
   } else {
     return 0.0;

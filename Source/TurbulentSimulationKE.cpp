@@ -51,11 +51,11 @@ void TurbulentSimulationKE::solveTimestep() {
   // ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
   setTimeStep();
-  std::cout << "timestep****" << parameters_.timestep.dt << "\n";
+  // std::cout << "timestep****" << parameters_.timestep.dt << "\n";
   turbflowFieldKE_.updatekold();
   turbflowFieldKE_.updateepsold();
-  std::cout << "******************************k*********************************************\n";
-  turbflowFieldKE_.getk().show();
+  // std::cout << "******************************k*********************************************\n";
+  // turbflowFieldKE_.getk().show();
 
   kIterator_.iterate();
   epsilonIterator_.iterate();
@@ -63,24 +63,28 @@ void TurbulentSimulationKE::solveTimestep() {
   wallkIterator_.iterate();
   wallEpsilonIterator_.iterate();
 
-  std::cout << "******************************P*********************************************\n";
-  turbflowFieldKE_.getPressure().show();
-  std::cout << "******************************U*********************************************\n";
-  turbflowFieldKE_.getVelocity().show();
-  std::cout << "******************************k*********************************************\n";
-  turbflowFieldKE_.getk().show();
-  std::cout << "*****************************epsilon**********************************************\n";
-  turbflowFieldKE_.geteps().show();
+  // std::cout << "******************************P*********************************************\n";
+  // turbflowFieldKE_.getPressure().show();
+  // std::cout << "******************************U*********************************************\n";
+  // turbflowFieldKE_.getVelocity().show();
+  // std::cout << "******************************k*********************************************\n";
+  // turbflowFieldKE_.getk().show();
+  // std::cout << "*****************************epsilon**********************************************\n";
+  // turbflowFieldKE_.geteps().show();
 
   nuTUpdate();
   wallnuTIterator_.iterate();
-  std::cout
-    << "*****************************nuT********************************************"
-       "**\n";
-  turbflowFieldKE_.getnuT().show();
+  // std::cout
+  //   << "*****************************nuT********************************************"
+  //      "**\n";
+  // turbflowFieldKE_.getnuT().show();
 
   // Compute FGH
   TurbulentFGHIteratorKE_.iterate();
+  // std::cout
+  //   << "*****************************F&G********************************************"
+  //      "**\n";
+  // turbflowFieldKE_.getFGH().show();
   // Set global boundary values
   wallFGHIterator_.iterate();
 

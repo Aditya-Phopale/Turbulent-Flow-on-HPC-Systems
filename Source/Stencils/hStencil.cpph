@@ -24,7 +24,7 @@ void Stencils::hStencil<FlowFieldType>::apply(FlowFieldType& flowField, int i, i
   }
   // For BFS
   else {
-    if (xPos <= FieldStencil<FlowFieldType>::parameters_.bfStep.xRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthX) {
+    if (xPos < FieldStencil<FlowFieldType>::parameters_.bfStep.xRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthX) {
       flowField.getheight().getScalar(i, j) = std::min(
         yPos
           - (FieldStencil<FlowFieldType>::parameters_.bfStep.yRatio * FieldStencil<FlowFieldType>::parameters_.geometry.lengthY),
