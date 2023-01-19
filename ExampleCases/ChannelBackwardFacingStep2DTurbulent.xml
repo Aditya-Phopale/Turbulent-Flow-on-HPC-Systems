@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
-    <flow Re="5000" />
+    <flow Re="20000" />
     <simulation finalTime="20.0" >
         <type>turbulenceKE</type>
         <scenario>channel</scenario>
@@ -14,7 +14,7 @@
         <constant5 I = "0.2"/>
     </turbulenceParameters>
     <backwardFacingStep xRatio="0.25" yRatio="0.5" />
-    <timestep dt="1" tau="0.5" />
+    <timestep dt="1e-4" tau="0.5" />
     <solver gamma="0.5" />
     <geometry
       dim="2"
@@ -47,6 +47,6 @@
         </back>
     </walls>
     <vtk interval="1">ChannelBackwardFacingStep2D</vtk>
-    <stdOut interval="0.0001" />
+    <stdOut interval="0.000001" />
     <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
 </configuration>
