@@ -517,6 +517,8 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     MPI_Bcast(&(parameters.turbulent.kappa), 1, MY_MPI_FLOAT, 0, communicator);
     MPI_Bcast(&(parameters.turbulent.delta), 1, MPI_INT, 0, communicator);
   } else if (parameters.simulation.scenario == "turbulenceKE") {
+    MPI_Bcast(&(parameters.turbulent.kappa), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.turbulent.delta), 1, MPI_INT, 0, communicator);
     MPI_Bcast(&(parameters.turbulent.c1), 1, MY_MPI_FLOAT, 0, communicator);
     MPI_Bcast(&(parameters.turbulent.c2), 1, MY_MPI_FLOAT, 0, communicator);
     MPI_Bcast(&(parameters.turbulent.ce), 1, MY_MPI_FLOAT, 0, communicator);

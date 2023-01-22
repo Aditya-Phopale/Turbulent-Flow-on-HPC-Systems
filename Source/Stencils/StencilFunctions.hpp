@@ -1374,6 +1374,7 @@ namespace Stencils {
     const RealType dkdyB = (lk[mapd(0, 0, 0, 0)] - lk[mapd(0, -1, 0, 0)]) / dy0;
 
     const RealType viscT = (0.5 * dy_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, 1, 0, 0)]) / dy1;
+
     const RealType viscB = (0.5 * dy_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, -1, 0, 0)]) / dy0;
 
     return (viscT * dkdyT - viscB * dkdyB) / dy_0;
@@ -1438,6 +1439,7 @@ namespace Stencils {
     const RealType depsdxL = (leps[mapd(0, 0, 0, 0)] - leps[mapd(-1, 0, 0, 0)]) / dx0;
 
     const RealType viscR = (0.5 * dx_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(1, 0, 0, 0)]) / dx1;
+
     const RealType viscL = (0.5 * dx_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(-1, 0, 0, 0)]) / dx0;
 
     // const RealType fuR = fu(parameters, flowField, i + 1, j);
@@ -1466,6 +1468,7 @@ namespace Stencils {
     const RealType depsdyB = (leps[mapd(0, 0, 0, 0)] - leps[mapd(0, -1, 0, 0)]) / dy0;
 
     const RealType viscT = (0.5 * dy_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, 1, 0, 0)]) / dy1;
+
     const RealType viscB = (0.5 * dy_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, -1, 0, 0)]) / dy0;
 
     // const RealType fuT = fu(parameters, flowField, i, j + 1);

@@ -48,19 +48,21 @@ void TurbulentSimulationKE::initializeFlowField() {
 
 void TurbulentSimulationKE::solveTimestep() {
 
-  // ppmTurbulentKE_.communicateViscosity();
+  ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
-  // setTimeStep();
-  parameters_.timestep.dt = 1e-4;
+  setTimeStep();
+  // parameters_.timestep.dt = 1e-4;
   wallVelocityIterator_.iterate();
   wallFGHIterator_.iterate();
   wallkIterator_.iterate();
   wallEpsilonIterator_.iterate();
-  // std::cout << "timestep****" << parameters_.timestep.dt << "\n";
+
   turbflowFieldKE_.updatekold();
+  ppmTurbulentKE_.communicateKineticEnergy();
   kIterator_.iterate();
 
   turbflowFieldKE_.updateepsold();
+  ppmTurbulentKE_.communicateDissipationRate();
   epsilonIterator_.iterate();
 
   nuTUpdate();
@@ -71,12 +73,12 @@ void TurbulentSimulationKE::solveTimestep() {
 
   solver_->solve();
 
-  // ppmTurbulentKE_.communicatePressure();
+  ppmTurbulentKE_.communicatePressure();
 
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
 
-  // ppmTurbulentKE_.communicateVelocities();
+  ppmTurbulentKE_.communicateVelocities();
   // std::cout << "******************************k*********************************************\n";
   // turbflowFieldKE_.getk().show();
 

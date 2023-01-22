@@ -344,12 +344,12 @@ void ParallelManagers::PetscParallelManager<FlowFieldType>::communicateViscosity
     backReceive.resize((parameters_.parallel.localSize[0] + 3) * (parameters_.parallel.localSize[1] + 3));
   }
 
-  Stencils::ViscosityBufferFillStencil viscFill_(
+  Stencils::ViscosityBufferFillStencil<FlowFieldType> viscFill_(
     parameters_, leftSend, rightSend, topSend, bottomSend, frontSend, backSend
   );
 
-  // ParallelBoundaryIterator<FlowFieldType> viscFillIterator(flowfield_, parameters_, viscFill_, 0, 0);
-  // viscFillIterator.iterate();
+  ParallelBoundaryIterator<FlowFieldType> viscFillIterator(flowfield_, parameters_, viscFill_, 0, 0);
+  viscFillIterator.iterate();
   MPI_Sendrecv(
     leftSend.data(),
     leftSend.size(),
@@ -440,11 +440,11 @@ void ParallelManagers::PetscParallelManager<FlowFieldType>::communicateViscosity
     MPI_STATUS_IGNORE
   );
 
-  Stencils::ViscosityBufferReadStencil viscRead_(
+  Stencils::ViscosityBufferReadStencil<FlowFieldType> viscRead_(
     parameters_, leftReceive, rightReceive, topReceive, bottomReceive, frontReceive, backReceive
   );
-  // ParallelBoundaryIterator<FlowFieldType> viscReadIterator(flowfield_, parameters_, viscRead_, 0, 0);
-  // viscReadIterator.iterate();
+  ParallelBoundaryIterator<FlowFieldType> viscReadIterator(flowfield_, parameters_, viscRead_, 0, 0);
+  viscReadIterator.iterate();
 }
 
 template <class FlowFieldType>

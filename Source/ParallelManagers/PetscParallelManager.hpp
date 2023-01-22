@@ -16,7 +16,9 @@
 #include "Stencils/VelocityBufferFillStencil.hpp"
 #include "Stencils/VelocityBufferReadStencil.cpph"
 #include "Stencils/VelocityBufferReadStencil.hpp"
+#include "Stencils/ViscosityBufferFillStencil.cpph"
 #include "Stencils/ViscosityBufferFillStencil.hpp"
+#include "Stencils/ViscosityBufferReadStencil.cpph"
 #include "Stencils/ViscosityBufferReadStencil.hpp"
 
 // #include <mpi.h>
