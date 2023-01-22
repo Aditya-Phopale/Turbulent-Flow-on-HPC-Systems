@@ -1,0 +1,4 @@
+1. formula check
+2. algorithm like mono
+3.report
+4. find exptl data for validation/comparison

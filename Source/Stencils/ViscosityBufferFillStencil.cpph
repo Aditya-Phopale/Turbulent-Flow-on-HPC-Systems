@@ -1,0 +1,91 @@
+#include "StdAfx.hpp"
+
+#include "Definitions.hpp"
+#include "StencilFunctions.hpp"
+#include "ViscosityBufferFillStencil.hpp"
+
+template <class FlowFieldType>
+Stencils::ViscosityBufferFillStencil<FlowFieldType>::ViscosityBufferFillStencil(
+  const Parameters&      parameters,
+  std::vector<RealType>& left,
+  std::vector<RealType>& right,
+  std::vector<RealType>& top,
+  std::vector<RealType>& bottom,
+  std::vector<RealType>& front,
+  std::vector<RealType>& back
+):
+  BoundaryStencil<FlowFieldType>(parameters),
+  Left_(left),
+  Right_(right),
+  Top_(top),
+  Bottom_(bottom),
+  Front_(front),
+  Back_(back) {}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyLeftWall(FlowFieldType& FlowField, int i, int j) {
+  Left_.at(j) = FlowField.getnuT().getScalar(i + 2, j);
+}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyRightWall(FlowFieldType& FlowField, int i, int j) {
+  Right_.at(j) = FlowField.getnuT().getScalar(i - 1, j);
+}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyBottomWall(FlowFieldType& FlowField, int i, int j) {
+  Bottom_.at(i) = FlowField.getnuT().getScalar(i, j + 2);
+}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyTopWall(FlowFieldType& FlowField, int i, int j) {
+  Top_.at(i) = FlowField.getnuT().getScalar(i, j - 1);
+}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyLeftWall(FlowFieldType& FlowField, int i, int j, int k) {
+  Left_.at(
+    j * (BoundaryStencil<FlowFieldType>::parameters_.parallel.localSize[2] + 3) + k
+  ) = FlowField.getnuT().getScalar(i + 2, j, k);
+}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyRightWall(
+  FlowFieldType& FlowField, int i, int j, int k
+) {
+  Right_.at(
+    j * (BoundaryStencil<FlowFieldType>::parameters_.parallel.localSize[2] + 3) + k
+  ) = FlowField.getnuT().getScalar(i - 1, j, k);
+}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyBottomWall(
+  FlowFieldType& FlowField, int i, int j, int k
+) {
+  Bottom_.at(
+    i * (BoundaryStencil<FlowFieldType>::parameters_.parallel.localSize[2] + 3) + k
+  ) = FlowField.getnuT().getScalar(i, j + 2, k);
+}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyTopWall(FlowFieldType& FlowField, int i, int j, int k) {
+  Top_.at(
+    i * (BoundaryStencil<FlowFieldType>::parameters_.parallel.localSize[2] + 3) + k
+  ) = FlowField.getnuT().getScalar(i, j - 1, k);
+}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyFrontWall(
+  FlowFieldType& FlowField, int i, int j, int k
+) {
+  Front_.at(
+    i * (BoundaryStencil<FlowFieldType>::parameters_.parallel.localSize[1] + 3) + j
+  ) = FlowField.getnuT().getScalar(i, j, k + 2);
+}
+
+template <class FlowFieldType>
+void Stencils::ViscosityBufferFillStencil<FlowFieldType>::applyBackWall(FlowFieldType& FlowField, int i, int j, int k) {
+  Back_.at(
+    i * (BoundaryStencil<FlowFieldType>::parameters_.parallel.localSize[1] + 3) + j
+  ) = FlowField.getnuT().getScalar(i, j, k - 1);
+}
