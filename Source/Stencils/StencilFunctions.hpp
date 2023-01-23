@@ -239,8 +239,8 @@ namespace Stencils {
 
   inline RealType dkdy(const RealType* const lk, const RealType* const lm) {
     // given in pg 164 (followed same as pressure)
-    const int index0 = mapd(0, 1, 0, 1);
-    const int index1 = mapd(0, 0, 0, 1);
+    const int index0 = mapd(0, 1, 0, 0);
+    const int index1 = mapd(0, 0, 0, 0);
     return (lk[index0] - lk[index1]) / 0.5 * (lm[index0] + lm[index1]);
   }
 
@@ -1281,7 +1281,9 @@ namespace Stencils {
 
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
                   / (flowField.geteps().getScalar(i, j));
-    // return 1;
+
+    if ((1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt) > 1)
+      return 1;
     return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
   }
 
@@ -1514,7 +1516,7 @@ namespace Stencils {
     return localVelocity[mapd(0, 0, 0, 0)]
         + dt * (2*d2udx2(localVelocity, localViscosity, parameters, localMeshsize)
             + d2udy2(localVelocity, localViscosity, parameters, localMeshsize) + d2vdydx(localVelocity, localViscosity, parameters, localMeshsize) - du2dx(localVelocity, parameters, localMeshsize)
-            - duvdy(localVelocity, parameters, localMeshsize) + parameters.environment.gx);//- 2*dkdx(localKineticEnergy, localMeshsize)/3 ;
+            - duvdy(localVelocity, parameters, localMeshsize) + parameters.environment.gx);// - 2*dkdx(localKineticEnergy, localMeshsize)/3 ;
   }
 
   inline RealType computeG2D_turbulent_KE(
@@ -1525,10 +1527,11 @@ namespace Stencils {
     const Parameters&     parameters,
     RealType              dt
   ) {
+
     return localVelocity[mapd(0, 0, 0, 1)]
         + dt * ( d2vdx2(localVelocity, localViscosity, parameters, localMeshsize) + d2udxdy(localVelocity, localViscosity, parameters, localMeshsize)
             + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
-            - dv2dy(localVelocity, parameters, localMeshsize)   + parameters.environment.gy);//- 2*dkdy(localKineticEnergy, localMeshsize)/3 ;
+            - dv2dy(localVelocity, parameters, localMeshsize)   + parameters.environment.gy); //- 2*dkdy(localKineticEnergy, localMeshsize)/3;
   }
 
   inline RealType computeG2D(
@@ -1597,6 +1600,10 @@ namespace Stencils {
     int                   i,
     int                   j
   ) {
+
+    // std::cout
+    //   << "f1 " << f1(parameters, flowField, i, j) << " f2 " << f2(parameters, flowField, i, j) << " fu "
+    //   << fu(parameters, flowField, i, j) << "\n";
     if(localEpsilon[mapd(0, 0, 0, 0)]
            + dt
                * ((parameters.turbulent.ce / parameters.turbulent.cmu) 

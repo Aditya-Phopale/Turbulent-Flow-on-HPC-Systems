@@ -17,7 +17,7 @@
     <solver gamma="0.5" />
     <geometry
       dim="2"
-      lengthX="5.0" lengthY="1.0" lengthZ="1.0"
+      lengthX="25.0" lengthY="1.0" lengthZ="1.0"
       sizeX="250" sizeY="100" sizeZ="10"
       stretchX="false" stretchY="true" stretchZ="true"
     >
@@ -45,7 +45,7 @@
             <vector x="0" y="0" z="0" />
         </back>
     </walls>
-    <vtk interval="1">Channel2D</vtk>
+    <vtk interval="0.1">Channel2D</vtk>
     <stdOut interval="0.000001" />
     <parallel numProcessorsX="1" numProcessorsY="1" numProcessorsZ="1" />
 </configuration>
