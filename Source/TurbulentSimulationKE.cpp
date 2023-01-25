@@ -50,8 +50,8 @@ void TurbulentSimulationKE::solveTimestep() {
 
   // ppmTurbulentKE_.communicateViscosity();
   // Determine and set max. timestep which is allowed in this simulation
-  // setTimeStep();
-  parameters_.timestep.dt = 1e-4;
+  setTimeStep();
+  // parameters_.timestep.dt = 1e-4;
   wallVelocityIterator_.iterate();
   wallFGHIterator_.iterate();
   wallkIterator_.iterate();

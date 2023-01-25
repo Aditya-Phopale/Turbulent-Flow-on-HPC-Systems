@@ -16,8 +16,8 @@ void Stencils::nuTStencilKE::apply(TurbulentFlowFieldKE& flowField, int i, int j
   if ((obstacle & OBSTACLE_SELF) == 0) { // If the cell is fluid
     flowField.getnuT().getScalar(
       i, j
-    ) = parameters_.turbulent.cmu * fu(parameters_, flowField, i, j) * flowField.getk().getScalar(i, j)
-        * flowField.getk().getScalar(i, j) / (flowField.geteps().getScalar(i, j));
+    ) = parameters_.turbulent.cmu * flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)
+        / (flowField.geteps().getScalar(i, j));
   }
 }
 

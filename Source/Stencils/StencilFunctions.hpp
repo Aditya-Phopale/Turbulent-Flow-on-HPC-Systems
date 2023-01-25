@@ -1368,12 +1368,18 @@ namespace Stencils {
 
     const RealType kR = (0.5 * dx_P1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lk[mapd(1, 0, 0, 0)]) / dx1;
     const RealType kL = (0.5 * dx_M1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lk[mapd(-1, 0, 0, 0)]) / dx0;
+    // const RealType kR = 0.5 * (lk[mapd(0, 0, 0, 0)] + lk[mapd(1, 0, 0, 0)]);
+    // const RealType kL = 0.5 * (lk[mapd(0, 0, 0, 0)] + lk[mapd(-1, 0, 0, 0)]);
 
     const RealType kr = (0.5 * dx_P1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(1, 0, 0, 0)]) / dx1;
-    const RealType kl = (0.5 * dx_M1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(-1, 0, 0, 0)]) / dx0;
+    const RealType kl = (0.5 * dx_M1 * lk[mapd(-1, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(0, 0, 0, 0)]) / dx0;
+    // const RealType kr = 0.5 * (lk[mapd(0, 0, 0, 0)] - lk[mapd(1, 0, 0, 0)]);
+    // const RealType kl = 0.5 * (lk[mapd(-1, 0, 0, 0)] - lk[mapd(0, 0, 0, 0)]);
 
     return (kR * lv[mapd(0, 0, 0, 0)] - kL * lv[mapd(-1, 0, 0, 0)]) / dx_0
            + (parameters.solver.gamma / dx_0) * (kr * fabs(lv[mapd(0, 0, 0, 0)]) - kl * fabs(lv[mapd(-1, 0, 0, 0)]));
+    // return (kR * lv[mapd(0, 0, 0, 0)] - kL * lv[mapd(-1, 0, 0, 0)]) / dx_0
+    //        + (kr * fabs(lv[mapd(0, 0, 0, 0)]) - kl * fabs(lv[mapd(-1, 0, 0, 0)])) / dx_0;
   }
 
   inline RealType dvkdy(
@@ -1387,12 +1393,18 @@ namespace Stencils {
 
     const RealType kT = (0.5 * dy_P1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lk[mapd(0, 1, 0, 0)]) / dy1;
     const RealType kB = (0.5 * dy_M1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lk[mapd(0, -1, 0, 0)]) / dy0;
+    // const RealType kT = 0.5 * (lk[mapd(0, 0, 0, 0)] + lk[mapd(0, 1, 0, 0)]);
+    // const RealType kB = 0.5 * (lk[mapd(0, 0, 0, 0)] + lk[mapd(0, -1, 0, 0)]);
 
     const RealType kt = (0.5 * dy_P1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * lk[mapd(0, 1, 0, 0)]) / dy1;
-    const RealType kb = (0.5 * dy_M1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * lk[mapd(0, -1, 0, 0)]) / dy0;
+    const RealType kb = (0.5 * dy_M1 * lk[mapd(0, -1, 0, 0)] - 0.5 * dy_0 * lk[mapd(0, 0, 0, 0)]) / dy0;
+    // const RealType kt = 0.5 * (lk[mapd(0, 0, 0, 0)] - lk[mapd(0, 1, 0, 0)]);
+    // const RealType kb = 0.5 * (lk[mapd(0, -1, 0, 0)] - lk[mapd(0, 0, 0, 0)]); // changed here, check above
 
     return (kT * lv[mapd(0, 0, 0, 1)] - kB * lv[mapd(0, -1, 0, 1)]) / dy_0
            + (parameters.solver.gamma / dy_0) * (kt * fabs(lv[mapd(0, 0, 0, 1)]) - kb * fabs(lv[mapd(0, -1, 0, 1)]));
+    // return (kT * lv[mapd(0, 0, 0, 1)] - kB * lv[mapd(0, -1, 0, 1)]) / dy_0
+    //        + (kt * fabs(lv[mapd(0, 0, 0, 1)]) - kb * fabs(lv[mapd(0, -1, 0, 1)]));
   }
 
   inline RealType dnuTkd2x( //
@@ -1448,13 +1460,19 @@ namespace Stencils {
 
     const RealType lepsR = (0.5 * dx_P1 * leps[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * leps[mapd(1, 0, 0, 0)]) / dx1;
     const RealType lepsL = (0.5 * dx_M1 * leps[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * leps[mapd(-1, 0, 0, 0)]) / dx0;
+    // const RealType lepsR = 0.5 * (leps[mapd(0, 0, 0, 0)] + leps[mapd(1, 0, 0, 0)]);
+    // const RealType lepsL = 0.5 * (leps[mapd(-1, 0, 0, 0)] + leps[mapd(0, 0, 0, 0)]);
 
     const RealType lepsr = (0.5 * dx_P1 * leps[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * leps[mapd(1, 0, 0, 0)]) / dx1;
-    const RealType lepsl = (0.5 * dx_M1 * leps[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * leps[mapd(-1, 0, 0, 0)]) / dx0;
+    const RealType lepsl = (0.5 * dx_M1 * leps[mapd(-1, 0, 0, 0)] - 0.5 * dx_0 * leps[mapd(0, 0, 0, 0)]) / dx0;
+    // const RealType lepsr = 0.5 * (leps[mapd(0, 0, 0, 0)] - leps[mapd(1, 0, 0, 0)]);
+    // const RealType lepsl = 0.5 * (leps[mapd(-1, 0, 0, 0)] - leps[mapd(0, 0, 0, 0)]);
 
     return (lepsR * lv[mapd(0, 0, 0, 0)] - lepsL * lv[mapd(-1, 0, 0, 0)]) / dx_0
            + (parameters.solver.gamma / dx_0
              ) * (lepsr * fabs(lv[mapd(0, 0, 0, 0)]) - lepsl * fabs(lv[mapd(-1, 0, 0, 0)]));
+    // return (lepsR * lv[mapd(0, 0, 0, 0)] - lepsL * lv[mapd(-1, 0, 0, 0)]) / dx_0
+    //        + (lepsr * fabs(lv[mapd(0, 0, 0, 0)]) - lepsl * fabs(lv[mapd(-1, 0, 0, 0)])) / dx_0;
   }
 
   inline RealType dvepsdy(
@@ -1468,13 +1486,19 @@ namespace Stencils {
 
     const RealType lepsT = (0.5 * dy_P1 * leps[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * leps[mapd(0, 1, 0, 0)]) / dy1;
     const RealType lepsB = (0.5 * dy_M1 * leps[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * leps[mapd(0, -1, 0, 0)]) / dy0;
+    // const RealType lepsT = 0.5 * (leps[mapd(0, 0, 0, 0)] + leps[mapd(0, 1, 0, 0)]);
+    // const RealType lepsB = 0.5 * (leps[mapd(0, 0, 0, 0)] + leps[mapd(0, -1, 0, 0)]);
 
     const RealType lepst = (0.5 * dy_P1 * leps[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * leps[mapd(0, 1, 0, 0)]) / dy1;
-    const RealType lepsb = (0.5 * dy_M1 * leps[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * leps[mapd(0, -1, 0, 0)]) / dy0;
+    const RealType lepsb = (0.5 * dy_M1 * leps[mapd(0, -1, 0, 0)] - 0.5 * dy_0 * leps[mapd(0, 0, 0, 0)]) / dy0;
+    // const RealType lepst = 0.5 * (leps[mapd(0, 0, 0, 0)] - leps[mapd(0, 1, 0, 0)]);
+    // const RealType lepsb = 0.5 * (leps[mapd(0, -1, 0, 0)] - leps[mapd(0, 0, 0, 0)]);
 
     return (lepsT * lv[mapd(0, 0, 0, 1)] - lepsB * lv[mapd(0, -1, 0, 1)]) / dy_0
            + (parameters.solver.gamma / dy_0
              ) * (lepst * fabs(lv[mapd(0, 0, 0, 1)]) - lepsb * fabs(lv[mapd(0, -1, 0, 1)]));
+    // return (lepsT * lv[mapd(0, 0, 0, 1)] - lepsB * lv[mapd(0, -1, 0, 1)]) / dy_0
+    //        + (lepst * fabs(lv[mapd(0, 0, 0, 1)]) - lepsb * fabs(lv[mapd(0, -1, 0, 1)])) / dy_0;
   }
 
   inline RealType dfunuTepsd2x(
