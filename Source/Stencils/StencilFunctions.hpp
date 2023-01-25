@@ -117,6 +117,44 @@ namespace Stencils {
     return (lv[index0] - lv[index1]) / lm[index0];
   }
 
+  // inline RealType dudy(const RealType* const lv, const RealType* const lm) {
+  //   // Evaluate dudx in the cell center by a central difference
+  //   const int indexc = mapd(0, 0, 0, 0);
+  //   const int indexl = mapd(-1, 0, 0, 0);
+  //   RealType  cv     = 0.5 * (lv[indexc] + lv[indexl]);
+
+  //   const int indexlt = mapd(-1, 1, 0, 0);
+  //   const int indext  = mapd(0, 1, 0, 0);
+  //   RealType  tv      = 0.5 * (lv[indexlt] + lv[indext]);
+
+  //   const int indexbl = mapd(-1, -1, 0, 0);
+  //   const int indexb  = mapd(0, -1, 0, 0);
+  //   RealType  bv      = 0.5 * (lv[indexbl] + lv[indexb]);
+
+  //   return 0.5
+  //          * ((tv - cv) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)])) + (cv - bv) / (0.5 * (lm[mapd(0, 0,
+  //          0, 1)] + lm[mapd(0, -1, 0, 1)])));
+  // }
+
+  // inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
+  //   // Evaluate dudx in the cell center by a central difference
+  //   const int indexc = mapd(0, 0, 0, 1);
+  //   const int indexb = mapd(0, -1, 0, 1);
+  //   RealType  cv     = 0.5 * (lv[indexc] + lv[indexb]);
+
+  //   const int indexl  = mapd(-1, 0, 0, 1);
+  //   const int indexbl = mapd(-1, -1, 0, 1);
+  //   RealType  lev     = 0.5 * (lv[indexl] + lv[indexbl]);
+
+  //   const int indexr  = mapd(1, 0, 0, 1);
+  //   const int indexbr = mapd(1, -1, 0, 1);
+  //   RealType  rv      = 0.5 * (lv[indexr] + lv[indexbr]);
+
+  //   return 0.5
+  //          * ((rv - cv) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)])) + (cv - lev) / (0.5 * (lm[mapd(0, 0,
+  //          0, 0)] + lm[mapd(-1, 0, 0, 0)])));
+  // }
+
   inline RealType dudy(const RealType* const lv, const RealType* const lm) {
     // Evaluate dudx in the cell center by a central difference
     const int indexc = mapd(0, 0, 0, 0);
@@ -131,8 +169,16 @@ namespace Stencils {
     const int indexb  = mapd(0, -1, 0, 0);
     RealType  bv      = 0.5 * (lv[indexbl] + lv[indexb]);
 
-    return 0.5
-           * ((tv - cv) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)])) + (cv - bv) / (0.5 * (lm[mapd(0, 0, 0, 1)] + lm[mapd(0, -1, 0, 1)])));
+    RealType topu = (cv * lm[mapd(0, 1, 0, 1)] * 0.5 + tv * lm[mapd(0, 0, 0, 1)] * 0.5)
+                    / (0.5 * lm[mapd(0, 1, 0, 1)] + 0.5 * lm[mapd(0, 0, 0, 1)]);
+    RealType bottomu = (cv * lm[mapd(0, -1, 0, 1)] * 0.5 + bv * lm[mapd(0, 0, 0, 1)] * 0.5)
+                       / (0.5 * lm[mapd(0, -1, 0, 1)] + 0.5 * lm[mapd(0, 0, 0, 1)]);
+
+    return (topu - bottomu) / lm[mapd(0, 0, 0, 1)];
+
+    // return 0.5
+    //        * ((tv - cv) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)])) + (cv - bv) / (0.5 * (lm[mapd(0, 0,
+    //        0, 1)] + lm[mapd(0, -1, 0, 1)])));
   }
 
   inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
@@ -149,8 +195,16 @@ namespace Stencils {
     const int indexbr = mapd(1, -1, 0, 1);
     RealType  rv      = 0.5 * (lv[indexr] + lv[indexbr]);
 
-    return 0.5
-           * ((rv - cv) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)])) + (cv - lev) / (0.5 * (lm[mapd(0, 0, 0, 0)] + lm[mapd(-1, 0, 0, 0)])));
+    RealType leftv = (cv * lm[mapd(-1, 0, 0, 0)] * 0.5 + lev * lm[mapd(0, 0, 0, 0)] * 0.5)
+                     / (0.5 * lm[mapd(-1, 0, 0, 0)] + 0.5 * lm[mapd(0, 0, 0, 0)]);
+    RealType rightv = (cv * lm[mapd(1, 0, 0, 0)] * 0.5 + rv * lm[mapd(0, 0, 0, 0)] * 0.5)
+                      / (0.5 * lm[mapd(1, 0, 0, 0)] + 0.5 * lm[mapd(0, 0, 0, 0)]);
+
+    return (rightv - leftv) / (lm[mapd(0, 0, 0, 0)]);
+
+    // return 0.5
+    //        * ((rv - cv) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)])) + (cv - lev) / (0.5 * (lm[mapd(0, 0,
+    //        0, 0)] + lm[mapd(-1, 0, 0, 0)])));
   }
 
   inline RealType dudz(const RealType* const lv, const RealType* const lm) {
@@ -1282,7 +1336,8 @@ namespace Stencils {
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
                   / (flowField.geteps().getScalar(i, j));
 
-    // return 1;
+    if ((1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt) > 1)
+      return 1;
 
     return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
   }
@@ -1296,9 +1351,10 @@ namespace Stencils {
   inline RealType f2(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
     RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
                   / (flowField.geteps().getScalar(i, j));
-    // std::cout << Rt << "\n";
-    // return 1 - exp(-Rt * Rt);
-    return 1;
+
+    if (1 - exp(-Rt * Rt) > 1)
+      return 1;
+    return 1 - exp(-Rt * Rt);
   }
 
   inline RealType dukdx(

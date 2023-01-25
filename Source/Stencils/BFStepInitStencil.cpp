@@ -8,6 +8,7 @@ Stencils::BFStepInitStencil::BFStepInitStencil(const Parameters& parameters):
   yLimit_(parameters.bfStep.yRatio * parameters.geometry.lengthY) {}
 
 void Stencils::BFStepInitStencil::apply(FlowField& flowField, int i, int j) {
+
   IntScalarField& flags  = flowField.getFlags();
   const RealType  posX   = parameters_.meshsize->getPosX(i, j);
   const RealType  posY   = parameters_.meshsize->getPosY(i, j);
@@ -32,6 +33,11 @@ void Stencils::BFStepInitStencil::apply(FlowField& flowField, int i, int j) {
   }
   if (posX + 0.5 * dx < xLimit_ && posY + dy + 0.5 * nextDy < yLimit_) {
     flags.getValue(i, j) += OBSTACLE_TOP;
+  }
+
+  if (FieldStencil<FlowField>::parameters_.bfStep.xRatio < 0 || FieldStencil<FlowField>::parameters_.bfStep.yRatio < 0) {
+    const RealType y                           = posY + 0.5 * dy;
+    flowField.getVelocity().getVector(i, j)[0] = 6 * y * (1 - y);
   }
 }
 

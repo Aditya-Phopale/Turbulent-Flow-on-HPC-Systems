@@ -16,8 +16,8 @@ RealType computeVelocity3D(int i, int j, int k, RealType stepSize, const Paramet
     const RealType y = posY + 0.5 * dy - stepSize;
     const RealType z = posZ + 0.5 * dz;
 
-    return parameters.walls.vectorLeft[0];
-    // return 36.0 * parameters.walls.vectorLeft[0] / (inletZSize * inletZSize * inletYSize * inletYSize) * y
+    // return parameters.walls.vectorLeft[0];
+    return 36.0 * parameters.walls.vectorLeft[0] / (inletZSize * inletZSize * inletYSize * inletYSize) * y;
     // *(y - inletYSize) * z*(z - inletZSize);
   } else {
     return 0.0;
@@ -35,8 +35,8 @@ RealType computeVelocity2D(int i, int j, RealType stepSize, const Parameters& pa
     const RealType y = posY + 0.5 * dy - stepSize;
 
     // For turbulence, please use:
-    return parameters.walls.vectorLeft[0];
-    // return 6.0 * parameters.walls.vectorLeft[0] / (inletYSize * inletYSize) * y * (inletYSize - y);
+    // return parameters.walls.vectorLeft[0];
+    return 6.0 * parameters.walls.vectorLeft[0] / (inletYSize * inletYSize) * y * (inletYSize - y);
   } else {
     return 0.0;
   }
