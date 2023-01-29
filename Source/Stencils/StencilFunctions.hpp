@@ -117,43 +117,6 @@ namespace Stencils {
     return (lv[index0] - lv[index1]) / lm[index0];
   }
 
-  // inline RealType dudy(const RealType* const lv, const RealType* const lm) {
-  //   // Evaluate dudx in the cell center by a central difference
-  //   const int indexc = mapd(0, 0, 0, 0);
-  //   const int indexl = mapd(-1, 0, 0, 0);
-  //   RealType  cv     = 0.5 * (lv[indexc] + lv[indexl]);
-
-  //   const int indexlt = mapd(-1, 1, 0, 0);
-  //   const int indext  = mapd(0, 1, 0, 0);
-  //   RealType  tv      = 0.5 * (lv[indexlt] + lv[indext]);
-
-  //   const int indexbl = mapd(-1, -1, 0, 0);
-  //   const int indexb  = mapd(0, -1, 0, 0);
-  //   RealType  bv      = 0.5 * (lv[indexbl] + lv[indexb]);
-
-  //   return 0.5
-  //          * ((tv - cv) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)])) + (cv - bv) / (0.5 * (lm[mapd(0, 0,
-  //          0, 1)] + lm[mapd(0, -1, 0, 1)])));
-  // }
-
-  // inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
-  //   // Evaluate dudx in the cell center by a central difference
-  //   const int indexc = mapd(0, 0, 0, 1);
-  //   const int indexb = mapd(0, -1, 0, 1);
-  //   RealType  cv     = 0.5 * (lv[indexc] + lv[indexb]);
-
-  //   const int indexl  = mapd(-1, 0, 0, 1);
-  //   const int indexbl = mapd(-1, -1, 0, 1);
-  //   RealType  lev     = 0.5 * (lv[indexl] + lv[indexbl]);
-
-  //   const int indexr  = mapd(1, 0, 0, 1);
-  //   const int indexbr = mapd(1, -1, 0, 1);
-  //   RealType  rv      = 0.5 * (lv[indexr] + lv[indexbr]);
-
-  //   return 0.5
-  //          * ((rv - cv) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)])) + (cv - lev) / (0.5 * (lm[mapd(0, 0,
-  //          0, 0)] + lm[mapd(-1, 0, 0, 0)])));
-  // }
 
   inline RealType dudy(const RealType* const lv, const RealType* const lm) {
     // Evaluate dudx in the cell center by a central difference
@@ -176,9 +139,6 @@ namespace Stencils {
 
     return (topu - bottomu) / lm[mapd(0, 0, 0, 1)];
 
-    // return 0.5
-    //        * ((tv - cv) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)])) + (cv - bv) / (0.5 * (lm[mapd(0, 0,
-    //        0, 1)] + lm[mapd(0, -1, 0, 1)])));
   }
 
   inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
@@ -202,9 +162,6 @@ namespace Stencils {
 
     return (rightv - leftv) / (lm[mapd(0, 0, 0, 0)]);
 
-    // return 0.5
-    //        * ((rv - cv) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)])) + (cv - lev) / (0.5 * (lm[mapd(0, 0,
-    //        0, 0)] + lm[mapd(-1, 0, 0, 0)])));
   }
 
   inline RealType dudz(const RealType* const lv, const RealType* const lm) {
@@ -1497,8 +1454,6 @@ namespace Stencils {
     return (lepsT * lv[mapd(0, 0, 0, 1)] - lepsB * lv[mapd(0, -1, 0, 1)]) / dy_0
            + (parameters.solver.gamma / dy_0
              ) * (lepst * fabs(lv[mapd(0, 0, 0, 1)]) - lepsb * fabs(lv[mapd(0, -1, 0, 1)]));
-    // return (lepsT * lv[mapd(0, 0, 0, 1)] - lepsB * lv[mapd(0, -1, 0, 1)]) / dy_0
-    //        + (lepst * fabs(lv[mapd(0, 0, 0, 1)]) - lepsb * fabs(lv[mapd(0, -1, 0, 1)])) / dy_0;
   }
 
   inline RealType dfunuTepsd2x(
@@ -1522,8 +1477,6 @@ namespace Stencils {
     const RealType viscR = (0.5 * dx_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(1, 0, 0, 0)]) / dx1;
     const RealType viscL = (0.5 * dx_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(-1, 0, 0, 0)]) / dx0;
 
-    // const RealType fuR = fu(parameters, flowField, i + 1, j);
-    // const RealType fuL = fu(parameters, flowField, i - 1, j);
 
     return (fu(parameters, flowField, i, j) * viscR * depsdxR - fu(parameters, flowField, i, j) * viscL * depsdxL)
            / dx_0;
@@ -1550,8 +1503,6 @@ namespace Stencils {
     const RealType viscT = (0.5 * dy_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, 1, 0, 0)]) / dy1;
     const RealType viscB = (0.5 * dy_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, -1, 0, 0)]) / dy0;
 
-    // const RealType fuT = fu(parameters, flowField, i, j + 1);
-    // const RealType fuB = fu(parameters, flowField, i, j - 1);
 
     return (fu(parameters, flowField, i, j) * viscT * depsdyT - fu(parameters, flowField, i, j) * viscB * depsdyB)
            / dy_0;

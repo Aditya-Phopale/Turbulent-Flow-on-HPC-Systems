@@ -13,10 +13,6 @@
 
 int main(int argc, char* argv[]) {
 
-  // int i = 0;
-  // while(i == 0){
-  //   sleep(5);
-  // }
   spdlog::set_level(spdlog::level::info);
 
   // Parallelisation related. Initialise and identify.
@@ -178,16 +174,3 @@ int main(int argc, char* argv[]) {
   return EXIT_SUCCESS;
 }
 
-// TODO by Friday
-// find timestep
-// solve timestep & initialize flowfield
-
-// TODO start by Friday
-// Report by Pratik and Jefin
-// parallelise
-// 3D
-
-// findtimestep - GG ToDO by friday
-// initialize flowfield- A-pop by friday
-// parallelise turb - J-man & P-raw
-// batch job scaling, help J-man, report -> P-raw

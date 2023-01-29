@@ -41,79 +41,47 @@ void TurbulentSimulationKE::initializeFlowField() {
     wallEpsilonIterator_.iterate();
   }
   nuTUpdate();
-  // std::cout << "*****************************nuT**********************************************\n";
-  // turbflowFieldKE_.getnuT().show();
-  // wallnuTIterator_.iterate();
+
 }
 
 void TurbulentSimulationKE::solveTimestep() {
 
-  // ppmTurbulentKE_.communicateViscosity();
-  // Determine and set max. timestep which is allowed in this simulation
+  ppmTurbulentKE_.communicateViscosity();
+  // Determine and set max. timestep which is allowed in this simulation. For Channel case run it with timestep set as 1e-4.
   setTimeStep();
-  // parameters_.timestep.dt = 1e-4;
+  // parameters_.timestep.dt = 1e-4; 
+
+  //Set boundary conditions for Velocity, FGH, k and epsilon
   wallVelocityIterator_.iterate();
   wallFGHIterator_.iterate();
   wallkIterator_.iterate();
   wallEpsilonIterator_.iterate();
-  // std::cout << "timestep****" << parameters_.timestep.dt << "\n";
+
+  //Save k values from previous time step for calculation
   turbflowFieldKE_.updatekold();
   kIterator_.iterate();
 
+//Save epsilion values from previous time step for calculation
   turbflowFieldKE_.updateepsold();
   epsilonIterator_.iterate();
 
+//Update viscosity
   nuTUpdate();
 
+//Calculate flux and RHS and solve Pressure Poisson
   TurbulentFGHIteratorKE_.iterate();
 
   rhsIterator_.iterate();
 
   solver_->solve();
 
-  // ppmTurbulentKE_.communicatePressure();
+  ppmTurbulentKE_.communicatePressure();
 
   velocityIterator_.iterate();
   obstacleIterator_.iterate();
 
-  // ppmTurbulentKE_.communicateVelocities();
-  // std::cout << "******************************k*********************************************\n";
-  // turbflowFieldKE_.getk().show();
+  ppmTurbulentKE_.communicateVelocities();
 
-  // wallkIterator_.iterate();
-
-  // std::cout << "******************************P*********************************************\n";
-  // turbflowFieldKE_.getPressure().show();
-  // std::cout << "******************************U*********************************************\n";
-  // turbflowFieldKE_.getVelocity().show();
-  // std::cout << "******************************k*********************************************\n";
-  // turbflowFieldKE_.getk().show();
-  // std::cout << "*****************************epsilon**********************************************\n";
-  // turbflowFieldKE_.geteps().show();
-
-  // wallnuTIterator_.iterate();
-  // std::cout
-  //   << "*****************************nuT********************************************"
-  //      "**\n";
-  // turbflowFieldKE_.getnuT().show();
-
-  // Compute FGH
-
-  // std::cout
-  //   << "*****************************F&G********************************************"
-  //      "**\n";
-  // turbflowFieldKE_.getFGH().show();
-  // Set global boundary values
-
-  // Solve for pressure
-
-  // TODO WS2: communicate pressure values
-
-  // Compute velocity
-
-  // TODO WS2: communicate velocity values
-
-  // Iterate for velocities on the boundary
 }
 
 void TurbulentSimulationKE::setTimeStep() {
@@ -155,8 +123,6 @@ void TurbulentSimulationKE::setTimeStep() {
       )
     )
   );
-  // if (fetestexcept(FE_DIVBYZERO))
-  //     std::cout <<"Exception occured\n";
 
   // Here, we select the type of operation before compiling. This allows to use the correct
   // data type for MPI. Not a concern for small simulations, but useful if using heterogeneous
