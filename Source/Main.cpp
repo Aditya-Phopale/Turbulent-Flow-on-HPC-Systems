@@ -4,10 +4,15 @@
 #include "Configuration.hpp"
 #include "MeshsizeFactory.hpp"
 #include "Simulation.hpp"
+#include "TurbulentFlowField.hpp"
+#include "TurbulentFlowFieldKE.hpp"
+#include "TurbulentSimulation.hpp"
+#include "TurbulentSimulationKE.hpp"
 
 #include "ParallelManagers/PetscParallelConfiguration.hpp"
 
 int main(int argc, char* argv[]) {
+
   spdlog::set_level(spdlog::level::info);
 
   // Parallelisation related. Initialise and identify.
@@ -39,7 +44,6 @@ int main(int argc, char* argv[]) {
 #else
   spdlog::info("Running in Release mode");
 #endif
-
   if (!argv[1]) {
     spdlog::error("You need to pass a configuration file: mpirun -np 1 ./NS-EOF ExampleCases/Cavity2D.xml.");
     throw std::runtime_error("Argument parsing error");
@@ -47,12 +51,20 @@ int main(int argc, char* argv[]) {
 
   // Read configuration and store information in parameters object
   Configuration configuration(argv[1]);
-  Parameters    parameters;
+
+  Parameters parameters;
   configuration.loadParameters(parameters);
+  spdlog::info(parameters.turbulent.cmu);
+  spdlog::info(parameters.turbulent.ce);
+  spdlog::info(parameters.turbulent.c1);
+  spdlog::info(parameters.turbulent.c2);
+
   ParallelManagers::PetscParallelConfiguration parallelConfiguration(parameters);
   MeshsizeFactory::getInstance().initMeshsize(parameters);
-  FlowField*  flowField  = NULL;
-  Simulation* simulation = NULL;
+  FlowField*            flowField       = NULL;
+  TurbulentFlowField*   Turbflowfield   = NULL;
+  TurbulentFlowFieldKE* TurbflowfieldKE = NULL;
+  Simulation*           simulation      = NULL;
 
   spdlog::debug(
     "Processor {} with index {}, {}, {} is computing the size of its subdomain and obtains {}, {} and {}.",
@@ -76,7 +88,13 @@ int main(int argc, char* argv[]) {
 
   // Initialise simulation
   if (parameters.simulation.type == "turbulence") {
-    // TODO WS2: initialise turbulent flow field and turbulent simulation object
+    if (rank == 0) {
+      spdlog::info("Start Turbulence simulation in {}D", parameters.geometry.dim);
+    }
+    Turbflowfield = new TurbulentFlowField(parameters);
+
+    simulation = new TurbulentSimulation(parameters, *Turbflowfield);
+
   } else if (parameters.simulation.type == "dns") {
     if (rank == 0) {
       spdlog::info("Start DNS simulation in {}D", parameters.geometry.dim);
@@ -86,6 +104,13 @@ int main(int argc, char* argv[]) {
       throw std::runtime_error("flowField == NULL!");
     }
     simulation = new Simulation(parameters, *flowField);
+  } else if (parameters.simulation.type == "turbulenceKE") {
+    if (rank == 0) {
+      spdlog::info("Start TurbulenceKE simulation in {}D", parameters.geometry.dim);
+    }
+    TurbflowfieldKE = new TurbulentFlowFieldKE(parameters);
+
+    simulation = new TurbulentSimulationKE(parameters, *TurbflowfieldKE);
   } else {
     throw std::runtime_error("Unknown simulation type! Currently supported: dns, turbulence");
   }
@@ -107,6 +132,7 @@ int main(int argc, char* argv[]) {
   simulation->plotVTK(timeSteps, time);
 
   Clock clock;
+
   // Time loop
 
   while (time < parameters.simulation.finalTime) {
@@ -136,6 +162,9 @@ int main(int argc, char* argv[]) {
   delete flowField;
   flowField = NULL;
 
+  delete Turbflowfield;
+  Turbflowfield = NULL;
+
 #ifdef ENABLE_PETSC
   PetscFinalize();
 #else
@@ -144,3 +173,4 @@ int main(int argc, char* argv[]) {
 
   return EXIT_SUCCESS;
 }
+

@@ -2,6 +2,8 @@
 
 #include "Definitions.hpp"
 #include "Parameters.hpp"
+#include "TurbulentFlowField.hpp"
+#include "TurbulentFlowFieldKE.hpp"
 
 namespace Stencils {
 
@@ -16,6 +18,38 @@ namespace Stencils {
     }
   }
 
+  inline void loadLocalViscosity2D(TurbulentFlowField& flowField, RealType* const localViscosity, int i, int j) {
+    for (int row = -1; row <= 1; row++) {
+      for (int column = -1; column <= 1; column++) {
+        localViscosity[39 + 9 * row + 3 * column] = flowField.getnuT().getScalar(i + column, j + row); // x-component
+      }
+    }
+  }
+
+  inline void loadLocalViscosity2D(TurbulentFlowFieldKE& flowField, RealType* const localViscosity, int i, int j) {
+    for (int row = -1; row <= 1; row++) {
+      for (int column = -1; column <= 1; column++) {
+        localViscosity[39 + 9 * row + 3 * column] = flowField.getnuT().getScalar(i + column, j + row); // x-component
+      }
+    }
+  }
+
+  inline void loadLocalK2D(TurbulentFlowFieldKE& flowField, RealType* const localK, int i, int j) {
+    for (int row = -1; row <= 1; row++) {
+      for (int column = -1; column <= 1; column++) {
+        localK[39 + 9 * row + 3 * column] = flowField.getkold().getScalar(i + column, j + row); // x-component
+      }
+    }
+  }
+
+  inline void loadLocalEpsilon2D(TurbulentFlowFieldKE& flowField, RealType* const localEpsilon, int i, int j) {
+    for (int row = -1; row <= 1; row++) {
+      for (int column = -1; column <= 1; column++) {
+        localEpsilon[39 + 9 * row + 3 * column] = flowField.getepsold().getScalar(i + column, j + row); // x-component
+      }
+    }
+  }
+
   // Load the local velocity cube with surrounding velocities
   inline void loadLocalVelocity3D(FlowField& flowField, RealType* const localVelocity, int i, int j, int k) {
     for (int layer = -1; layer <= 1; layer++) {
@@ -25,6 +59,18 @@ namespace Stencils {
           localVelocity[39 + 27 * layer + 9 * row + 3 * column]     = point[0]; // x-component
           localVelocity[39 + 27 * layer + 9 * row + 3 * column + 1] = point[1]; // y-component
           localVelocity[39 + 27 * layer + 9 * row + 3 * column + 2] = point[2]; // z-component
+        }
+      }
+    }
+  }
+
+  inline void loadLocalViscosity3D(TurbulentFlowField& flowField, RealType* const localViscosity, int i, int j, int k) {
+    for (int layer = -1; layer <= 1; layer++) {
+      for (int row = -1; row <= 1; row++) {
+        for (int column = -1; column <= 1; column++) {
+          localViscosity[39 + 27 * layer + 9 * row + 3 * column] = flowField.getnuT().getScalar(
+            i + column, j + row, k + layer
+          ); // x-component
         }
       }
     }
@@ -71,6 +117,118 @@ namespace Stencils {
     return (lv[index0] - lv[index1]) / lm[index0];
   }
 
+
+  inline RealType dudy(const RealType* const lv, const RealType* const lm) {
+    // Evaluate dudx in the cell center by a central difference
+    const int indexc = mapd(0, 0, 0, 0);
+    const int indexl = mapd(-1, 0, 0, 0);
+    RealType  cv     = 0.5 * (lv[indexc] + lv[indexl]);
+
+    const int indexlt = mapd(-1, 1, 0, 0);
+    const int indext  = mapd(0, 1, 0, 0);
+    RealType  tv      = 0.5 * (lv[indexlt] + lv[indext]);
+
+    const int indexbl = mapd(-1, -1, 0, 0);
+    const int indexb  = mapd(0, -1, 0, 0);
+    RealType  bv      = 0.5 * (lv[indexbl] + lv[indexb]);
+
+    RealType topu = (cv * lm[mapd(0, 1, 0, 1)] * 0.5 + tv * lm[mapd(0, 0, 0, 1)] * 0.5)
+                    / (0.5 * lm[mapd(0, 1, 0, 1)] + 0.5 * lm[mapd(0, 0, 0, 1)]);
+    RealType bottomu = (cv * lm[mapd(0, -1, 0, 1)] * 0.5 + bv * lm[mapd(0, 0, 0, 1)] * 0.5)
+                       / (0.5 * lm[mapd(0, -1, 0, 1)] + 0.5 * lm[mapd(0, 0, 0, 1)]);
+
+    return (topu - bottomu) / lm[mapd(0, 0, 0, 1)];
+
+  }
+
+  inline RealType dvdx(const RealType* const lv, const RealType* const lm) {
+    // Evaluate dudx in the cell center by a central difference
+    const int indexc = mapd(0, 0, 0, 1);
+    const int indexb = mapd(0, -1, 0, 1);
+    RealType  cv     = 0.5 * (lv[indexc] + lv[indexb]);
+
+    const int indexl  = mapd(-1, 0, 0, 1);
+    const int indexbl = mapd(-1, -1, 0, 1);
+    RealType  lev     = 0.5 * (lv[indexl] + lv[indexbl]);
+
+    const int indexr  = mapd(1, 0, 0, 1);
+    const int indexbr = mapd(1, -1, 0, 1);
+    RealType  rv      = 0.5 * (lv[indexr] + lv[indexbr]);
+
+    RealType leftv = (cv * lm[mapd(-1, 0, 0, 0)] * 0.5 + lev * lm[mapd(0, 0, 0, 0)] * 0.5)
+                     / (0.5 * lm[mapd(-1, 0, 0, 0)] + 0.5 * lm[mapd(0, 0, 0, 0)]);
+    RealType rightv = (cv * lm[mapd(1, 0, 0, 0)] * 0.5 + rv * lm[mapd(0, 0, 0, 0)] * 0.5)
+                      / (0.5 * lm[mapd(1, 0, 0, 0)] + 0.5 * lm[mapd(0, 0, 0, 0)]);
+
+    return (rightv - leftv) / (lm[mapd(0, 0, 0, 0)]);
+
+  }
+
+  inline RealType dudz(const RealType* const lv, const RealType* const lm) {
+    // Evaluate dudx in the cell center by a central difference
+    const int indexc   = mapd(0, 0, 0, 0);
+    const int indexba  = mapd(0, 0, -1, 0);
+    const int indexf   = mapd(0, 0, 1, 0);
+    const int indexbal = mapd(-1, 0, -1, 0);
+    const int indexfl  = mapd(-1, 0, 1, 0);
+    const int indexl   = mapd(-1, 0, 0, 0);
+
+    RealType topR     = (lv[indexf] - lv[indexc]) / (0.5 * (lm[mapd(0, 0, 1, 2)] + lm[mapd(0, 0, 0, 2)]));
+    RealType topL     = (lv[indexfl] - lv[indexl]) / (0.5 * (lm[mapd(-1, 0, 1, 2)] + lm[mapd(-1, 0, 0, 2)]));
+    RealType bottonmL = (lv[indexl] - lv[indexbal]) / (0.5 * (lm[mapd(-1, 0, 0, 2)] + lm[mapd(-1, 0, -1, 2)]));
+    RealType bottomR  = (lv[indexc] - lv[indexba]) / (0.5 * (lm[mapd(0, 0, 0, 2)] + lm[mapd(0, 0, -1, 2)]));
+    return 0.25 * (topR + topL + bottomR + bottonmL);
+  }
+  // Implemented derivaive functions till now are correct
+
+  inline RealType dwdx(const RealType* const lv, const RealType* const lm) {
+    // Evaluate dudx in the cell center by a central difference
+    const int indexc   = mapd(0, 0, 0, 2);
+    const int indexl   = mapd(-1, 0, 0, 2);
+    const int indexr   = mapd(1, 0, 0, 2);
+    const int indexbal = mapd(-1, 0, -1, 2);
+    const int indexba  = mapd(0, 0, -1, 2);
+    const int indexbar = mapd(1, 0, -1, 2);
+
+    RealType frontR = (lv[indexr] - lv[indexc]) / (0.5 * (lm[mapd(1, 0, 0, 0)] + lm[mapd(0, 0, 0, 0)]));
+    RealType frontL = (lv[indexc] - lv[indexl]) / (0.5 * (lm[mapd(0, 0, 0, 0)] + lm[mapd(-1, 0, 0, 0)]));
+    RealType backL  = (lv[indexba] - lv[indexbal]) / (0.5 * (lm[mapd(0, 0, -1, 0)] + lm[mapd(-1, 0, -1, 0)]));
+    RealType backR  = (lv[indexbar] - lv[indexba]) / (0.5 * (lm[mapd(1, 0, -1, 0)] + lm[mapd(0, 0, -1, 0)]));
+    return 0.25 * (frontR + frontL + backR + backL);
+  }
+
+  inline RealType dvdz(const RealType* const lv, const RealType* const lm) {
+    // Evaluate dudx in the cell center by a central difference
+    const int indexc   = mapd(0, 0, 0, 1);
+    const int indexf   = mapd(0, 0, 1, 1);
+    const int indexba  = mapd(0, 0, -1, 1);
+    const int indexb   = mapd(0, -1, 0, 1);
+    const int indexbf  = mapd(0, -1, 1, 1);
+    const int indexbba = mapd(0, -1, -1, 1);
+
+    RealType topF     = (lv[indexf] - lv[indexc]) / (0.5 * (lm[mapd(0, 0, 1, 2)] + lm[mapd(0, 0, 0, 2)]));
+    RealType topBa    = (lv[indexc] - lv[indexba]) / (0.5 * (lm[mapd(0, 0, 0, 2)] + lm[mapd(0, 0, -1, 2)]));
+    RealType bottomF  = (lv[indexbf] - lv[indexb]) / (0.5 * (lm[mapd(0, -1, 1, 2)] + lm[mapd(0, -1, 0, 2)]));
+    RealType bottomBa = (lv[indexb] - lv[indexbba]) / (0.5 * (lm[mapd(0, -1, 0, 2)] + lm[mapd(0, -1, -1, 2)]));
+    return 0.25 * (topF + topBa + bottomF + bottomBa);
+  }
+
+  inline RealType dwdy(const RealType* const lv, const RealType* const lm) {
+    // Evaluate dudx in the cell center by a central difference
+    const int indexc   = mapd(0, 0, 0, 2);
+    const int indext   = mapd(0, 1, 0, 2);
+    const int indexb   = mapd(0, -1, 0, 2);
+    const int indexba  = mapd(0, 0, -1, 2);
+    const int indexbat = mapd(0, 1, -1, 2);
+    const int indexbab = mapd(0, -1, -1, 2);
+
+    RealType topF     = (lv[indext] - lv[indexc]) / (0.5 * (lm[mapd(0, 1, 0, 1)] + lm[mapd(0, 0, 0, 1)]));
+    RealType topBa    = (lv[indexbat] - lv[indexba]) / (0.5 * (lm[mapd(0, 1, -1, 1)] + lm[mapd(0, 0, -1, 1)]));
+    RealType BottomF  = (lv[indexc] - lv[indexb]) / (0.5 * (lm[mapd(0, 0, 0, 1)] + lm[mapd(0, 0, -1, 1)]));
+    RealType BottomBa = (lv[indexba] - lv[indexbab]) / (0.5 * (lm[mapd(0, 0, -1, 1)] + lm[mapd(0, -1, -1, 1)]));
+    return 0.25 * (topF + topBa + BottomF + BottomBa);
+  }
+
   inline RealType dvdy(const RealType* const lv, const RealType* const lm) {
     const int index0 = mapd(0, 0, 0, 1);
     const int index1 = mapd(0, -1, 0, 1);
@@ -83,7 +241,20 @@ namespace Stencils {
     return (lv[index0] - lv[index1]) / lm[index0];
   }
 
-  // Second derivative of u-component w.r.t. x-direction, evaluated at the location of the u-component.
+  inline RealType dkdx(const RealType* const lk, const RealType* const lm) {
+    // given in pg 164 (followed same as pressure)
+    const int index0 = mapd(1, 0, 0, 0);
+    const int index1 = mapd(0, 0, 0, 0);
+    return (lk[index0] - lk[index1]) / 0.5 * (lm[index0] + lm[index1]);
+  }
+
+  inline RealType dkdy(const RealType* const lk, const RealType* const lm) {
+    // given in pg 164 (followed same as pressure)
+    const int index0 = mapd(0, 1, 0, 1);
+    const int index1 = mapd(0, 0, 0, 1);
+    return (lk[index0] - lk[index1]) / 0.5 * (lm[index0] + lm[index1]);
+  }
+
   inline RealType d2udx2(const RealType* const lv, const RealType* const lm) {
     // Evaluate the second derivative at the location of the u-component of the velocity field;
     // we therefore use the two neighbouring u-components and assume arbitrary mesh sizes in both
@@ -99,6 +270,27 @@ namespace Stencils {
     return 2.0 * (lv[indexP1] / (dx1 * dxSum) - lv[index0] / (dx1 * dx0) + lv[indexM1] / (dx0 * dxSum));
   }
 
+  // Second derivative of turbulent u-component w.r.t. x-direction, evaluated at the location of the u-component.
+  inline RealType d2udx2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    // Evaluate the second derivative at the location of the u-component of the velocity field;
+    // we therefore use the two neighbouring u-components and assume arbitrary mesh sizes in both
+    // directions -> the formula arises from a straight-forward taylor expansion
+    // -> for equal meshsizes, we obtain the usual [1 -2 1]-like stencil.
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    RealType dudxR = (lv[mapd(1, 0, 0, 0)] - lv[mapd(0, 0, 0, 0)]) / dx_P1;
+    RealType dudxL = (lv[mapd(0, 0, 0, 0)] - lv[mapd(-1, 0, 0, 0)]) / dx_0;
+
+    RealType ViscR = lvis[mapd(1, 0, 0, 0)] + 1 / parameters.flow.Re;
+    RealType ViscL = lvis[mapd(0, 0, 0, 0)] + 1 / parameters.flow.Re;
+
+    return (ViscR * dudxR - ViscL * dudxL) / dx_0;
+  }
+
   inline RealType d2udy2(const RealType* const lv, const RealType* const lm) {
     // Average mesh sizes, since the component u is located in the middle of the cell's face.
     const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
@@ -111,6 +303,41 @@ namespace Stencils {
            * (lv[mapd(0, 1, 0, 0)] / (dy1 * dySum) - lv[mapd(0, 0, 0, 0)] / (dy1 * dy0) + lv[mapd(0, -1, 0, 0)] / (dy0 * dySum));
   }
 
+  inline RealType d2udy2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    RealType dudyT = (lv[mapd(0, 1, 0, 0)] - lv[mapd(0, 0, 0, 0)]) / dy1;
+    RealType dudyB = (lv[mapd(0, 0, 0, 0)] - lv[mapd(0, -1, 0, 0)]) / dy0;
+
+    RealType ViscT1 = lvis[mapd(0, 1, 0, 0)];
+    RealType ViscT2 = lvis[mapd(1, 1, 0, 0)];
+    RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
+    RealType ViscB1 = lvis[mapd(0, -1, 0, 0)];
+    RealType ViscB2 = lvis[mapd(1, -1, 0, 0)];
+
+    RealType ViscT = (0.5 * (0.5 * (ViscT1 * dx_P1 + ViscT2 * dx_0) / dx1) * dy_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dy_P1
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscB = (0.5 * (0.5 * (ViscB1 * dx_P1 + ViscB2 * dx_0) / dx1) * dy_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dy_M1
+                     ) / dy0
+                     + 1 / parameters.flow.Re;
+
+    return (ViscT * dudyT - ViscB * dudyB) / dy_0;
+  }
+
   inline RealType d2udz2(const RealType* const lv, const RealType* const lm) {
     const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
     const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
@@ -120,6 +347,41 @@ namespace Stencils {
     const RealType dzSum = dz0 + dz1;
     return 2.0
            * (lv[mapd(0, 0, 1, 0)] / (dz1 * dzSum) - lv[mapd(0, 0, 0, 0)] / (dz1 * dz0) + lv[mapd(0, 0, -1, 0)] / (dz0 * dzSum));
+  }
+
+  inline RealType d2udz2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
+    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    const RealType dz_P1 = lm[mapd(0, 0, 1, 2)];
+    const RealType dz0   = 0.5 * (dz_0 + dz_M1);
+    const RealType dz1   = 0.5 * (dz_0 + dz_P1);
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    RealType dudzT = (lv[mapd(0, 0, 1, 0)] - lv[mapd(0, 0, 0, 0)]) / dz1;
+    RealType dudzB = (lv[mapd(0, 0, 0, 0)] - lv[mapd(0, 0, -1, 0)]) / dz0;
+
+    RealType ViscT1 = lvis[mapd(0, 0, 1, 0)];
+    RealType ViscT2 = lvis[mapd(1, 0, 1, 0)];
+    RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
+    RealType ViscB1 = lvis[mapd(0, 0, -1, 0)];
+    RealType ViscB2 = lvis[mapd(1, 0, -1, 0)];
+
+    RealType ViscT = (0.5 * (0.5 * (ViscT1 * dx_P1 + ViscT2 * dx_0) / dx1) * dz_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dz_P1
+                     ) / dz1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscB = (0.5 * (0.5 * (ViscB1 * dx_P1 + ViscB2 * dx_0) / dx1) * dz_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dz_M1
+                     ) / dz0
+                     + 1 / parameters.flow.Re;
+
+    return (ViscT * dudzT - ViscB * dudzB) / dz_0;
   }
 
   // Second derivative of the v-component, evaluated at the location of the v-component.
@@ -134,6 +396,257 @@ namespace Stencils {
            * (lv[mapd(1, 0, 0, 1)] / (dx1 * dxSum) - lv[mapd(0, 0, 0, 1)] / (dx1 * dx0) + lv[mapd(-1, 0, 0, 1)] / (dx0 * dxSum));
   }
 
+  inline RealType d2vdx2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType ViscR1 = lvis[mapd(1, 0, 0, 0)];
+    const RealType ViscR2 = lvis[mapd(1, 1, 0, 0)];
+    const RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    const RealType ViscM2 = lvis[mapd(0, 1, 0, 0)];
+    const RealType ViscL1 = lvis[mapd(-1, 0, 0, 0)];
+    const RealType ViscL2 = lvis[mapd(-1, 1, 0, 0)];
+
+    RealType dvdxR = (lv[mapd(1, 0, 0, 1)] - lv[mapd(0, 0, 0, 1)]) / dx1;
+    RealType dvdxL = (lv[mapd(0, 0, 0, 1)] - lv[mapd(-1, 0, 0, 1)]) / dx0;
+
+    RealType ViscR = (0.5 * (0.5 * (ViscR1 * dx_0 + ViscM1 * dx_P1) / (dx1)) * (dy_P1)
+                      + 0.5 * (0.5 * (ViscR2 * dx_0 + ViscM2 * dx_P1) / (dx1)) * (dy_0)
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscL = (0.5 * (0.5 * (ViscL1 * dx_0 + ViscM1 * dx_M1) / (dx0)) * (dy_P1)
+                      + 0.5 * (0.5 * (ViscL2 * dx_0 + ViscM2 * dx_M1) / (dx0)) * (dy_0)
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    return (ViscR * dvdxR - ViscL * dvdxL) / dx_0;
+  }
+
+  inline RealType d2vdydx(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    RealType dvdxT = lv[mapd(1, 0, 0, 1)] - lv[mapd(0, 0, 0, 1)] / dx1;
+    RealType dvdxB = lv[mapd(1, -1, 0, 1)] - lv[mapd(0, -1, 0, 1)] / dx1;
+
+    RealType ViscT1 = lvis[mapd(0, 1, 0, 0)];
+    RealType ViscT2 = lvis[mapd(1, 1, 0, 0)];
+    RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
+    RealType ViscB1 = lvis[mapd(0, -1, 0, 0)];
+    RealType ViscB2 = lvis[mapd(1, -1, 0, 0)];
+
+    RealType ViscT = (0.5 * (0.5 * (ViscT1 * dx_P1 + ViscT2 * dx_0) / dx1) * dy_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dy_P1
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscB = (0.5 * (0.5 * (ViscB1 * dx_P1 + ViscB2 * dx_0) / dx1) * dy_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dy_M1
+                     ) / dy0
+                     + 1 / parameters.flow.Re;
+
+    return (ViscT * dvdxT - ViscB * dvdxB) / dy_0;
+  }
+
+  inline RealType d2udxdy(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType ViscR1 = lvis[mapd(1, 0, 0, 0)];
+    const RealType ViscR2 = lvis[mapd(1, 1, 0, 0)];
+    const RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    const RealType ViscM2 = lvis[mapd(0, 1, 0, 0)];
+    const RealType ViscL1 = lvis[mapd(-1, 0, 0, 0)];
+    const RealType ViscL2 = lvis[mapd(-1, 1, 0, 0)];
+
+    RealType dudyR = (lv[mapd(0, 1, 0, 0)] - lv[mapd(0, 0, 0, 0)]) / dy1;
+    RealType dudyL = (lv[mapd(-1, 1, 0, 0)] - lv[mapd(-1, 0, 0, 0)]) / dy1;
+
+    RealType ViscR = (0.5 * (0.5 * (ViscR1 * dx_0 + ViscM1 * dx_P1) / (dx1)) * (dy_P1)
+                      + 0.5 * (0.5 * (ViscR2 * dx_0 + ViscM2 * dx_P1) / (dx1)) * (dy_0)
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscL = (0.5 * (0.5 * (ViscL1 * dx_0 + ViscM1 * dx_M1) / (dx0)) * (dy_P1)
+                      + 0.5 * (0.5 * (ViscL2 * dx_0 + ViscM2 * dx_M1) / (dx0)) * (dy_0)
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    return ((ViscR * dudyR) - (ViscL * dudyL)) / dx_0;
+  }
+
+  inline RealType d2wdxdz(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    const RealType dz_P1 = lm[mapd(0, 0, 1, 2)];
+    const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
+    const RealType dz0   = 0.5 * (dz_0 + dz_M1);
+    const RealType dz1   = 0.5 * (dz_0 + dz_P1);
+
+    RealType dwdxT = lv[mapd(1, 0, 0, 2)] - lv[mapd(0, 0, 0, 2)] / dx1;
+    RealType dwdxB = lv[mapd(1, 0, -1, 2)] - lv[mapd(0, 0, -1, 2)] / dx1;
+
+    RealType ViscT1 = lvis[mapd(0, 0, 1, 0)];
+    RealType ViscT2 = lvis[mapd(1, 0, 1, 0)];
+    RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
+    RealType ViscB1 = lvis[mapd(0, 0, -1, 0)];
+    RealType ViscB2 = lvis[mapd(1, 0, -1, 0)];
+
+    RealType ViscT = (0.5 * (0.5 * (ViscT1 * dx_P1 + ViscT2 * dx_0) / dx1) * dz_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dz_P1
+                     ) / dz1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscB = (0.5 * (0.5 * (ViscB1 * dx_P1 + ViscB2 * dx_0) / dx1) * dz_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dz_M1
+                     ) / dz0
+                     + 1 / parameters.flow.Re;
+
+    return (ViscT * dwdxT - ViscB * dwdxB) / dz_0;
+  }
+
+  inline RealType d2wdydz(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(1, 0, 0, 1)];
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    const RealType dz_P1 = lm[mapd(0, 0, 1, 2)];
+    const RealType dz_M1 = lm[mapd(0, 0, -1, 2)];
+    const RealType dz0   = 0.5 * (dz_0 + dz_M1);
+    const RealType dz1   = 0.5 * (dz_0 + dz_P1);
+
+    RealType dwdyT = lv[mapd(0, 1, 0, 2)] - lv[mapd(0, 0, 0, 2)] / dy1;
+    RealType dwdyB = lv[mapd(0, 1, -1, 2)] - lv[mapd(0, 0, -1, 2)] / dy1;
+
+    RealType ViscT1 = lvis[mapd(0, 0, 1, 0)];
+    RealType ViscT2 = lvis[mapd(1, 0, 1, 0)];
+    RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
+    RealType ViscB1 = lvis[mapd(0, 0, -1, 0)];
+    RealType ViscB2 = lvis[mapd(1, 0, -1, 0)];
+
+    RealType ViscT = (0.5 * (0.5 * (ViscT1 * dy_P1 + ViscT2 * dy_0) / dy1) * dz_0
+                      + 0.5 * (0.5 * (ViscM1 * dy_P1 + ViscM2 * dy_0) / dy1) * dz_P1
+                     ) / dz1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscB = (0.5 * (0.5 * (ViscB1 * dy_P1 + ViscB2 * dy_0) / dy1) * dz_0
+                      + 0.5 * (0.5 * (ViscM1 * dy_P1 + ViscM2 * dy_0) / dy1) * dz_M1
+                     ) / dz0
+                     + 1 / parameters.flow.Re;
+
+    return (ViscT * dwdyT - ViscB * dwdyB) / dz_0;
+  }
+
+  inline RealType d2udzdx(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    RealType dvdxT = lv[mapd(1, 0, 0, 1)] - lv[mapd(0, 0, 0, 1)] / dx1;
+    RealType dvdxB = lv[mapd(1, -1, 0, 1)] - lv[mapd(0, -1, 0, 1)] / dx1;
+
+    RealType ViscT1 = lvis[mapd(0, 1, 0, 0)];
+    RealType ViscT2 = lvis[mapd(1, 1, 0, 0)];
+    RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
+    RealType ViscB1 = lvis[mapd(0, -1, 0, 0)];
+    RealType ViscB2 = lvis[mapd(1, -1, 0, 0)];
+
+    RealType ViscT = (0.5 * (0.5 * (ViscT1 * dx_P1 + ViscT2 * dx_0) / dx1) * dy_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dy_P1
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscB = (0.5 * (0.5 * (ViscB1 * dx_P1 + ViscB2 * dx_0) / dx1) * dy_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dy_M1
+                     ) / dy0
+                     + 1 / parameters.flow.Re;
+
+    return (ViscT * dvdxT - ViscB * dvdxB) / dy_0;
+  }
+
+  inline RealType d2vdzdy(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    RealType dvdxT = lv[mapd(1, 0, 0, 1)] - lv[mapd(0, 0, 0, 1)] / dx1;
+    RealType dvdxB = lv[mapd(1, -1, 0, 1)] - lv[mapd(0, -1, 0, 1)] / dx1;
+
+    RealType ViscT1 = lvis[mapd(0, 1, 0, 0)];
+    RealType ViscT2 = lvis[mapd(1, 1, 0, 0)];
+    RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    RealType ViscM2 = lvis[mapd(1, 0, 0, 0)];
+    RealType ViscB1 = lvis[mapd(0, -1, 0, 0)];
+    RealType ViscB2 = lvis[mapd(1, -1, 0, 0)];
+
+    RealType ViscT = (0.5 * (0.5 * (ViscT1 * dx_P1 + ViscT2 * dx_0) / dx1) * dy_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dy_P1
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscB = (0.5 * (0.5 * (ViscB1 * dx_P1 + ViscB2 * dx_0) / dx1) * dy_0
+                      + 0.5 * (0.5 * (ViscM1 * dx_P1 + ViscM2 * dx_0) / dx1) * dy_M1
+                     ) / dy0
+                     + 1 / parameters.flow.Re;
+
+    return (ViscT * dvdxT - ViscB * dvdxB) / dy_0;
+  }
   inline RealType d2vdy2(const RealType* const lv, const RealType* const lm) {
     const int indexM1 = mapd(0, -1, 0, 1);
     const int index0  = mapd(0, 0, 0, 1);
@@ -143,6 +656,58 @@ namespace Stencils {
     const RealType dy1   = lm[indexP1];
     const RealType dySum = dy0 + dy1;
     return 2.0 * (lv[indexP1] / (dy1 * dySum) - lv[index0] / (dy1 * dy0) + lv[indexM1] / (dy0 * dySum));
+  }
+
+  inline RealType d2vdy2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    RealType dvdyT = (lv[mapd(0, 1, 0, 1)] - lv[mapd(0, 0, 0, 1)]) / dy_P1;
+    RealType dvdyB = (lv[mapd(0, 0, 0, 1)] - lv[mapd(0, -1, 0, 1)]) / dy_0;
+
+    RealType ViscT = lvis[mapd(0, 1, 0, 0)] + 1 / parameters.flow.Re;
+    RealType ViscB = lvis[mapd(0, 0, 0, 0)] + 1 / parameters.flow.Re;
+
+    return (ViscT * dvdyT - ViscB * dvdyB) / dy1;
+  }
+
+  inline RealType d2vdz2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    const RealType dz_0  = lm[mapd(0, 0, 0, 2)];
+    const RealType dz_P1 = lm[mapd(1, 0, 0, 2)];
+    const RealType dz_M1 = lm[mapd(-1, 0, 0, 2)];
+    const RealType dz0   = 0.5 * (dz_0 + dz_M1);
+    const RealType dz1   = 0.5 * (dz_0 + dz_P1);
+
+    const RealType ViscR1 = lvis[mapd(0, 0, 1, 0)];
+    const RealType ViscR2 = lvis[mapd(0, 1, 1, 0)];
+    const RealType ViscM1 = lvis[mapd(0, 0, 0, 0)];
+    const RealType ViscM2 = lvis[mapd(0, 1, 0, 0)];
+    const RealType ViscL1 = lvis[mapd(0, 0, -1, 0)];
+    const RealType ViscL2 = lvis[mapd(0, 1, -1, 0)];
+
+    RealType dvdzR = (lv[mapd(1, 0, 0, 1)] - lv[mapd(0, 0, 0, 1)]) / dz1;
+    RealType dvdzL = (lv[mapd(0, 0, 0, 1)] - lv[mapd(-1, 0, 0, 1)]) / dz0;
+
+    RealType ViscR = (0.5 * (0.5 * (ViscR1 * dz_0 + ViscM1 * dz_P1) / (dz1)) * (dy_P1)
+                      + 0.5 * (0.5 * (ViscR2 * dz_0 + ViscM2 * dz_P1) / (dz1)) * (dy_0)
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    RealType ViscL = (0.5 * (0.5 * (ViscL1 * dz_0 + ViscM1 * dz_M1) / (dz0)) * (dy_P1)
+                      + 0.5 * (0.5 * (ViscL2 * dz_0 + ViscM2 * dz_M1) / (dz0)) * (dy_0)
+                     ) / dy1
+                     + 1 / parameters.flow.Re;
+
+    return (ViscR * dvdzR - ViscL * dvdzL) / dz_0;
   }
 
   inline RealType d2vdz2(const RealType* const lv, const RealType* const lm) {
@@ -157,6 +722,19 @@ namespace Stencils {
   }
 
   // Second derivative of the w-component, evaluated at the location of the w-component.
+  inline RealType d2wdx2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+    const RealType dxSum = dx0 + dx1;
+    return 2.0
+           * (lv[mapd(1, 0, 0, 2)] / (dx1 * dxSum) - lv[mapd(0, 0, 0, 2)] / (dx1 * dx0) + lv[mapd(-1, 0, 0, 2)] / (dx0 * dxSum));
+  }
+
   inline RealType d2wdx2(const RealType* const lv, const RealType* const lm) {
     const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
     const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
@@ -179,7 +757,33 @@ namespace Stencils {
            * (lv[mapd(0, 1, 0, 2)] / (dy1 * dySum) - lv[mapd(0, 0, 0, 2)] / (dy1 * dy0) + lv[mapd(0, -1, 0, 2)] / (dy0 * dySum));
   }
 
+  inline RealType d2wdy2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+    const RealType dySum = dy0 + dy1;
+    return 2.0
+           * (lv[mapd(0, 1, 0, 2)] / (dy1 * dySum) - lv[mapd(0, 0, 0, 2)] / (dy1 * dy0) + lv[mapd(0, -1, 0, 2)] / (dy0 * dySum));
+  }
+
   inline RealType d2wdz2(const RealType* const lv, const RealType* const lm) {
+    const int index_M1 = mapd(0, 0, -1, 2);
+    const int index_0  = mapd(0, 0, 0, 2);
+    const int index_P1 = mapd(0, 0, 1, 2);
+
+    const RealType dz0   = lm[index_0];
+    const RealType dz1   = lm[index_P1];
+    const RealType dzSum = dz0 + dz1;
+    return 2.0 * (lv[index_P1] / (dz1 * dzSum) - lv[index_0] / (dz1 * dz0) + lv[index_M1] / (dz0 * dzSum));
+  }
+
+  inline RealType d2wdz2(
+    const RealType* const lv, const RealType* const lvis, const Parameters& parameters, const RealType* const lm
+  ) {
     const int index_M1 = mapd(0, 0, -1, 2);
     const int index_0  = mapd(0, 0, 0, 2);
     const int index_P1 = mapd(0, 0, 1, 2);
@@ -680,6 +1284,233 @@ namespace Stencils {
     return tmp2;
   }
 
+  //************************************************************************************************************************//
+  inline RealType fu(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
+
+    RealType Rd = sqrt(fabs(flowField.getk().getScalar(i, j))) * flowField.getheight().getScalar(i, j)
+                  * parameters.flow.Re;
+
+    RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
+                  / (flowField.geteps().getScalar(i, j));
+
+    if ((1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt) > 1)
+      return 1;
+
+    return (1 - exp(-0.0165 * Rd)) * (1 - exp(-0.0165 * Rd)) * (1 + 20.5 / Rt);
+  }
+
+  inline RealType f1(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
+    return 1
+           + (0.05 / fu(parameters, flowField, i, j)) * (0.05 / fu(parameters, flowField, i, j))
+               * (0.05 / fu(parameters, flowField, i, j));
+  }
+
+  inline RealType f2(const Parameters& parameters, TurbulentFlowFieldKE& flowField, int i, int j) {
+    RealType Rt = (flowField.getk().getScalar(i, j) * flowField.getk().getScalar(i, j)) * parameters.flow.Re
+                  / (flowField.geteps().getScalar(i, j));
+
+    if (1 - exp(-Rt * Rt) > 1)
+      return 1;
+    return 1 - exp(-Rt * Rt);
+  }
+
+  inline RealType dukdx(
+    const RealType* const lv, const Parameters& parameters, const RealType* const lk, const RealType* const lm
+  ) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType kR = (0.5 * dx_P1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lk[mapd(1, 0, 0, 0)]) / dx1;
+    const RealType kL = (0.5 * dx_M1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lk[mapd(-1, 0, 0, 0)]) / dx0;
+    // const RealType kR = 0.5 * (lk[mapd(0, 0, 0, 0)] + lk[mapd(1, 0, 0, 0)]);
+    // const RealType kL = 0.5 * (lk[mapd(0, 0, 0, 0)] + lk[mapd(-1, 0, 0, 0)]);
+
+    const RealType kr = (0.5 * dx_P1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(1, 0, 0, 0)]) / dx1;
+    const RealType kl = (0.5 * dx_M1 * lk[mapd(-1, 0, 0, 0)] - 0.5 * dx_0 * lk[mapd(0, 0, 0, 0)]) / dx0;
+    // const RealType kr = 0.5 * (lk[mapd(0, 0, 0, 0)] - lk[mapd(1, 0, 0, 0)]);
+    // const RealType kl = 0.5 * (lk[mapd(-1, 0, 0, 0)] - lk[mapd(0, 0, 0, 0)]);
+
+    return (kR * lv[mapd(0, 0, 0, 0)] - kL * lv[mapd(-1, 0, 0, 0)]) / dx_0
+           + (parameters.solver.gamma / dx_0) * (kr * fabs(lv[mapd(0, 0, 0, 0)]) - kl * fabs(lv[mapd(-1, 0, 0, 0)]));
+    // return (kR * lv[mapd(0, 0, 0, 0)] - kL * lv[mapd(-1, 0, 0, 0)]) / dx_0
+    //        + (kr * fabs(lv[mapd(0, 0, 0, 0)]) - kl * fabs(lv[mapd(-1, 0, 0, 0)])) / dx_0;
+  }
+
+  inline RealType dvkdy(
+    const RealType* const lv, const Parameters& parameters, const RealType* const lk, const RealType* const lm
+  ) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    const RealType kT = (0.5 * dy_P1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lk[mapd(0, 1, 0, 0)]) / dy1;
+    const RealType kB = (0.5 * dy_M1 * lk[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lk[mapd(0, -1, 0, 0)]) / dy0;
+    // const RealType kT = 0.5 * (lk[mapd(0, 0, 0, 0)] + lk[mapd(0, 1, 0, 0)]);
+    // const RealType kB = 0.5 * (lk[mapd(0, 0, 0, 0)] + lk[mapd(0, -1, 0, 0)]);
+
+    const RealType kt = (0.5 * dy_P1 * lk[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * lk[mapd(0, 1, 0, 0)]) / dy1;
+    const RealType kb = (0.5 * dy_M1 * lk[mapd(0, -1, 0, 0)] - 0.5 * dy_0 * lk[mapd(0, 0, 0, 0)]) / dy0;
+    // const RealType kt = 0.5 * (lk[mapd(0, 0, 0, 0)] - lk[mapd(0, 1, 0, 0)]);
+    // const RealType kb = 0.5 * (lk[mapd(0, -1, 0, 0)] - lk[mapd(0, 0, 0, 0)]); // changed here, check above
+
+    return (kT * lv[mapd(0, 0, 0, 1)] - kB * lv[mapd(0, -1, 0, 1)]) / dy_0
+           + (parameters.solver.gamma / dy_0) * (kt * fabs(lv[mapd(0, 0, 0, 1)]) - kb * fabs(lv[mapd(0, -1, 0, 1)]));
+    // return (kT * lv[mapd(0, 0, 0, 1)] - kB * lv[mapd(0, -1, 0, 1)]) / dy_0
+    //        + (kt * fabs(lv[mapd(0, 0, 0, 1)]) - kb * fabs(lv[mapd(0, -1, 0, 1)]));
+  }
+
+  inline RealType dnuTkd2x( //
+    const Parameters&     parameters,
+    const RealType* const lvis,
+    const RealType* const lk,
+    const RealType* const lm
+  ) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType dkdxR = (lk[mapd(1, 0, 0, 0)] - lk[mapd(0, 0, 0, 0)]) / dx1;
+    const RealType dkdxL = (lk[mapd(0, 0, 0, 0)] - lk[mapd(-1, 0, 0, 0)]) / dx0;
+
+    const RealType viscR = (0.5 * dx_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(1, 0, 0, 0)]) / dx1;
+    const RealType viscL = (0.5 * dx_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(-1, 0, 0, 0)]) / dx0;
+
+    return (viscR * dkdxR - viscL * dkdxL) / dx_0;
+  }
+
+  inline RealType dnuTkd2y( //
+    const Parameters&     parameters,
+    const RealType* const lvis,
+    const RealType* const lk,
+    const RealType* const lm
+  ) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    const RealType dkdyT = (lk[mapd(0, 1, 0, 0)] - lk[mapd(0, 0, 0, 0)]) / dy1;
+    const RealType dkdyB = (lk[mapd(0, 0, 0, 0)] - lk[mapd(0, -1, 0, 0)]) / dy0;
+
+    const RealType viscT = (0.5 * dy_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, 1, 0, 0)]) / dy1;
+    const RealType viscB = (0.5 * dy_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, -1, 0, 0)]) / dy0;
+
+    return (viscT * dkdyT - viscB * dkdyB) / dy_0;
+  }
+
+  inline RealType duepsdx(
+    const RealType* const lv, const Parameters& parameters, const RealType* const leps, const RealType* const lm
+  ) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType lepsR = (0.5 * dx_P1 * leps[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * leps[mapd(1, 0, 0, 0)]) / dx1;
+    const RealType lepsL = (0.5 * dx_M1 * leps[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * leps[mapd(-1, 0, 0, 0)]) / dx0;
+    // const RealType lepsR = 0.5 * (leps[mapd(0, 0, 0, 0)] + leps[mapd(1, 0, 0, 0)]);
+    // const RealType lepsL = 0.5 * (leps[mapd(-1, 0, 0, 0)] + leps[mapd(0, 0, 0, 0)]);
+
+    const RealType lepsr = (0.5 * dx_P1 * leps[mapd(0, 0, 0, 0)] - 0.5 * dx_0 * leps[mapd(1, 0, 0, 0)]) / dx1;
+    const RealType lepsl = (0.5 * dx_M1 * leps[mapd(-1, 0, 0, 0)] - 0.5 * dx_0 * leps[mapd(0, 0, 0, 0)]) / dx0;
+    // const RealType lepsr = 0.5 * (leps[mapd(0, 0, 0, 0)] - leps[mapd(1, 0, 0, 0)]);
+    // const RealType lepsl = 0.5 * (leps[mapd(-1, 0, 0, 0)] - leps[mapd(0, 0, 0, 0)]);
+
+    return (lepsR * lv[mapd(0, 0, 0, 0)] - lepsL * lv[mapd(-1, 0, 0, 0)]) / dx_0
+           + (parameters.solver.gamma / dx_0
+             ) * (lepsr * fabs(lv[mapd(0, 0, 0, 0)]) - lepsl * fabs(lv[mapd(-1, 0, 0, 0)]));
+    // return (lepsR * lv[mapd(0, 0, 0, 0)] - lepsL * lv[mapd(-1, 0, 0, 0)]) / dx_0
+    //        + (lepsr * fabs(lv[mapd(0, 0, 0, 0)]) - lepsl * fabs(lv[mapd(-1, 0, 0, 0)])) / dx_0;
+  }
+
+  inline RealType dvepsdy(
+    const RealType* const lv, const Parameters& parameters, const RealType* const leps, const RealType* const lm
+  ) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    const RealType lepsT = (0.5 * dy_P1 * leps[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * leps[mapd(0, 1, 0, 0)]) / dy1;
+    const RealType lepsB = (0.5 * dy_M1 * leps[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * leps[mapd(0, -1, 0, 0)]) / dy0;
+    // const RealType lepsT = 0.5 * (leps[mapd(0, 0, 0, 0)] + leps[mapd(0, 1, 0, 0)]);
+    // const RealType lepsB = 0.5 * (leps[mapd(0, 0, 0, 0)] + leps[mapd(0, -1, 0, 0)]);
+
+    const RealType lepst = (0.5 * dy_P1 * leps[mapd(0, 0, 0, 0)] - 0.5 * dy_0 * leps[mapd(0, 1, 0, 0)]) / dy1;
+    const RealType lepsb = (0.5 * dy_M1 * leps[mapd(0, -1, 0, 0)] - 0.5 * dy_0 * leps[mapd(0, 0, 0, 0)]) / dy0;
+    // const RealType lepst = 0.5 * (leps[mapd(0, 0, 0, 0)] - leps[mapd(0, 1, 0, 0)]);
+    // const RealType lepsb = 0.5 * (leps[mapd(0, -1, 0, 0)] - leps[mapd(0, 0, 0, 0)]);
+
+    return (lepsT * lv[mapd(0, 0, 0, 1)] - lepsB * lv[mapd(0, -1, 0, 1)]) / dy_0
+           + (parameters.solver.gamma / dy_0
+             ) * (lepst * fabs(lv[mapd(0, 0, 0, 1)]) - lepsb * fabs(lv[mapd(0, -1, 0, 1)]));
+  }
+
+  inline RealType dfunuTepsd2x(
+    TurbulentFlowFieldKE& flowField,
+    const Parameters&     parameters,
+    const RealType* const lvis,
+    const RealType* const leps,
+    const RealType* const lm,
+    int                   i,
+    int                   j
+  ) {
+    const RealType dx_0  = lm[mapd(0, 0, 0, 0)];
+    const RealType dx_P1 = lm[mapd(1, 0, 0, 0)];
+    const RealType dx_M1 = lm[mapd(-1, 0, 0, 0)];
+    const RealType dx0   = 0.5 * (dx_0 + dx_M1);
+    const RealType dx1   = 0.5 * (dx_0 + dx_P1);
+
+    const RealType depsdxR = (leps[mapd(1, 0, 0, 0)] - leps[mapd(0, 0, 0, 0)]) / dx1;
+    const RealType depsdxL = (leps[mapd(0, 0, 0, 0)] - leps[mapd(-1, 0, 0, 0)]) / dx0;
+
+    const RealType viscR = (0.5 * dx_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(1, 0, 0, 0)]) / dx1;
+    const RealType viscL = (0.5 * dx_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dx_0 * lvis[mapd(-1, 0, 0, 0)]) / dx0;
+
+
+    return (fu(parameters, flowField, i, j) * viscR * depsdxR - fu(parameters, flowField, i, j) * viscL * depsdxL)
+           / dx_0;
+  }
+
+  inline RealType dfunuTepsd2y(
+    TurbulentFlowFieldKE& flowField,
+    const Parameters&     parameters,
+    const RealType* const lvis,
+    const RealType* const leps,
+    const RealType* const lm,
+    int                   i,
+    int                   j
+  ) {
+    const RealType dy_0  = lm[mapd(0, 0, 0, 1)];
+    const RealType dy_P1 = lm[mapd(0, 1, 0, 1)];
+    const RealType dy_M1 = lm[mapd(0, -1, 0, 1)];
+    const RealType dy0   = 0.5 * (dy_0 + dy_M1);
+    const RealType dy1   = 0.5 * (dy_0 + dy_P1);
+
+    const RealType depsdyT = (leps[mapd(0, 1, 0, 0)] - leps[mapd(0, 0, 0, 0)]) / dy1;
+    const RealType depsdyB = (leps[mapd(0, 0, 0, 0)] - leps[mapd(0, -1, 0, 0)]) / dy0;
+
+    const RealType viscT = (0.5 * dy_P1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, 1, 0, 0)]) / dy1;
+    const RealType viscB = (0.5 * dy_M1 * lvis[mapd(0, 0, 0, 0)] + 0.5 * dy_0 * lvis[mapd(0, -1, 0, 0)]) / dy0;
+
+
+    return (fu(parameters, flowField, i, j) * viscT * depsdyT - fu(parameters, flowField, i, j) * viscB * depsdyB)
+           / dy_0;
+  }
+
+  //************************************************************************************************************************//
+
+  // make if tree for FGH turbulent stencil with return values.
   inline RealType computeF2D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
   ) {
@@ -687,6 +1518,47 @@ namespace Stencils {
         + dt * (1 / parameters.flow.Re * (d2udx2(localVelocity, localMeshsize)
             + d2udy2(localVelocity, localMeshsize)) - du2dx(localVelocity, parameters, localMeshsize)
             - duvdy(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
+  }
+
+  inline RealType computeF2D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 0)]
+        + dt * (2*d2udx2(localVelocity, localViscosity, parameters, localMeshsize)
+            + d2udy2(localVelocity, localViscosity, parameters, localMeshsize) + d2vdydx(localVelocity, localViscosity, parameters, localMeshsize) - du2dx(localVelocity, parameters, localMeshsize)
+            - duvdy(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
+  }
+
+  inline RealType computeF2D_turbulent_KE(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localKineticEnergy,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 0)]
+        + dt * (2*d2udx2(localVelocity, localViscosity, parameters, localMeshsize)
+            + d2udy2(localVelocity, localViscosity, parameters, localMeshsize) + d2vdydx(localVelocity, localViscosity, parameters, localMeshsize) - du2dx(localVelocity, parameters, localMeshsize)
+            - duvdy(localVelocity, parameters, localMeshsize) + parameters.environment.gx);//- 2*dkdx(localKineticEnergy, localMeshsize)/3 ;
+  }
+
+  inline RealType computeG2D_turbulent_KE(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localKineticEnergy,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 1)]
+        + dt * ( d2vdx2(localVelocity, localViscosity, parameters, localMeshsize) + d2udxdy(localVelocity, localViscosity, parameters, localMeshsize)
+            + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
+            - dv2dy(localVelocity, parameters, localMeshsize)   + parameters.environment.gy);//- 2*dkdy(localKineticEnergy, localMeshsize)/3 ;
   }
 
   inline RealType computeG2D(
@@ -698,12 +1570,108 @@ namespace Stencils {
             - dv2dy(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
   }
 
+  inline RealType computeG2D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+
+    return localVelocity[mapd(0, 0, 0, 1)]
+        + dt * ( d2vdx2(localVelocity, localViscosity, parameters, localMeshsize) + d2udxdy(localVelocity, localViscosity, parameters, localMeshsize)
+            + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
+            - dv2dy(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
+  }
+
+  inline RealType computek2D(
+    TurbulentFlowFieldKE& flowField,
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localk,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt,
+    int                   i,
+    int                   j
+  ) {
+    if(localk[mapd(0, 0, 0, 0)]
+           + dt
+               * (dnuTkd2x(parameters, localViscosity, localk, localMeshsize) 
+                + dnuTkd2y(parameters, localViscosity, localk, localMeshsize) 
+                - dukdx(localVelocity, parameters, localk, localMeshsize) 
+                - dvkdy(localVelocity, parameters, localk, localMeshsize) 
+                + 0.5 * flowField.getnuT().getScalar(i,j) * (4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize),2)) 
+                - flowField.geteps().getScalar(i, j)) < 1e-6)
+      return 1e-6;
+
+    return localk[mapd(0, 0, 0, 0)]
+           + dt
+               * (dnuTkd2x(parameters, localViscosity, localk, localMeshsize) 
+                + dnuTkd2y(parameters, localViscosity, localk, localMeshsize) 
+                - dukdx(localVelocity, parameters, localk, localMeshsize) 
+                - dvkdy(localVelocity, parameters, localk, localMeshsize) 
+                + 0.5 * flowField.getnuT().getScalar(i,j) * (4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize),2)) 
+                - flowField.geteps().getScalar(i, j));
+  }
+
+  inline RealType computeEpsilon2D(
+    TurbulentFlowFieldKE& flowField,
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localk,
+    const RealType* const localEpsilon,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt,
+    int                   i,
+    int                   j
+  ) {
+    if(localEpsilon[mapd(0, 0, 0, 0)]
+           + dt
+               * ((parameters.turbulent.ce / parameters.turbulent.cmu) 
+               * (dfunuTepsd2x(flowField, parameters, localViscosity, localEpsilon, localMeshsize, i, j) 
+                + dfunuTepsd2y(flowField, parameters, localViscosity, localEpsilon, localMeshsize,i, j)) 
+                - duepsdx(localVelocity, parameters, localEpsilon, localMeshsize) 
+                - dvepsdy(localVelocity, parameters, localEpsilon, localMeshsize)
+                + 0.5*parameters.turbulent.c1*flowField.getk().getScalar(i,j)*f1(parameters, flowField,i,j)*(4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize),2))
+                - parameters.turbulent.c2*f2(parameters, flowField,i,j)*pow(flowField.geteps().getScalar(i,j),2)/flowField.getk().getScalar(i,j)) < 1e-6)
+      return 1e-6;
+
+    return localEpsilon[mapd(0, 0, 0, 0)]
+           + dt
+               * ((parameters.turbulent.ce / parameters.turbulent.cmu) 
+               * (dfunuTepsd2x(flowField, parameters, localViscosity, localEpsilon, localMeshsize, i, j) 
+                + dfunuTepsd2y(flowField, parameters, localViscosity, localEpsilon, localMeshsize,i, j)) 
+                - duepsdx(localVelocity, parameters, localEpsilon, localMeshsize) 
+                - dvepsdy(localVelocity, parameters, localEpsilon, localMeshsize)
+                + 0.5*parameters.turbulent.c1*flowField.getk().getScalar(i,j)*f1(parameters, flowField,i,j)*(4 * pow(dudx(localVelocity, localMeshsize),2) + 2 * pow(dudy(localVelocity, localMeshsize) + dvdx(localVelocity, localMeshsize),2) + 4 * pow(dvdy(localVelocity, localMeshsize) ,2))
+                - parameters.turbulent.c2*f2(parameters, flowField,i,j)*pow(flowField.geteps().getScalar(i,j),2)/flowField.getk().getScalar(i,j));
+  }
+
   inline RealType computeF3D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
   ) {
     return localVelocity[mapd(0, 0, 0, 0)]
         + dt * (1 / parameters.flow.Re * (d2udx2(localVelocity, localMeshsize)
             + d2udy2(localVelocity, localMeshsize) + d2udz2(localVelocity, localMeshsize))
+            - du2dx(localVelocity, parameters, localMeshsize) - duvdy(localVelocity, parameters, localMeshsize)
+            - duwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
+  }
+
+  inline RealType computeF3D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 0)]
+        + dt * (2*d2udx2(localVelocity, localViscosity, parameters, localMeshsize)
+            + d2udy2(localVelocity, localViscosity, parameters, localMeshsize) 
+            + d2udz2(localVelocity, localViscosity, parameters, localMeshsize)  
+            + d2vdydx(localVelocity, localViscosity, parameters, localMeshsize) 
+            + d2wdxdz(localVelocity, localViscosity, parameters, localMeshsize)
             - du2dx(localVelocity, parameters, localMeshsize) - duvdy(localVelocity, parameters, localMeshsize)
             - duwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gx);
   }
@@ -718,6 +1686,23 @@ namespace Stencils {
             - dvwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
   }
 
+  inline RealType computeG3D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 1)]
+        + dt * (d2vdx2(localVelocity, localViscosity, parameters, localMeshsize)            
+              + 2*d2vdy2(localVelocity, localViscosity, parameters, localMeshsize)
+              + d2vdz2(localVelocity, localViscosity, parameters, localMeshsize)
+              + d2udxdy(localVelocity, localViscosity, parameters, localMeshsize)
+              + d2wdydz(localVelocity, localViscosity, parameters, localMeshsize)
+              - dv2dy(localVelocity, parameters, localMeshsize) - duvdx(localVelocity, parameters, localMeshsize)
+              - dvwdz(localVelocity, parameters, localMeshsize) + parameters.environment.gy);
+  }
+
   inline RealType computeH3D(
     const RealType* const localVelocity, const RealType* const localMeshsize, const Parameters& parameters, RealType dt
   ) {
@@ -726,6 +1711,23 @@ namespace Stencils {
             + d2wdy2(localVelocity, localMeshsize) + d2wdz2(localVelocity, localMeshsize))
             - dw2dz(localVelocity, parameters, localMeshsize) - duwdx(localVelocity, parameters, localMeshsize)
             - dvwdy(localVelocity, parameters, localMeshsize) + parameters.environment.gz);
+  }
+
+  inline RealType computeH3D_turbulent(
+    const RealType* const localVelocity,
+    const RealType* const localViscosity,
+    const RealType* const localMeshsize,
+    const Parameters&     parameters,
+    RealType              dt
+  ) {
+    return localVelocity[mapd(0, 0, 0, 1)]
+        + dt * (d2wdx2(localVelocity, localViscosity, parameters, localMeshsize)            
+              + d2wdy2(localVelocity, localViscosity, parameters, localMeshsize)
+              + 2*d2wdz2(localVelocity, localViscosity, parameters, localMeshsize)
+              + d2udzdx(localVelocity, localViscosity, parameters, localMeshsize)
+              + d2vdzdy(localVelocity, localViscosity, parameters, localMeshsize)
+              - dw2dz(localVelocity, parameters, localMeshsize) - duwdx(localVelocity, parameters, localMeshsize)
+              - dvwdy(localVelocity, parameters, localMeshsize) + parameters.environment.gz);
   }
 
 } // namespace Stencils

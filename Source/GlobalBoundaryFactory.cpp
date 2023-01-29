@@ -153,3 +153,185 @@ GlobalBoundaryIterator<FlowField> GlobalBoundaryFactory::getGlobalBoundaryVeloci
     0
   );
 }
+
+GlobalTurbulentBoundaryFactory::GlobalTurbulentBoundaryFactory(Parameters& parameters):
+  parameters_(parameters) {
+  // The parameters will be modified, and therefore are not declared as constants.
+
+  // All stencils are created, disregarding whether they will be used or not. This is less
+  // complicated and doesn't seem that costly.
+
+  moving_[0] = new Stencils::MovingWallKStencil(parameters);
+  moving_[1] = new Stencils::MovingWallEpsilonStencil(parameters);
+
+  outflow_[0] = new Stencils::NeumannKBoundaryStencil(parameters);
+  outflow_[1] = new Stencils::NeumannEpsilonBoundaryStencil(parameters);
+  outflow_[2] = new Stencils::NeumannnuTBoundaryStencil(parameters);
+
+  channelInput_[0] = new Stencils::BFInputKStencil(parameters);
+  channelInput_[1] = new Stencils::BFInputEpsilonStencil(parameters);
+
+  // Then, assign them according to the scenario.
+  std::string scenario = parameters.simulation.scenario;
+
+  if (scenario == "cavity") {
+    // Here, all is about setting the velocity at the boundaries.
+    for (int i = 0; i < 6; i++) {
+      KStencils_[i]       = moving_[0];
+      EpsilonStencils_[i] = moving_[1];
+      nuTStencils_[i]     = outflow_[2];
+    }
+    // parameters.walls.typeLeft   = DIRICHLET;
+    // parameters.walls.typeRight  = DIRICHLET;
+    // parameters.walls.typeBottom = DIRICHLET;
+    // parameters.walls.typeTop    = DIRICHLET;
+    // parameters.walls.typeFront  = DIRICHLET;
+    // parameters.walls.typeBack   = DIRICHLET;
+  } else if (scenario == "channel") {
+    // To the left, we have the input
+    KStencils_[0]       = channelInput_[0];
+    EpsilonStencils_[0] = channelInput_[1];
+    nuTStencils_[0]     = outflow_[2];
+
+    // To the right, there is an outflow boundary
+    KStencils_[1]       = outflow_[0];
+    EpsilonStencils_[1] = outflow_[1];
+    nuTStencils_[1]     = outflow_[2];
+
+    // The other walls are moving walls
+    for (int i = 2; i < 6; i++) {
+      KStencils_[i]       = moving_[0];
+      EpsilonStencils_[i] = outflow_[1];
+      nuTStencils_[i]     = outflow_[2];
+    }
+    // parameters.walls.typeLeft   = DIRICHLET;
+    // parameters.walls.typeRight  = NEUMANN;
+    // parameters.walls.typeBottom = DIRICHLET;
+    // parameters.walls.typeTop    = DIRICHLET;
+    // parameters.walls.typeFront  = DIRICHLET;
+    // parameters.walls.typeBack   = DIRICHLET;
+  } else if (scenario == "pressure-channel") {
+    // We have Dirichlet conditions for pressure on both sides,
+    // hence outflow conditions for the velocities.
+    KStencils_[0]       = outflow_[0];
+    EpsilonStencils_[0] = outflow_[1];
+    nuTStencils_[0]     = outflow_[2];
+
+    // To the right, there is an outflow boundary
+    KStencils_[1]       = outflow_[0];
+    EpsilonStencils_[1] = outflow_[1];
+    nuTStencils_[1]     = outflow_[2];
+
+    // The other walls are moving walls
+    for (int i = 2; i < 6; i++) {
+      KStencils_[i]       = moving_[0];
+      EpsilonStencils_[i] = outflow_[1];
+      nuTStencils_[i]     = outflow_[2];
+    }
+    // parameters.walls.typeLeft   = NEUMANN;
+    // parameters.walls.typeRight  = NEUMANN;
+    // parameters.walls.typeBottom = DIRICHLET;
+    // parameters.walls.typeTop    = DIRICHLET;
+    // parameters.walls.typeFront  = DIRICHLET;
+    // parameters.walls.typeBack   = DIRICHLET;
+    // } else if ((scenario == "periodic-box") || (scenario == "taylor-green")) {
+    //   for (int i = 0; i < 6; i++) {
+    //     KStencils_[i] = periodic_[0];
+    //     EpsilonStencils_[i]      = periodic_[1];
+    //   }
+    //   parameters.walls.typeLeft   = PERIODIC;
+    //   parameters.walls.typeRight  = PERIODIC;
+    //   parameters.walls.typeBottom = PERIODIC;
+    //   parameters.walls.typeTop    = PERIODIC;
+    //   parameters.walls.typeFront  = PERIODIC;
+    //   parameters.walls.typeBack   = PERIODIC;
+    //
+  } else {
+    throw std::runtime_error("Scenario not recognized");
+  }
+}
+
+GlobalTurbulentBoundaryFactory::~GlobalTurbulentBoundaryFactory() {
+  delete moving_[0];
+  delete moving_[1];
+
+  delete outflow_[0];
+  delete outflow_[1];
+  delete outflow_[2];
+
+  delete channelInput_[0];
+  delete channelInput_[1];
+}
+
+GlobalBoundaryIterator<TurbulentFlowFieldKE> GlobalTurbulentBoundaryFactory::getGlobalBoundaryKIterator(
+  TurbulentFlowFieldKE& flowField
+) {
+  if (parameters_.geometry.dim == 2) {
+    return GlobalBoundaryIterator<TurbulentFlowFieldKE>(
+      flowField, parameters_, *(KStencils_[0]), *(KStencils_[1]), *(KStencils_[2]), *(KStencils_[3]), 1, 0
+    );
+  }
+  return GlobalBoundaryIterator<TurbulentFlowFieldKE>(
+    flowField,
+    parameters_,
+    *(KStencils_[0]),
+    *(KStencils_[1]),
+    *(KStencils_[2]),
+    *(KStencils_[3]),
+    *(KStencils_[4]),
+    *(KStencils_[5]),
+    1,
+    0
+  );
+}
+
+GlobalBoundaryIterator<TurbulentFlowFieldKE> GlobalTurbulentBoundaryFactory::getGlobalBoundaryEpsilonIterator(
+  TurbulentFlowFieldKE& flowField
+) {
+  if (parameters_.geometry.dim == 2) {
+    return GlobalBoundaryIterator<TurbulentFlowFieldKE>(
+      flowField,
+      parameters_,
+      *(EpsilonStencils_[0]),
+      *(EpsilonStencils_[1]),
+      *(EpsilonStencils_[2]),
+      *(EpsilonStencils_[3]),
+      1,
+      0
+    );
+  }
+  return GlobalBoundaryIterator<TurbulentFlowFieldKE>(
+    flowField,
+    parameters_,
+    *(EpsilonStencils_[0]),
+    *(EpsilonStencils_[1]),
+    *(EpsilonStencils_[2]),
+    *(EpsilonStencils_[3]),
+    *(EpsilonStencils_[4]),
+    *(EpsilonStencils_[5]),
+    1,
+    0
+  );
+}
+
+GlobalBoundaryIterator<TurbulentFlowFieldKE> GlobalTurbulentBoundaryFactory::getGlobalBoundarynuTIterator(
+  TurbulentFlowFieldKE& flowField
+) {
+  if (parameters_.geometry.dim == 2) {
+    return GlobalBoundaryIterator<TurbulentFlowFieldKE>(
+      flowField, parameters_, *(nuTStencils_[0]), *(nuTStencils_[1]), *(nuTStencils_[2]), *(nuTStencils_[3]), 1, 0
+    );
+  }
+  return GlobalBoundaryIterator<TurbulentFlowFieldKE>(
+    flowField,
+    parameters_,
+    *(nuTStencils_[0]),
+    *(nuTStencils_[1]),
+    *(nuTStencils_[2]),
+    *(nuTStencils_[3]),
+    *(nuTStencils_[4]),
+    *(nuTStencils_[5]),
+    1,
+    0
+  );
+}

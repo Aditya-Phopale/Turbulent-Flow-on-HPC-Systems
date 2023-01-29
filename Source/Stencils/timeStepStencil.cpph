@@ -1,0 +1,50 @@
+#pragma once
+#include "StdAfx.hpp"
+
+#include "Definitions.hpp"
+#include "StencilFunctions.hpp"
+#include "timeStepStencil.hpp"
+
+template <class FlowFieldType>
+Stencils::timeStepStencil<FlowFieldType>::timeStepStencil(const Parameters& parameters):
+  FieldStencil<FlowFieldType>(parameters) {
+  Mindt = parameters.timestep.dt;
+}
+
+template <class FlowFieldType>
+void Stencils::timeStepStencil<FlowFieldType>::apply(FlowFieldType& flowField, int i, int j) {
+  RealType factor
+    = 1.0
+        / (FieldStencil<FlowFieldType>::parameters_.meshsize->getDxMin() * FieldStencil<FlowFieldType>::parameters_.meshsize->getDxMin())
+      + 1.0
+          / (FieldStencil<FlowFieldType>::parameters_.meshsize->getDyMin() * FieldStencil<FlowFieldType>::parameters_.meshsize->getDyMin());
+
+  RealType vtotal = 1 / FieldStencil<FlowFieldType>::parameters_.flow.Re + flowField.getnuT().getScalar(i, j);
+  // std::cout << flowField.getnuT().getScalar(i, j) << "\n";
+  Mindt = std::min(1 / (2 * vtotal * factor), Mindt);
+}
+
+template <class FlowFieldType>
+void Stencils::timeStepStencil<FlowFieldType>::apply(FlowFieldType& flowField, int i, int j, int k) {
+  RealType factor
+    = 1.0
+        / (FieldStencil<FlowFieldType>::parameters_.meshsize->getDxMin() * FieldStencil<FlowFieldType>::parameters_.meshsize->getDxMin())
+      + 1.0
+          / (FieldStencil<FlowFieldType>::parameters_.meshsize->getDyMin() * FieldStencil<FlowFieldType>::parameters_.meshsize->getDyMin())
+      + 1.0
+          / (FieldStencil<FlowFieldType>::parameters_.meshsize->getDzMin() * FieldStencil<FlowFieldType>::parameters_.meshsize->getDzMin());
+
+  Mindt = std::min(
+    (FieldStencil<FlowFieldType>::parameters_.flow.Re + 1 / flowField.getnuT().getScalar(i, j, k)) / (2 * factor), Mindt
+  );
+}
+
+template <class FlowFieldType>
+void Stencils::timeStepStencil<FlowFieldType>::reset() {
+  Mindt = MY_FLOAT_MAX;
+}
+
+template <class FlowFieldType>
+RealType Stencils::timeStepStencil<FlowFieldType>::getDt() {
+  return Mindt;
+}

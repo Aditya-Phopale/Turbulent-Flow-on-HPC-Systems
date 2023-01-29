@@ -396,6 +396,65 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
     //------------------------------------------------------
     // TODO WS2: Turbulence
     //------------------------------------------------------
+    if (parameters.simulation.type == "turbulence") {
+      node = confFile.FirstChildElement()->FirstChildElement("turbulenceParameters");
+      if (node == NULL) {
+        throw std::runtime_error("Error loading turbulence parameters");
+      }
+
+      readFloatMandatory(parameters.turbulent.kappa, node, "kappa");
+      subNode = node->FirstChildElement("boundarylayer");
+      if (subNode != NULL) {
+        readIntMandatory(parameters.turbulent.delta, subNode, "delta");
+      } else {
+        throw std::runtime_error("Missing type in boundary layer");
+      }
+    }
+    if (parameters.simulation.type == "turbulenceKE") {
+      node = confFile.FirstChildElement()->FirstChildElement("turbulenceParameters");
+      if (node == NULL) {
+        throw std::runtime_error("Error loading turbulence parameters");
+      }
+
+      readFloatMandatory(parameters.turbulent.kappa, node, "kappa");
+
+      subNode = node->FirstChildElement("boundarylayer");
+      if (subNode != NULL) {
+        readIntMandatory(parameters.turbulent.delta, subNode, "delta");
+      } else {
+        throw std::runtime_error("Missing type in boundary layer");
+      }
+      subNode = node->FirstChildElement("constant1");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.cmu, subNode, "cmu");
+      } else {
+        throw std::runtime_error("Missing constant cmu");
+      }
+      subNode = node->FirstChildElement("constant2");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.ce, subNode, "ce");
+      } else {
+        throw std::runtime_error("Missing constant ce");
+      }
+      subNode = node->FirstChildElement("constant3");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.c1, subNode, "c1");
+      } else {
+        throw std::runtime_error("Missing constant c1");
+      }
+      subNode = node->FirstChildElement("constant4");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.c2, subNode, "c2");
+      } else {
+        throw std::runtime_error("Missing constant c2");
+      }
+      subNode = node->FirstChildElement("constant5");
+      if (subNode != NULL) {
+        readFloatMandatory(parameters.turbulent.I, subNode, "I");
+      } else {
+        throw std::runtime_error("Missing constant I");
+      }
+    }
   }
 
   // Broadcasting of the values
@@ -454,4 +513,14 @@ void Configuration::loadParameters(Parameters& parameters, const MPI_Comm& commu
   MPI_Bcast(parameters.walls.vectorBack, 3, MY_MPI_FLOAT, 0, communicator);
 
   // TODO WS2: broadcast turbulence parameters
+  if (parameters.simulation.scenario == "turbulence") {
+    MPI_Bcast(&(parameters.turbulent.kappa), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.turbulent.delta), 1, MPI_INT, 0, communicator);
+  } else if (parameters.simulation.scenario == "turbulenceKE") {
+    MPI_Bcast(&(parameters.turbulent.c1), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.turbulent.c2), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.turbulent.ce), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.turbulent.cmu), 1, MY_MPI_FLOAT, 0, communicator);
+    MPI_Bcast(&(parameters.turbulent.I), 1, MY_MPI_FLOAT, 0, communicator);
+  }
 }

@@ -5,6 +5,8 @@
 #include "GlobalBoundaryFactory.hpp"
 #include "Iterators.hpp"
 
+#include "ParallelManagers/PetscParallelManager.cpph"
+#include "ParallelManagers/PetscParallelManager.hpp"
 #include "Solvers/LinearSolver.hpp"
 #include "Stencils/BFInputStencils.hpp"
 #include "Stencils/BFStepInitStencil.hpp"
@@ -49,6 +51,8 @@ protected:
 
   virtual void setTimeStep();
 
+  ParallelManagers::PetscParallelManager<FlowField> ppm_;
+
 public:
   Simulation(Parameters& parameters, FlowField& flowField);
   virtual ~Simulation() = default;
@@ -57,6 +61,10 @@ public:
   virtual void initializeFlowField();
 
   virtual void solveTimestep();
+
+  virtual void hUpdate() {}
+
+  virtual void nuTUpdate() {}
 
   /** Plots the flow field */
   virtual void plotVTK(int timeStep, RealType simulationTime);

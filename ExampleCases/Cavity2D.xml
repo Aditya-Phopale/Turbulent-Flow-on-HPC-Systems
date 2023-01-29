@@ -5,6 +5,7 @@
         <type>dns</type>
         <scenario>cavity</scenario>
     </simulation>
+    <turbulenceParameters kappa = "0.41"/>
     <timestep dt="1" tau="0.5" />
     <solver gamma="0.5" />
     <geometry dim="2"

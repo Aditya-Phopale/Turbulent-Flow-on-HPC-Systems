@@ -14,7 +14,8 @@ Parameters::Parameters():
   parallel{},
   stdOut{},
   bfStep{},
-  meshsize(NULL) {}
+  meshsize(NULL),
+  turbulent{} {}
 
 Parameters::~Parameters() {
   if (meshsize != NULL) {
